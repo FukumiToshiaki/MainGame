@@ -1,0 +1,248 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="system">
+      <UniqueIdentifier>{22dd8095-74f9-46df-81a1-36675a040b1f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Boss">
+      <UniqueIdentifier>{0a7a9a47-d4a8-4f81-b083-a1429f8d6186}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Player">
+      <UniqueIdentifier>{eb687341-5d5f-4615-8375-d396ec680012}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="LongEnemy">
+      <UniqueIdentifier>{05da36a6-6a58-4140-8340-a46a0a82425a}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="stdafx.cpp" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="system\system.cpp">
+      <Filter>system</Filter>
+    </ClCompile>
+    <ClCompile Include="Game.cpp" />
+    <ClCompile Include="Map.cpp" />
+    <ClCompile Include="Light_Test.cpp" />
+    <ClCompile Include="Enemy_Shield.cpp" />
+    <ClCompile Include="Enemy_Melee.cpp" />
+    <ClCompile Include="Enemy_Sky.cpp" />
+    <ClCompile Include="BossState_Idle.cpp">
+      <Filter>Boss</Filter>
+    </ClCompile>
+    <ClCompile Include="BossState_Walk.cpp">
+      <Filter>Boss</Filter>
+    </ClCompile>
+    <ClCompile Include="IBossState.cpp">
+      <Filter>Boss</Filter>
+    </ClCompile>
+    <ClCompile Include="Enemy_Boss.cpp">
+      <Filter>Boss</Filter>
+    </ClCompile>
+    <ClCompile Include="BossState_Biting.cpp">
+      <Filter>Boss</Filter>
+    </ClCompile>
+    <ClCompile Include="BossState_Shoot.cpp">
+      <Filter>Boss</Filter>
+    </ClCompile>
+    <ClCompile Include="BossState_Rest.cpp">
+      <Filter>Boss</Filter>
+    </ClCompile>
+    <ClCompile Include="Player.cpp">
+      <Filter>Player</Filter>
+    </ClCompile>
+    <ClCompile Include="IPlayer_State.cpp">
+      <Filter>Player</Filter>
+    </ClCompile>
+    <ClCompile Include="PlayerState_Idle.cpp">
+      <Filter>Player</Filter>
+    </ClCompile>
+    <ClCompile Include="PlayerState_AttackBiting.cpp">
+      <Filter>Player</Filter>
+    </ClCompile>
+    <ClCompile Include="PlayerState_Walk.cpp">
+      <Filter>Player</Filter>
+    </ClCompile>
+    <ClCompile Include="BossState_Damage.cpp">
+      <Filter>Boss</Filter>
+    </ClCompile>
+    <ClCompile Include="PlayerState_Defense.cpp">
+      <Filter>Player</Filter>
+    </ClCompile>
+    <ClCompile Include="PlayerState_GuardBreak.cpp">
+      <Filter>Player</Filter>
+    </ClCompile>
+    <ClCompile Include="PlayerState_WalkAttack.cpp">
+      <Filter>Player</Filter>
+    </ClCompile>
+    <ClCompile Include="BossState_Tail.cpp">
+      <Filter>Boss</Filter>
+    </ClCompile>
+    <ClCompile Include="PlayerState_Damage.cpp">
+      <Filter>Player</Filter>
+    </ClCompile>
+    <ClCompile Include="PlayerCamera.cpp">
+      <Filter>Player</Filter>
+    </ClCompile>
+    <ClCompile Include="PlayerStatus.cpp">
+      <Filter>Player</Filter>
+    </ClCompile>
+    <ClCompile Include="Title.cpp" />
+    <ClCompile Include="GameOver.cpp" />
+    <ClCompile Include="GameClear.cpp" />
+    <ClCompile Include="BossState_FlyAttack.cpp">
+      <Filter>Boss</Filter>
+    </ClCompile>
+    <ClCompile Include="BossState_Scream.cpp">
+      <Filter>Boss</Filter>
+    </ClCompile>
+    <ClCompile Include="Enemy_Long.cpp">
+      <Filter>LongEnemy</Filter>
+    </ClCompile>
+    <ClCompile Include="PlayerState_AttackLong.cpp">
+      <Filter>Player</Filter>
+    </ClCompile>
+    <ClCompile Include="ILongState.cpp">
+      <Filter>LongEnemy</Filter>
+    </ClCompile>
+    <ClCompile Include="EnemyBase.cpp" />
+    <ClCompile Include="BossPattern.cpp">
+      <Filter>Boss</Filter>
+    </ClCompile>
+    <ClCompile Include="BossStatus.cpp">
+      <Filter>Boss</Filter>
+    </ClCompile>
+    <ClCompile Include="BossState_Fly.cpp">
+      <Filter>Boss</Filter>
+    </ClCompile>
+    <ClCompile Include="BossState_Landing.cpp">
+      <Filter>Boss</Filter>
+    </ClCompile>
+    <ClCompile Include="BossState_Takeoff.cpp">
+      <Filter>Boss</Filter>
+    </ClCompile>
+    <ClCompile Include="BossState_Die.cpp">
+      <Filter>Boss</Filter>
+    </ClCompile>
+    <ClCompile Include="BossState_FlyShoot.cpp">
+      <Filter>Boss</Filter>
+    </ClCompile>
+    <ClCompile Include="PlayerState_Die.cpp">
+      <Filter>Player</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="stdafx.h" />
+    <ClInclude Include="system\system.h">
+      <Filter>system</Filter>
+    </ClInclude>
+    <ClInclude Include="Game.h" />
+    <ClInclude Include="Map.h" />
+    <ClInclude Include="Light_Test.h" />
+    <ClInclude Include="Enemy_Shield.h" />
+    <ClInclude Include="Enemy_Melee.h" />
+    <ClInclude Include="Enemy_Sky.h" />
+    <ClInclude Include="BossState_Idle.h">
+      <Filter>Boss</Filter>
+    </ClInclude>
+    <ClInclude Include="BossState_Walk.h">
+      <Filter>Boss</Filter>
+    </ClInclude>
+    <ClInclude Include="IBossState.h">
+      <Filter>Boss</Filter>
+    </ClInclude>
+    <ClInclude Include="Enemy_Boss.h">
+      <Filter>Boss</Filter>
+    </ClInclude>
+    <ClInclude Include="BossState_Biting.h">
+      <Filter>Boss</Filter>
+    </ClInclude>
+    <ClInclude Include="BossState_Shoot.h">
+      <Filter>Boss</Filter>
+    </ClInclude>
+    <ClInclude Include="BossState_Rest.h">
+      <Filter>Boss</Filter>
+    </ClInclude>
+    <ClInclude Include="Player.h">
+      <Filter>Player</Filter>
+    </ClInclude>
+    <ClInclude Include="IPlayer_State.h">
+      <Filter>Player</Filter>
+    </ClInclude>
+    <ClInclude Include="PlayerState_Idle.h">
+      <Filter>Player</Filter>
+    </ClInclude>
+    <ClInclude Include="PlayerState_AttackBiting.h">
+      <Filter>Player</Filter>
+    </ClInclude>
+    <ClInclude Include="PlayerState_Walk.h">
+      <Filter>Player</Filter>
+    </ClInclude>
+    <ClInclude Include="BossState_Damage.h">
+      <Filter>Boss</Filter>
+    </ClInclude>
+    <ClInclude Include="PlayerState_Defense.h">
+      <Filter>Player</Filter>
+    </ClInclude>
+    <ClInclude Include="PlayerState_GuardBreak.h">
+      <Filter>Player</Filter>
+    </ClInclude>
+    <ClInclude Include="PlayerState_WalkAttack.h">
+      <Filter>Player</Filter>
+    </ClInclude>
+    <ClInclude Include="BossState_Tail.h">
+      <Filter>Boss</Filter>
+    </ClInclude>
+    <ClInclude Include="PlayerCamera.h">
+      <Filter>Player</Filter>
+    </ClInclude>
+    <ClInclude Include="PlayerState_Damage.h">
+      <Filter>Player</Filter>
+    </ClInclude>
+    <ClInclude Include="PlayerStatus.h">
+      <Filter>Player</Filter>
+    </ClInclude>
+    <ClInclude Include="Title.h" />
+    <ClInclude Include="GameOver.h" />
+    <ClInclude Include="GameClear.h" />
+    <ClInclude Include="BossState_Scream.h">
+      <Filter>Boss</Filter>
+    </ClInclude>
+    <ClInclude Include="BossState_FlyAttack.h">
+      <Filter>Boss</Filter>
+    </ClInclude>
+    <ClInclude Include="Enemy_Long.h">
+      <Filter>LongEnemy</Filter>
+    </ClInclude>
+    <ClInclude Include="PlayerState_AttackLong.h">
+      <Filter>Player</Filter>
+    </ClInclude>
+    <ClInclude Include="ILongState.h">
+      <Filter>LongEnemy</Filter>
+    </ClInclude>
+    <ClInclude Include="EnemyBase.h" />
+    <ClInclude Include="BossPattern.h">
+      <Filter>Boss</Filter>
+    </ClInclude>
+    <ClInclude Include="BossStatus.h">
+      <Filter>Boss</Filter>
+    </ClInclude>
+    <ClInclude Include="BossState_Fly.h">
+      <Filter>Boss</Filter>
+    </ClInclude>
+    <ClInclude Include="BossState_Landing.h">
+      <Filter>Boss</Filter>
+    </ClInclude>
+    <ClInclude Include="BossState_Takeoff.h">
+      <Filter>Boss</Filter>
+    </ClInclude>
+    <ClInclude Include="BossState_Die.h">
+      <Filter>Boss</Filter>
+    </ClInclude>
+    <ClInclude Include="BossState_FlyShoot.h">
+      <Filter>Boss</Filter>
+    </ClInclude>
+    <ClInclude Include="PlayerState_Die.h">
+      <Filter>Player</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
