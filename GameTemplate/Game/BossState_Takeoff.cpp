@@ -9,6 +9,7 @@ void BossState_Takeoff::Animation()
 	);
 	if (m_enemy_Boss->GetIsPlayingAnimation() == false && m_enemy_Boss->GetisTakeoff()) {
 		m_enemy_Boss->SetisFly(true);
+		m_enemy_Boss->SetisTakeoff(false);
 	}
 }
 
@@ -17,5 +18,4 @@ void BossState_Takeoff::Update()
 	if (m_enemy_Boss->GetisFly()) {
 		m_enemy_Boss->ChangeState(Enemy_Boss::enState_Fly);
 	}
-	m_enemy_Boss->SetisTakeoff(false);
 }

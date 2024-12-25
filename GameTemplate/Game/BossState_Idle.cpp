@@ -27,9 +27,9 @@ void BossState_Idle::Update()
 	if (m_enemy_Boss->GetisTail()) {
 		m_enemy_Boss->ChangeState(Enemy_Boss::enState_Attack_Tail);
 	}
-	//if (m_enemy_Boss->GetisTakeoff()) {
-	//	m_enemy_Boss->ChangeState(Enemy_Boss::enState_Takeoff);
-	//}
+	if (m_enemy_Boss->GetisTakeoff()) {
+		m_enemy_Boss->ChangeState(Enemy_Boss::enState_Takeoff);
+	}
 	if (m_enemy_Boss->GetisScream()){
 		m_enemy_Boss->ChangeState(Enemy_Boss::enState_Attack_Scream);
 	}
