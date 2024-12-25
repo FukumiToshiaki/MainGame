@@ -13,7 +13,7 @@
 #define MELEE_ATTACK 0
 #define TAIL_ATTACK 13
 #define FLY 20
-#define SHOOT_ATTACK 17
+#define MELEE_SHOOT_ATTACK 17
 #define MELEE_POINT 25
 #define ATTACK_COOLTIME 6.0f
 #define MELEE_DISTANCE 550.0f
@@ -35,8 +35,17 @@ bool BossPattern::Start()
 void BossPattern::Update()
 {
 	CoolTime();
+
 	MeleePattern();
-	Melee();
+	LongPattern();
+	//trueなら近距離に行く
+	if (m_isBifurcation) {
+		Melee();
+	}
+	//falseなら遠距離に行く
+	else {
+		Long();
+	}
 	// 基底クラスのUpdateを呼ぶ
 	Enemy_Boss::Update();
 }
@@ -74,6 +83,26 @@ int BossPattern::MeleePattern()
 	m_diff.Normalize();
 	if (m_distance.Length() <= MELEE_DISTANCE) {
 		m_isDistance = false;
+		if (m_isUnderPattern && m_distance.Length() <= MELEE_DISTANCE) {
+			//trueなら近距離
+			m_isBifurcation = true;
+			//第1段階
+			if (m_testHP > FIRST_PHASE) {
+				return 0;
+			}
+			//第2段階
+			else if (m_testHP > SECOND_PHASE) {
+				return 1;
+			}
+			//第3段階
+			else if (m_testHP > FINAL_PHASE) {
+				return 2;
+			}
+			//第4段階
+			else {
+				return 3;
+			}
+		}
 	}
 	//プレイヤーとの距離が一定以下なら追跡　遠距離攻撃フラグを無しに
 	else if (m_distance.Length() <= DISTANCE_POS) {
@@ -83,24 +112,6 @@ int BossPattern::MeleePattern()
 	}
 	else {
 		m_shootStandTime -= g_gameTime->GetFrameDeltaTime();
-	}
-	if (m_isUnderPattern && m_distance.Length() <= MELEE_DISTANCE) {
-		//第1段階
-		if (m_testHP > FIRST_PHASE) {
-			return 0;
-		}
-		//第2段階
-		else if (m_testHP > SECOND_PHASE) {
-			return 1;
-		}
-		//第3段階
-		else if (m_testHP > FINAL_PHASE) {
-			return 2;
-		}
-		//第4段階
-		else {
-			return 3;
-		}
 	}
 }
 
@@ -133,9 +144,9 @@ void BossPattern::Melee()
 	m_attack_Rand += rand() % 10;
 
 	if (m_attack_Rand >= FLY) {
-		m_isFly = true;
+		m_isTakeoff = true;
 	}
-	else if (m_attack_Rand >= SHOOT_ATTACK) {
+	else if (m_attack_Rand >= MELEE_SHOOT_ATTACK) {
 		m_isShoot = true;
 		m_moveSpeed = { 0.0f,0.0f,0.0f };
 		m_moveSpeed = m_diff;
@@ -185,49 +196,68 @@ void BossPattern::Melee()
 
 }
 
-//int BossPattern::LongPattern()
-//{
-//	if (m_shootStandTime <= 0.0f) {
-//		if (m_testHP > FIRST_PHASE) {
-//			return 0;
-//		}
-//		//第2段階
-//		else if (m_testHP > SECOND_PHASE) {
-//			return 1;
-//		}
-//		//第3段階
-//		else if (m_testHP > FINAL_PHASE) {
-//			return 2;
-//		}
-//		//第4段階
-//		else {
-//			return 3;
-//		}
-//		m_shootStandTime = ATTACK_COOLTIME;
-//	}
-//}
+int BossPattern::LongPattern()
+{
+	if (m_shootStandTime <= 0.0f) {
+		m_isBifurcation = false;
+		if (m_testHP > FIRST_PHASE) {
+			return 0;
+		}
+		//第2段階
+		else if (m_testHP > SECOND_PHASE) {
+			return 1;
+		}
+		//第3段階
+		else if (m_testHP > FINAL_PHASE) {
+			return 2;
+		}
+		//第4段階
+		else {
+			return 3;
+		}
+	}
+}
 
-//void BossPattern::Long()
-//{
-//	m_shootPoint = this->LongPattern();
-//	switch (m_shootPoint)
-//	{
-//	case 0:
-//		m_attack_Rand = rand() % 10;
-//		break;
-//	case 1:
-//		m_attack_Rand = rand() % 8;
-//		break;
-//	case 2:
-//		m_attack_Rand = rand() % 6;
-//		break;
-//	case 3:
-//		m_attack_Rand = rand() % 4;
-//		break;
-//	}
-//
-//	if (m_attack_Rand == 0) {
-//
-//	}
-//}
+void BossPattern::Long()
+{
 
+	//フラグが立っていないなら計算する必要がないので、早期リターン
+	if (!m_isUnderPattern) {
+		return;
+	}
+
+	m_shootPoint = this->LongPattern();
+	switch (m_shootPoint)
+	{
+	case 0:
+		m_attack_Rand += 12;
+		break;
+	case 1:
+		m_attack_Rand += 13;
+		break;
+	case 2:
+		m_attack_Rand += 14;
+		break;
+	case 3:
+		m_attack_Rand += 16;
+		break;
+	}
+
+	m_attack_Rand += rand() % 10;
+
+	//FLY以上なら空を飛び、別パターンに入る
+	if (m_attack_Rand >= FLY) {
+		m_isTakeoff = true;
+	}
+	//FLY以下なら遠距離から攻撃する
+	else {
+			m_moveSpeed = { 0.0f,0.0f,0.0f };
+			m_isDistance = false;
+			m_isShoot = true;
+			m_moveSpeed = m_diff;
+	}
+	m_meleeAttackCoolTime = ATTACK_COOLTIME;
+	m_attack_Rand = 0;
+	m_isUnderPattern = false;
+
+}

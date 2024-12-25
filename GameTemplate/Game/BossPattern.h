@@ -53,9 +53,9 @@ private:
 	Player* m_player = nullptr;
 	
 	/// <summary>
-	/// •Ï”
+	/// bool
 	/// </summary>
-
+	bool m_isBifurcation = false;
 
 	/// <summary>
 	/// •Ï”
