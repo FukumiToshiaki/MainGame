@@ -255,6 +255,7 @@ protected:
 	Vector3						m_scale = Vector3::One;			//大きさ。
 	Vector3		m_forward = Vector3::AxisZ;					//エネミーの正面ベクトル。
 	Vector3 m_collisionPos;
+	Vector3 m_flyPos;
 	/// <summary>
 	/// クラス
 	/// </summary>
@@ -265,6 +266,7 @@ protected:
 	int m_attack_Rand = -1;
 	int m_attack_Count = -1;
 	int m_testHP = 7;
+	int m_flyBoneId;
 	float m_angle = 0.0f;
 	float m_radius = 2.0f;
 	/// <summary>
@@ -293,6 +295,7 @@ protected:
 	ModelRender m_modelRender;
 	Player* m_player = nullptr;
 	CollisionObject* m_collision = nullptr;
+	CollisionObject* m_flyPosCollision = nullptr;
 	Game* m_game = nullptr;
 	IBossState* m_Iboss_State = nullptr;
 	Animation m_animation;	// アニメーション

@@ -113,6 +113,8 @@ bool Enemy_Boss::Start()
 	ChangeState(enState_Idle);
 	//PhysicsWorld::GetInstance()->EnableDrawDebugWireFrame();
 
+	//空を飛んでいるときのボーンを受け取る
+	//m_flyBoneId = m_modelRender.FindBoneID(L"m_pos");
 	return true;
 }
 
@@ -469,6 +471,13 @@ void Enemy_Boss::Update()
 	m_collision->SetPosition(m_collisionPos);
 	m_collision->Update();
 	m_modelRender.Update();
+	//ボーンの座標を受け取るプログラムテスト
+//Matrix matrix = m_modelRender.GetBone(m_flyBoneId)->GetWorldMatrix();
+//m_flyPosCollision->SetPosition(m_flyPos);
+//m_flyPosCollision->SetRotation(m_rotation);
+//m_flyPosCollision->Update();
+//m_flyPosCollision->SetWorldMatrix(matrix);
+
 }
 
 void Enemy_Boss::Render(RenderContext& rc)
