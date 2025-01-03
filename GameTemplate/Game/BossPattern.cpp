@@ -81,27 +81,25 @@ int BossPattern::MeleePattern()
 	m_distance = m_player->Get_PlayerPos() - m_pos;
 	m_diff = m_player->Get_PlayerPos() - m_pos;
 	m_diff.Normalize();
-	if (m_distance.Length() <= MELEE_DISTANCE) {
+	if (m_isUnderPattern && m_distance.Length() <= MELEE_DISTANCE) {
 		m_isDistance = false;
-		if (m_isUnderPattern && m_distance.Length() <= MELEE_DISTANCE) {
-			//trueなら近距離
-			m_isBifurcation = true;
-			//第1段階
-			if (m_testHP > FIRST_PHASE) {
-				return 0;
-			}
-			//第2段階
-			else if (m_testHP > SECOND_PHASE) {
-				return 1;
-			}
-			//第3段階
-			else if (m_testHP > FINAL_PHASE) {
-				return 2;
-			}
-			//第4段階
-			else {
-				return 3;
-			}
+		//trueなら近距離
+		m_isBifurcation = true;
+		//第1段階
+		if (m_testHP > FIRST_PHASE) {
+			return 0;
+		}
+		//第2段階
+		else if (m_testHP > SECOND_PHASE) {
+			return 1;
+		}
+		//第3段階
+		else if (m_testHP > FINAL_PHASE) {
+			return 2;
+		}
+		//第4段階
+		else {
+			return 3;
 		}
 	}
 	//プレイヤーとの距離が一定以下なら追跡　遠距離攻撃フラグを無しに

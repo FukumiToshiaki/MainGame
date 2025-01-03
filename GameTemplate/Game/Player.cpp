@@ -20,7 +20,7 @@
 
 #define START_POS_X 0.0f
 #define START_POS_Y 0.0f
-#define START_POS_Z -900.0f
+#define START_POS_Z -2000.0f
 #define PLAYER_MOVESPEED 500.0f
 #define SCALE 2.0f
 
