@@ -15,7 +15,7 @@ void BossState_Takeoff::Animation()
 
 void BossState_Takeoff::Update()
 {
-	if (m_enemy_Boss->GetisFly()) {
+	if (m_enemy_Boss->GetisFly()&&!m_enemy_Boss->GetisTakeoff()) {
 		m_enemy_Boss->ChangeState(Enemy_Boss::enState_Fly);
 	}
 }

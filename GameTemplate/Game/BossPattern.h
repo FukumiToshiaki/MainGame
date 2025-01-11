@@ -42,11 +42,17 @@ public:
 	bool Start();
 	void Update();
 	void CoolTime();
-	int MeleePattern();
-	void Melee();
-	int LongPattern();
+	void DistancePattern();
+	void AttackModeLast();
+	void DefenseModeLast();
 	void Long();
 
+	int BossPatternMode();
+	void SuperDefenseMode();
+	void DefenseMode();
+	void NormalMode();
+	void AttackMode();
+	void SuperAttackMode();
 
 private:
 	Enemy_Boss* m_enemy_Boss = nullptr;
@@ -60,10 +66,10 @@ private:
 	/// <summary>
 	/// ïœêî
 	/// </summary>
-	float m_meleeAttackCoolTime = 5.0f;
-	float m_shootStandTime = 3.0f;
+	float m_coolTime = 5.0f;
+	float m_coolTimeLastMode = 3.0f;
 	float m_shootAttack = 4.0f;
-	int m_meleePoint = 0;
+	int m_pattern = 0;
 	int m_shootPoint = 0;
 
 	/// <summary>

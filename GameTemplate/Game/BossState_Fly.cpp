@@ -9,7 +9,7 @@ void BossState_Fly::Animation()
 	);
 	if (/*m_enemy_Boss->GetIsPlayingAnimation() == false &&*/ m_enemy_Boss->GetisFly()) {
 		//m_enemy_Boss->SetisLanding(true);
-		m_enemy_Boss->SetisFlyAttack(true);
+		//m_enemy_Boss->SetisFlyAttack(true);
 		//m_enemy_Boss->SetisFlyShoot(true);
 		m_enemy_Boss->SetisFly(false);
 	}
@@ -17,14 +17,13 @@ void BossState_Fly::Animation()
 
 void BossState_Fly::Update()
 {
-	if (m_enemy_Boss->GetisFlyAttack()) {
+	if (m_enemy_Boss->GetisFlyAttack()&& !m_enemy_Boss->GetisFly()) {
 		m_enemy_Boss->ChangeState(Enemy_Boss::enState_Attack_Fly);
-		m_enemy_Boss->SetisFly(false);
 	}
-	if (m_enemy_Boss->GetisFlyShoot()) {
+	else if (m_enemy_Boss->GetisFlyShoot()&& !m_enemy_Boss->GetisFly()) {
 		m_enemy_Boss->ChangeState(Enemy_Boss::enState_Attack_FlyShoot);
 	}
-	if (m_enemy_Boss->GetisLanding()) {
+	else if (!m_enemy_Boss->GetisFly()) {
 		m_enemy_Boss->ChangeState(Enemy_Boss::enState_Landing);
 	}
 }

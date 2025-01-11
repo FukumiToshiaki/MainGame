@@ -224,6 +224,16 @@ public:
 		m_isClear = Clear;
 	}
 
+	bool GetisDefence()
+	{
+		return m_isDefence;
+	}
+
+	void SetisDefence(bool Defence)
+	{
+		m_isDefence = Defence;
+	}
+
 	void SetUnderMelee(bool UnderMelee)
 	{
 		m_isUnderAttackMelee = UnderMelee;
@@ -244,7 +254,19 @@ public:
 		m_isUnderPattern = Pattern;
 	}
 
+	void SetMoveSpeed(Vector3 movespeed)
+	{
+		m_moveSpeed = movespeed;
+	}
 
+	Vector3 GetDiff()
+	{
+		return m_diff;
+	}
+	//void SetDiff(Vector3 diff)
+	//{
+	//	m_diff = diff;
+	//}
 protected:
 	/// <summary>
 	/// ベクター
@@ -263,10 +285,10 @@ protected:
 	/// <summary>
 	/// 変数
 	/// </summary>
-	int m_attack_Rand = -1;
+	int m_attack_Rand = 0;
 	int m_attack_Count = -1;
-	int m_testHP = 7;
-	int m_flyBoneId;
+	int m_testHP = 1;
+	int m_flyBoneId = 0;
 	float m_angle = 0.0f;
 	float m_radius = 2.0f;
 	/// <summary>
@@ -279,6 +301,7 @@ protected:
 	bool m_isFlyShoot = false;
 	bool m_isRest = false;
 	bool m_isDamage = false;
+	bool m_isDefence = false;
 	bool m_isTail = false;
 	bool m_isFlyAttack = false;
 	bool m_isTakeoff = false;

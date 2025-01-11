@@ -16,6 +16,9 @@ void BossState_Shoot::Animation()
 
 void BossState_Shoot::Update()
 {
+	m_enemy_Boss->SetMoveSpeed(Vector3::Zero);
+	m_enemy_Boss->SetMoveSpeed(m_enemy_Boss->GetDiff());
+
 	if (m_enemy_Boss->GetisDamage()) {
 		m_enemy_Boss->ChangeState(Enemy_Boss::enState_Damage);
 	}

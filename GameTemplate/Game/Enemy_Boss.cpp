@@ -18,6 +18,7 @@
 #include "BossState_FlyShoot.h"
 #include "BossState_Scream.h"
 #include "BossState_Die.h"
+#include "BossState_Defence.h"
 
 #define START_POS_X 0.0f
 #define START_POS_Y 0.0f
@@ -64,12 +65,12 @@ bool Enemy_Boss::Start()
 	m_animationClipArray[enState_Attack_Scream].SetLoopFlag(false);
 	m_animationClipArray[enState_Attack_FlyShoot].SetLoopFlag(false);
 	m_animationClipArray[enState_Damage].SetLoopFlag(false);
-	m_animationClipArray[enState_Defence].SetLoopFlag(true);
+	m_animationClipArray[enState_Defence].SetLoopFlag(false);
 	m_animationClipArray[enState_Rest].SetLoopFlag(true);
 	m_animationClipArray[enState_Move].SetLoopFlag(true);
 	m_animationClipArray[enState_Die].SetLoopFlag(false);
 	m_animationClipArray[enState_Fly].SetLoopFlag(true);
-	m_animationClipArray[enState_Attack_Fly].SetLoopFlag(true);
+	m_animationClipArray[enState_Attack_Fly].SetLoopFlag(false);
 	m_animationClipArray[enState_Takeoff].SetLoopFlag(false);
 	m_animationClipArray[enState_Landing].SetLoopFlag(false);
 
@@ -114,7 +115,7 @@ bool Enemy_Boss::Start()
 	//PhysicsWorld::GetInstance()->EnableDrawDebugWireFrame();
 
 	//空を飛んでいるときのボーンを受け取る
-	//m_flyBoneId = m_modelRender.FindBoneID(L"m_pos");
+	m_flyBoneId = m_modelRender.FindBoneID(L"ValleyFat");
 	return true;
 }
 
@@ -388,6 +389,7 @@ void Enemy_Boss::ChangeState(EnState changeState)
 		m_Iboss_State = new BossState_Damage(this);
 		break;
 	case Enemy_Boss::enState_Defence:
+		m_Iboss_State = new BossState_Defence(this);
 		break;
 	case Enemy_Boss::enState_Rest:
 		break;
@@ -428,16 +430,13 @@ void Enemy_Boss::Update()
 	switch (m_attack_Rand)
 	{
 	case 0:
-		Biting();
 		break;
 	case 1:
 		Shoot();
 		break;
 	case 2:
-		TailAttack();
 		break;
 	case 3:
-		FlyAttack();
 		break;
 	}*/
 	//コリジョンの当たり判定
@@ -465,6 +464,9 @@ void Enemy_Boss::Update()
 	Rotation();
 	Hit();
 	Move();
+	Biting();
+	TailAttack();
+	FlyAttack();
 	m_modelRender.SetRotation(m_rotation);
 	m_skeleton.Update(m_model.GetWorldMatrix());
 	m_modelRender.SetPosition(m_pos);
@@ -472,11 +474,11 @@ void Enemy_Boss::Update()
 	m_collision->Update();
 	m_modelRender.Update();
 	//ボーンの座標を受け取るプログラムテスト
-//Matrix matrix = m_modelRender.GetBone(m_flyBoneId)->GetWorldMatrix();
-//m_flyPosCollision->SetPosition(m_flyPos);
-//m_flyPosCollision->SetRotation(m_rotation);
-//m_flyPosCollision->Update();
-//m_flyPosCollision->SetWorldMatrix(matrix);
+Matrix matrix = m_modelRender.GetBone(m_flyBoneId)->GetWorldMatrix();
+m_collision->SetPosition(m_pos);
+m_collision->SetRotation(m_rotation);
+m_collision->Update();
+m_collision->SetWorldMatrix(matrix);
 
 }
 

@@ -14,6 +14,8 @@ void BossState_Tail::Animation()
 
 void BossState_Tail::Update()
 {
+	m_enemy_Boss->SetMoveSpeed(m_enemy_Boss->GetDiff());
+
 	if (m_enemy_Boss->GetisDamage()) {
 		m_enemy_Boss->ChangeState(Enemy_Boss::enState_Damage);
 		//m_enemy_Boss->SetisTail(false);

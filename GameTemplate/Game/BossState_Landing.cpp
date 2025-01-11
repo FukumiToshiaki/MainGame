@@ -16,7 +16,7 @@ void BossState_Landing::Animation()
 
 void BossState_Landing::Update()
 {
-	if (m_enemy_Boss->GetisIdle()) {
+	if (m_enemy_Boss->GetisIdle() && !m_enemy_Boss->GetisLanding()) {
 		m_enemy_Boss->ChangeState(Enemy_Boss::enState_Idle);
 	}
 //	m_enemy_Boss->SetisUnderPattern(false);

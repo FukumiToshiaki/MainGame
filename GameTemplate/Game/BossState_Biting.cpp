@@ -15,6 +15,8 @@ void BossState_Biting::Animation()
 
 void BossState_Biting::Update()
 {
+	m_enemy_Boss->SetMoveSpeed(m_enemy_Boss->GetDiff());
+
 	if (!m_enemy_Boss->GetisBiting()) {
 		m_enemy_Boss->ChangeState(Enemy_Boss::enState_Idle);
 		//m_enemy_Boss->SetisBiting(false);
