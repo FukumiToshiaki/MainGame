@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "Map.h"
-#define SCALE 5.5f
+#define SCALE 5.1f
 
 bool Map::Start()
 {
@@ -13,9 +13,20 @@ bool Map::Start()
     //モデルを更新する。
     m_modelRender.Update();
 
+    const Vector3 m_scaleWall = { SCALE,SCALE,SCALE }; //大きさ
+    m_modelRender_Wall.SetScale(m_scaleWall);
+
+    m_modelRender_Wall.Init("Assets/modelData/GameMap/MapWall.tkm", nullptr, 0, enModelUpAxisZ, false, true);
+    m_modelRender_Wall.SetShadowChasterFlag(false);
+    m_modelRender_Wall.SetPosition(m_pos);
+    //モデルを更新する。
+    m_modelRender_Wall.Update();
+
+
     physicsStaticObject.CreateFromModel(m_modelRender.GetModel(),
     m_modelRender.GetModel().GetWorldMatrix());
-    
+    physicsStaticObject_Wall.CreateFromModel(m_modelRender_Wall.GetModel(),
+    m_modelRender_Wall.GetModel().GetWorldMatrix());
     return true;
 }
 
@@ -35,13 +46,13 @@ void Map::Update()
     m_modelRender.SetPosition(m_pos);
     m_modelRender.Update();
 
-    //m_modelRender_Test.SetPosition(m_test_Pos);
-   // m_modelRender_Test.Update();
+    m_modelRender_Wall.SetPosition(m_pos);
+    m_modelRender_Wall.Update();
 }
 
 void Map::Render(RenderContext& rc)
 {
-    //m_modelRender_Test.Draw(rc);
+    //m_modelRender_Wall.Draw(rc);
 
-     m_modelRender.Draw(rc);
+    m_modelRender.Draw(rc);
 }
