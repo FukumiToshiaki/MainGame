@@ -23,6 +23,7 @@
 #define START_POS_Z -2000.0f
 #define PLAYER_MOVESPEED 500.0f
 #define SCALE 2.0f
+#define LONGATTACKCOOLTIME 5.0f
 
 void Player::InitSkeleton()
 {
@@ -46,6 +47,8 @@ bool Player::Start()
 	m_animationClipArray[enAnimClip_Walk].SetLoopFlag(true);
 	m_animationClipArray[enAnimClip_Idle].Load("Assets/animData/Pico_Anime/Player_Test_Idle.tka");
 	m_animationClipArray[enAnimClip_Idle].SetLoopFlag(true);
+	//m_animationClipArray[enAnimClip_Idle].Load("Assets/animData/Pico_Anime/Pico_Idle.tka");
+	//m_animationClipArray[enAnimClip_Idle].SetLoopFlag(true);
 	m_animationClipArray[enAnimClip_WalkAttack].Load("Assets/animData/Pico_Anime/Player_Test_WalkAttack.tka");
 	m_animationClipArray[enAnimClip_WalkAttack].SetLoopFlag(false);
 	m_animationClipArray[enAnimClip_LongAttack].Load("Assets/animData/Pico_Anime/Player_Long_Attack.tka");
@@ -70,6 +73,7 @@ bool Player::Start()
 		});
 
 	m_modelRender.Init("Assets/modelData/Player_Test/Player_Test.tkm", m_animationClipArray, enAnimClip_Num);
+	//m_modelRender.Init("Assets/modelData/PlayerData/PicoChan.tkm", m_animationClipArray, enAnimClip_Num);
 	m_spriteRender.Init("Assets/sprite/lock.DDS", 400, 400);
 	//アニメーションなしなら動く
 	//m_modelRender.Init("Assets/modelData/Player_Test/Player_Test.tkm");
@@ -89,11 +93,6 @@ bool Player::Start()
 	m_modelRender.SetPosition(m_pos);
 	m_modelRender.SetScale(m_scale);
 	m_modelRender.SetRotation(m_rotation);
-	////当たり判定の作成。
-	m_collision= NewGO<CollisionObject>(0);
-	m_collision->CreateSphere(m_pos, Quaternion::Identity, 100.0f);
-	m_collision->SetName("player_collsion");
-	m_collision->SetIsEnableAutoDelete(false);
 	//m_modelRender.Update();
 	//m_attack_Pos = m_pos;
 	//m_attack_Pos.x += 100.0f;
@@ -107,6 +106,11 @@ bool Player::Start()
 	m_enemy_Sky = FindGO<Enemy_Sky>("enemy_sky");
 
 	ChangeState(enState_Idle);
+	////当たり判定の作成。
+	m_collision = NewGO<CollisionObject>(0);
+	m_collision->CreateSphere(m_pos, Quaternion::Identity, 100.0f);
+	m_collision->SetName("player_collsion");
+	m_collision->SetIsEnableAutoDelete(false);
 
 	////手首のボーンを受け取る
 	//m_TestBoneId = m_modelRender.FindBoneID(L"mixamorig:RightHand");
@@ -309,10 +313,10 @@ void Player::Update()
 
 void Player::Move()
 {
-	if (m_isDie){
+	if (m_state == enState_Die) {
 		return;
 	}
-	if (m_isAttack_Biting || m_isGuardBreak || m_isWalkAttack) {
+	if (m_state == enState_Attack_Biting || m_state == enState_GuradBreak || m_state == enState_WalkAttack || m_state == enState_LongAttack) {
 		m_isNowAttack = true;
 		return;
 	}
@@ -344,10 +348,7 @@ void Player::Move()
 	forward *= m_stickL.z * PLAYER_MOVESPEED;
 
 	if (m_stickL.x != 0.0f || m_stickL.z != 0.0f) {
-		m_isWalk = true;
-	}
-	else {
-		m_isWalk = false;
+		m_state = enState_Walk;
 	}
 	////移動速度にスティックの入力量を加算する。
 	m_moveSpeed += right + forward;
@@ -384,15 +385,15 @@ void Player::Rotation()
 }
 void Player::Attack_Biting()
 {
-	if (g_pad[0]->IsTrigger(enButtonRB2) && !m_isWalkAttack&&!m_isNowAttack) {
-		m_isAttack_Biting = true;
+	if (g_pad[0]->IsTrigger(enButtonRB2) && m_state != enState_Walk && !m_isNowAttack) {
+		m_state = enState_Attack_Biting;
 	}
 	//攻撃判定中なら
 	if (m_isUnderAttack) {
 		//攻撃用のコリジョンを作成する
 		BitingAttackCollision();
 	}
-		if (m_isAttack_Biting) {
+		if (m_state == enState_Attack_Biting) {
 			m_moveSpeed.x = 0.0f;
 			m_moveSpeed.z = 0.0f;
 		}
@@ -402,10 +403,10 @@ void Player::WalkAttack()
 	if (g_pad[0]->IsTrigger(enButtonRB2) && !m_isNowAttack) {
 		if (m_stickL.x != 0.0f || m_stickL.z != 0.0f)
 		{
-			m_isWalkAttack = true;
+			m_state = enState_WalkAttack;
 		}
 	}
-	if (m_isWalkAttack)
+	if (m_state == enState_WalkAttack)
 	{
 		m_moveSpeed.x = 0.0f;
 		m_moveSpeed.z = 0.0f;
@@ -417,20 +418,17 @@ void Player::WalkAttack()
 void Player::Defense()
 {
 	if (g_pad[0]->IsPress(enButtonRB1) && !m_isNowAttack) {
-		m_isDefense = true;
+		m_state = enState_Defense;
 		m_moveSpeed.x = 0.0f;
 		m_moveSpeed.z = 0.0f;
-	}
-	else {
-		m_isDefense = false;
 	}
 }
 void Player::GuardBreak()
 {
 	if (g_pad[0]->IsTrigger(enButtonY) && !m_isNowAttack) {
-		m_isGuardBreak = true;
+		m_state = enState_GuradBreak;
 	}
-	if (m_isGuardBreak) {
+	if (m_state == enState_GuradBreak) {
 		m_moveSpeed.x = 0.0f;
 		m_moveSpeed.z = 0.0f;
 		//m_rotation = { 0.0f,0.0f,0.0f,0.0f };
@@ -441,7 +439,7 @@ void Player::GuardBreak()
 }
 void Player::Hit()
 {
-	if (m_isDamage) {
+	if (m_state == enState_Damage) {
 		return;
 	}
 
@@ -450,7 +448,7 @@ void Player::Hit()
 	for (auto& collision : collisionList_MeleeAttack) {
 		if (collision->IsHit(m_collision)) {
 			//ダメージ
-			m_isDamage = true;
+			m_state = enState_Damage;
 			m_testHP--;
 			return;
 		}
@@ -460,20 +458,21 @@ void Player::Hit()
 	for (auto& collision : collisionList_TailAttack) {
 		if (collision->IsHit(m_collision)) {
 			//ダメージ
-			m_isDamage = true;
+			m_state = enState_Damage;
 			m_testHP--;
 			return;
 		}
 	}
-	//// 攻撃コリジョンと衝突しているかを調べる
-	//const auto& collisionList_Attack = g_collisionObjectManager->FindCollisionObjects("boss_attack_melee" /*"player_walk_attack" "player_biting_attack"*/);
-	//for (auto& collision : collisionList_Attack) {
-	//	if (collision->IsHit(m_collision)) {
-	//		//ダメージ
-	//		m_isDamage = true;
-
-	//	}
-	//}
+	// 攻撃コリジョンと衝突しているかを調べる
+	const auto& collisionList_Attack = g_collisionObjectManager->FindCollisionObjects("boss_attack_fly" /*"player_walk_attack" "player_biting_attack"*/);
+	for (auto& collision : collisionList_Attack) {
+		if (collision->IsHit(m_collision)) {
+			//ダメージ
+			m_state = enState_Damage;
+			m_testHP--;
+			return;
+		}
+	}
 }
 void Player::TakeAim()
 {
@@ -580,20 +579,18 @@ void Player::LockOn()
 }
 void Player::LongAttack()
 {
-	if (g_pad[0]->IsTrigger(enButtonLB1))
-	{
-		m_isLongAttack = true;
+	if (m_longAttackCoolTime <= 0) {
+		if (g_pad[0]->IsTrigger(enButtonLB1)) {
+			m_state = enState_LongAttack;
+			EffectEmitter* effectEmitter = NewGO<EffectEmitter>(0, "long_attack");
+			effectEmitter->Init(0);
+			effectEmitter->SetScale(Vector3::One * 10.0f);
+			effectEmitter->SetPosition(m_pos);
+			effectEmitter->Play();
+			m_longAttackCoolTime = LONGATTACKCOOLTIME;
+		}
 	}
-	if (m_isLongAttack) {
-		EffectEmitter* effectEmitter = NewGO<EffectEmitter>(0, "long_attack");
-		effectEmitter->Init(0);
-		effectEmitter->SetScale(Vector3::One * 10.0f);
-		effectEmitter->SetPosition(m_pos);
-		effectEmitter->Play();
-	}
-	if (!this->GetIsPlayingAnimation()&&!m_isUnderLongAttack) {
-		m_isLongAttack = false;
-	}
+	m_longAttackCoolTime -= g_gameTime->GetFrameDeltaTime();
 }
 void Player::Render(RenderContext& rc)
 {

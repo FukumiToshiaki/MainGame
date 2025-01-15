@@ -104,65 +104,65 @@ public:
 		return m_modelRender.IsPlayingAnimation();
 	}
 
-	bool GetIsAttack_Biting()
-	{
-		return m_isAttack_Biting;
-	}
-	void SetIsAttack_Biting(const bool Attack_Biting) {
-		m_isAttack_Biting = Attack_Biting;
-	}
+	//bool GetIsAttack_Biting()
+	//{
+	//	return m_isAttack_Biting;
+	//}
+	//void SetIsAttack_Biting(const bool Attack_Biting) {
+	//	m_isAttack_Biting = Attack_Biting;
+	//}
 
-	bool GetIsWalk()
-	{
-		return m_isWalk;
-	}
+	//bool GetIsWalk()
+	//{
+	//	return m_isWalk;
+	//}
 
-	bool GetIsWalkAttack()
-	{
-		return m_isWalkAttack;
-	}
-	void SetIsWalkAttack(const bool WalkAttack) {
-		m_isWalkAttack = WalkAttack;
-	}
+	//bool GetIsWalkAttack()
+	//{
+	//	return m_isWalkAttack;
+	//}
+	//void SetIsWalkAttack(const bool WalkAttack) {
+	//	m_isWalkAttack = WalkAttack;
+	//}
 
-	bool GetIsLongAttack()
-	{
-		return m_isLongAttack;
-	}
-	bool GetIsDefense()
-	{
-		return m_isDefense;
-	}
-	void SetIsDefense(const bool Defense)
-	{
-		m_isDefense = Defense;
-	}
+	//bool GetIsLongAttack()
+	//{
+	//	return m_isLongAttack;
+	//}
+	//bool GetIsDefense()
+	//{
+	//	return m_isDefense;
+	//}
+	//void SetIsDefense(const bool Defense)
+	//{
+	//	m_isDefense = Defense;
+	//}
 
-	bool GetIsGuradBreak()
-	{
-		return m_isGuardBreak;
-	}
-	void SetIsGuradBreak(const bool Break)
-	{
-		m_isGuardBreak = Break;
-	}
+	//bool GetIsGuradBreak()
+	//{
+	//	return m_isGuardBreak;
+	//}
+	//void SetIsGuradBreak(const bool Break)
+	//{
+	//	m_isGuardBreak = Break;
+	//}
 
-	bool GetisDamage()
-	{
-		return m_isDamage;
-	}
-	void SetisDamage(const bool damage) {
-		m_isDamage = damage;
-	}
+	//bool GetisDamage()
+	//{
+	//	return m_isDamage;
+	//}
+	//void SetisDamage(const bool damage) {
+	//	m_isDamage = damage;
+	//}
 
-	bool GetisDie()
-	{
-		return m_isDie;
-	}
-	void SetisDie(bool Die)
-	{
-		m_isDie = Die;
-	}
+	//bool GetisDie()
+	//{
+	//	return m_isDie;
+	//}
+	//void SetisDie(bool Die)
+	//{
+	//	m_isDie = Die;
+	//}
 
 	bool GetisOver()
 	{
@@ -225,28 +225,29 @@ private:
 /// 変数
 /// </summary>
 	int m_enemyNo = 0;
-	int m_testHP = 5;
+	float m_testHP = 10;
 	int m_count = -1;
 	int m_targetCount = -1;
+	float m_longAttackCoolTime = 5.0f;
 /// <summary>
 /// ブール型
 /// </summary>
 	bool m_isNowAttack = false;//攻撃中ならtrue
-	bool m_isAttack_Biting = false;	//
-	bool m_isWalk = false;			//
-	bool m_isWalkAttack = false;	//
-	bool m_isDefense = false;		//	
-	bool m_isGuardBreak = false;	//
-	bool m_isLongAttack = false;	//遠距離攻撃
+	//bool m_isAttack_Biting = false;	//
+	//bool m_isWalk = false;			//
+	//bool m_isWalkAttack = false;	//
+	//bool m_isDefense = false;		//	
+	//bool m_isGuardBreak = false;	//
+	//bool m_isLongAttack = false;	//遠距離攻撃
 	bool m_isUnderAttack = false;	//攻撃中ならtrue
 	bool m_isUnderWalkAttack = false;//ダッシュ攻撃中ならtrue
 	bool m_isUnderGuradBreak = false;//ガードブレイク中ならtrue
 	bool m_isUnderLongAttack = false;//ロングアタック中ならtrue
-	bool m_isDamage = false;		//
+	//bool m_isDamage = false;		//
 	bool m_isTakeAim = false;
 	bool m_isLockOn = false;
 	bool m_isLockOnCamera = false;
-	bool m_isDie = false;
+	//bool m_isDie = false;
 	bool m_isOver = false;
 
 	Model m_model;			// モデル
