@@ -24,7 +24,7 @@
 #define START_POS_Y 0.0f
 #define START_POS_Z 500.0f
 #define SCALE 4.5f
-//#define CHASE_SPEED 200.0f
+#define FLYATTACK_SPEED 10.0f
 #define DISTANCE_POS 1400.0f
 #define BITING_DISTANCE 500.0f
 #define REST_DISTANCE 1200.0f
@@ -109,6 +109,7 @@ bool Enemy_Boss::Start()
 	m_collision->CreateSphere(m_collisionPos, Quaternion::Identity, COLLISION);
 	m_collision->SetIsEnableAutoDelete(false);
 	m_collision->SetName("boss");
+	m_collision->SetIsEnable(true);
 	m_rotation.SetRotationY(135.0f);
 	m_pos = { START_POS_X, START_POS_Y, START_POS_Z };
 	ChangeState(enState_Idle);
@@ -170,8 +171,13 @@ void Enemy_Boss::Biting()
 		MeleeAttackCollision();
 	}
 }
-void Enemy_Boss::Move()
+void Enemy_Boss::FlyAttackMove()
 {
+	if (m_state!=enState_Attack_Fly)
+	{
+		return;
+	}
+	m_pos += m_moveSpeed * FLYATTACK_SPEED;
 	////プレイヤーの追跡の変数
 	//m_distance = m_player->Get_PlayerPos() - m_pos;
 	//m_diff = m_player->Get_PlayerPos() - m_pos;
@@ -215,7 +221,7 @@ void Enemy_Boss::Rest()
 }
 void Enemy_Boss::Hit()
 {
-	if (m_isDamage) {
+	if (m_state==enState_Damage) {
 		return;
 	}
 	// 攻撃コリジョンと衝突しているかを調べる
@@ -227,7 +233,7 @@ void Enemy_Boss::Hit()
 	for (auto& collision_GuardBreak : collisionList_GuardBreak) {
 		if (collision_GuardBreak->IsHit(m_collision)) {
 			//ダメージ
-			m_isDamage = true;
+			ChangeState(enState_Damage);
 			m_testHP=m_testHP - 2;
 			return;
 		}
@@ -237,7 +243,7 @@ void Enemy_Boss::Hit()
 	for (auto& collision_WalkAttack : collisionList_WalkAttack) {
 		if (collision_WalkAttack->IsHit(m_collision)) {
 			//ダメージ
-			m_isDamage = true;
+			ChangeState(enState_Damage);
 			m_testHP--;
 			return;
 		}
@@ -247,7 +253,7 @@ void Enemy_Boss::Hit()
 	for (auto& collision_MeleeAttack : collisionList_MeleeAttack) {
 		if (collision_MeleeAttack->IsHit(m_collision)) {
 			//ダメージ
-			m_isDamage = true;
+			ChangeState(enState_Damage);
 			m_testHP--;
 			return;
 		}
@@ -320,6 +326,15 @@ void Enemy_Boss::FlyAttackCollision()
 	);
 	collisionObject->SetName("boss_attack_fly");
 }
+void Enemy_Boss::FlyTime()
+{
+	if (m_state == enState_Fly)
+	{
+		return;
+	}
+	m_testFlyTime -= g_gameTime->GetFrameDeltaTime();
+
+}
 void Enemy_Boss::OnAnimationEvent(const wchar_t* clipName, const wchar_t* eventName)
 {
 	//キーの名前がBoss_Attack_Melee_startの場合
@@ -362,7 +377,7 @@ void Enemy_Boss::OnAnimationEvent(const wchar_t* clipName, const wchar_t* eventN
 	}
 
 }
-void Enemy_Boss::ChangeState(EnState changeState)
+void Enemy_Boss::ChangeState(EnState changeState, int integerArgument0)
 {
 	m_Iboss_State = nullptr;
 	switch (changeState)
@@ -397,16 +412,16 @@ void Enemy_Boss::ChangeState(EnState changeState)
 		m_Iboss_State = new BossState_Walk(this);
 		break;
 	case Enemy_Boss::enState_Takeoff:
-		m_Iboss_State = new BossState_Takeoff(this);
+		m_Iboss_State = new BossState_Takeoff(this, (EnState)integerArgument0);
 		break;
 	case Enemy_Boss::enState_Fly:
-		m_Iboss_State = new BossState_Fly(this);
+		m_Iboss_State = new BossState_Fly(this, (EnState)integerArgument0);
 		break;
 	case Enemy_Boss::enState_Landing:
 		m_Iboss_State = new BossState_Landing(this);
 		break;
 	case Enemy_Boss::enState_Attack_Fly:
-		m_Iboss_State = new BossState_FlyAttack(this);
+		m_Iboss_State = new BossState_FlyAttack(this,(EnState)integerArgument0);
 		break;
 	case Enemy_Boss::enState_Die:
 		m_Iboss_State = new BossState_Die(this);
@@ -463,7 +478,7 @@ void Enemy_Boss::Update()
 	m_Iboss_State->Update();
 	Rotation();
 	Hit();
-	Move();
+	FlyAttackMove();
 	Biting();
 	TailAttack();
 	FlyAttack();

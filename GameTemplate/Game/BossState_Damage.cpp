@@ -8,16 +8,16 @@ void BossState_Damage::Animation()
 		Enemy_Boss::enState_Damage, 0.2f
 	);
 	if (!m_enemy_Boss->GetIsPlayingAnimation()) {
-		m_enemy_Boss->SetisDamage(false);
+		m_enemy_Boss->ChangeState(Enemy_Boss::enState_Idle);
+	}
+	if (m_enemy_Boss->GetHP() <= 0) {
+		m_enemy_Boss->ChangeState(Enemy_Boss::enState_Die);
 	}
 }
 
 void BossState_Damage::Update()
 {
-	if (!m_enemy_Boss->GetisDamage()) {
-		m_enemy_Boss->ChangeState(Enemy_Boss::enState_Idle);
-	}
-	if (m_enemy_Boss->GetisDie()) {
-		m_enemy_Boss->ChangeState(Enemy_Boss::enState_Die);
-	}
+	//if (m_enemy_Boss->GetisDie()) {
+	//	m_enemy_Boss->ChangeState(Enemy_Boss::enState_Die);
+	//}
 }

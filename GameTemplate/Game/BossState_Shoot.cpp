@@ -8,7 +8,7 @@ void BossState_Shoot::Animation()
 		Enemy_Boss::enState_Attack_Shoot,0.2f
 	);
 	if (!m_enemy_Boss->GetIsPlayingAnimation()) {
-		m_enemy_Boss->SetisShoot(false);
+		m_enemy_Boss->ChangeState(Enemy_Boss::enState_Idle);
 		//m_enemy_Boss->SetisUnderPattern(false);
 	}
 
@@ -18,12 +18,4 @@ void BossState_Shoot::Update()
 {
 	m_enemy_Boss->SetMoveSpeed(Vector3::Zero);
 	m_enemy_Boss->SetMoveSpeed(m_enemy_Boss->GetDiff());
-
-	if (m_enemy_Boss->GetisDamage()) {
-		m_enemy_Boss->ChangeState(Enemy_Boss::enState_Damage);
-	}
-
-	if (!m_enemy_Boss->GetisShoot()) {
-		m_enemy_Boss->ChangeState(Enemy_Boss::enState_Idle);
-	}
 }

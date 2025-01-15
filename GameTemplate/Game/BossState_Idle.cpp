@@ -14,9 +14,8 @@ void BossState_Idle::Update()
 {
 	m_enemy_Boss->SetMoveSpeed(Vector3::Zero);
 	m_enemy_Boss->SetMoveSpeed(m_enemy_Boss->GetDiff());
-	m_enemy_Boss->SetisIdle(false);
 
-	if (m_enemy_Boss->GetisDistance()&&!m_enemy_Boss->GetisBiting()) {
+	/*if (m_enemy_Boss->GetisDistance() && !m_enemy_Boss->GetisBiting()) {
 		m_enemy_Boss->ChangeState(Enemy_Boss::enState_Move);
 	}
 	if (m_enemy_Boss->GetisBiting()) {
@@ -39,5 +38,5 @@ void BossState_Idle::Update()
 	}
 	if (m_enemy_Boss->GetisDefence()) {
 		m_enemy_Boss->ChangeState(Enemy_Boss::enState_Defence);
-	}
+	}*/
 }

@@ -7,23 +7,12 @@ void BossState_Fly::Animation()
 	m_enemy_Boss->GetModelRender().PlayAnimation(
 		Enemy_Boss::enState_Fly, 0.2f
 	);
-	if (/*m_enemy_Boss->GetIsPlayingAnimation() == false &&*/ m_enemy_Boss->GetisFly()) {
-		//m_enemy_Boss->SetisLanding(true);
-		//m_enemy_Boss->SetisFlyAttack(true);
-		//m_enemy_Boss->SetisFlyShoot(true);
-		m_enemy_Boss->SetisFly(false);
+	if (m_enemy_Boss->GetFlyTime()<=0) {
+		// 次のステートに遷移する
+		m_enemy_Boss->ChangeState(m_enemy_Boss->enState_Landing);
 	}
 }
 
 void BossState_Fly::Update()
 {
-	if (m_enemy_Boss->GetisFlyAttack()&& !m_enemy_Boss->GetisFly()) {
-		m_enemy_Boss->ChangeState(Enemy_Boss::enState_Attack_Fly);
-	}
-	else if (m_enemy_Boss->GetisFlyShoot()&& !m_enemy_Boss->GetisFly()) {
-		m_enemy_Boss->ChangeState(Enemy_Boss::enState_Attack_FlyShoot);
-	}
-	else if (!m_enemy_Boss->GetisFly()) {
-		m_enemy_Boss->ChangeState(Enemy_Boss::enState_Landing);
-	}
 }

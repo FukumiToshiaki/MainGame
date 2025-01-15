@@ -13,7 +13,7 @@ public:
 	bool Start();
 	void Update();
 	void Render(RenderContext& rc);
-	void Move();
+	void FlyAttackMove();
 	// スケルトンを初期化
 	void InitSkeleton();
 	// アニメーションを初期化。
@@ -38,6 +38,8 @@ public:
 	void FlyAttack();
 	//空中突進の当たり判定
 	void FlyAttackCollision();
+	//滞空時間
+	void FlyTime();
 	// アニメーションイベント用の関数。
 	void OnAnimationEvent(const wchar_t* clipName, const wchar_t* eventName);
 
@@ -79,7 +81,7 @@ public:
 	};
 	EnState m_state = enState_Idle;
 	//ステートの管理
-	void ChangeState(EnState changeState);
+	void ChangeState(EnState changeState, int integerArgument0 = 0);
 
 	const bool& GetIsPlayingAnimation()const
 	{
@@ -90,130 +92,8 @@ public:
 	{
 		return m_modelRender;
 	}
-	bool GetisIdle()
-	{
-		return m_isIdle;
-	}
-	void SetisIdle(bool Idle)
-	{
-		m_isIdle = Idle;
-	}
 
-	bool GetisDistance()
-	{
-		return m_isDistance;
-	}
-	void SetisDistance(bool Distance)
-	{
-		m_isDistance = Distance;
-	}
-
-	bool GetisBiting()
-	{
-		return m_isBiting;
-	}
-	void SetisBiting(bool Bit)
-	{
-		m_isBiting = Bit;
-	}
-	bool GetisShoot()
-	{
-		return m_isShoot;
-	}
-	void SetisShoot(bool Shoot)
-	{
-		m_isShoot = Shoot;
-	}
-
-	bool GetisRest()
-	{
-		return m_isRest;
-	}
-	void SetisRest(bool Rest)
-	{
-		m_isRest = Rest;
-	}
-
-	bool GetisDamage()
-	{
-		return m_isDamage;
-	}
-	void SetisDamage(bool damege) {
-		m_isDamage = damege;
-	}
-
-	bool GetisTail()
-	{
-		return m_isTail;
-
-	}	
-	void SetisTail(bool Tail)
-	{
-		m_isTail = Tail;
-	}
-
-	bool GetisFlyAttack()
-	{
-		return m_isFlyAttack;
-	}
-	void SetisFlyAttack(bool FlyAttack)
-	{
-		m_isFlyAttack = FlyAttack;
-	}
-
-	bool GetisTakeoff()
-	{
-		return m_isTakeoff;
-	}
-	void SetisTakeoff(bool Takeoff)
-	{
-		m_isTakeoff = Takeoff;
-	}
-
-	bool GetisFly()
-	{
-		return m_isFly;
-	}
-	void SetisFly(bool Fly)
-	{
-		m_isFly = Fly;
-	}
-
-	bool GetisLanding()
-	{
-		return m_isLanding;
-	}
-	void SetisLanding(bool Landing)
-	{
-		m_isLanding = Landing;
-	}
-
-	bool GetisFlyShoot()
-	{
-		return m_isFlyShoot;
-	}
-	void SetisFlyShoot(bool FlyShoot) 
-	{
-		m_isFlyShoot = FlyShoot;
-	}
-
-	bool GetisDie()
-	{
-		return m_isDie;
-	}
-	void SetisDie(bool Die)
-	{
-		m_isDie = Die;
-	}
-
-	bool GetisScream()
-	{
-		return m_isScream;
-	}
-	void SetisScream(bool Scream)
-	{
-		m_isScream = Scream;
-	}
+	
 
 	bool GetisClear()
 	{
@@ -224,15 +104,7 @@ public:
 		m_isClear = Clear;
 	}
 
-	bool GetisDefence()
-	{
-		return m_isDefence;
-	}
-
-	void SetisDefence(bool Defence)
-	{
-		m_isDefence = Defence;
-	}
+	
 
 	void SetUnderMelee(bool UnderMelee)
 	{
@@ -242,6 +114,11 @@ public:
 	void SetUnderTail(bool UnderTail)
 	{
 		m_isUnderTail = UnderTail;
+	}
+
+	void SetUnderFlyAttack(bool UnderFlyAttack)
+	{
+		m_isUnderFlyAttack = UnderFlyAttack;
 	}
 
 	int GetHP()
@@ -262,6 +139,11 @@ public:
 	Vector3 GetDiff()
 	{
 		return m_diff;
+	}
+
+	float GetFlyTime()
+	{
+		return m_testFlyTime;
 	}
 	//void SetDiff(Vector3 diff)
 	//{
@@ -291,24 +173,11 @@ protected:
 	int m_flyBoneId = 0;
 	float m_angle = 0.0f;
 	float m_radius = 2.0f;
+	float m_testFlyTime = 3.0f;
 	/// <summary>
 	/// ブール型
 	/// </summary>
-	bool m_isDistance = false;
-	bool m_isIdle = false;
-	bool m_isBiting = false;
-	bool m_isShoot = false;
-	bool m_isFlyShoot = false;
-	bool m_isRest = false;
-	bool m_isDamage = false;
-	bool m_isDefence = false;
-	bool m_isTail = false;
-	bool m_isFlyAttack = false;
-	bool m_isTakeoff = false;
-	bool m_isFly = false;
-	bool m_isLanding = false;
-	bool m_isScream = false;
-	bool m_isDie = false;
+	
 	bool m_isUnderAttackMelee = false;	//攻撃中ならtrue
 	bool m_isUnderTail = false;			//攻撃中ならtrue
 	bool m_isUnderFlyAttack = false;	//攻撃中ならtrue

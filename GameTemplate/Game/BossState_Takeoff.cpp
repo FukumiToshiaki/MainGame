@@ -7,15 +7,12 @@ void BossState_Takeoff::Animation()
 	m_enemy_Boss->GetModelRender().PlayAnimation(
 		Enemy_Boss::enState_Takeoff, 0.2f
 	);
-	if (m_enemy_Boss->GetIsPlayingAnimation() == false && m_enemy_Boss->GetisTakeoff()) {
-		m_enemy_Boss->SetisFly(true);
-		m_enemy_Boss->SetisTakeoff(false);
+	if (m_enemy_Boss->GetIsPlayingAnimation() == false) {
+		// 次のステートに遷移する
+		m_enemy_Boss->ChangeState((Enemy_Boss::EnState)m_enNextState);
 	}
 }
 
 void BossState_Takeoff::Update()
 {
-	if (m_enemy_Boss->GetisFly()&&!m_enemy_Boss->GetisTakeoff()) {
-		m_enemy_Boss->ChangeState(Enemy_Boss::enState_Fly);
-	}
 }

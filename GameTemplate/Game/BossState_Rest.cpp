@@ -8,7 +8,7 @@ void BossState_Rest::Animation()
 		Enemy_Boss::enState_Rest
 	);
 	if (!m_enemy_Boss->GetIsPlayingAnimation()) {
-		m_enemy_Boss->SetisRest(false);
+		m_enemy_Boss->ChangeState(Enemy_Boss::enState_Idle);
 	}
 
 }
