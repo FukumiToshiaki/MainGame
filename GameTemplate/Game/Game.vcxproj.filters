@@ -129,6 +129,10 @@
     <ClCompile Include="PlayerState_Die.cpp">
       <Filter>Player</Filter>
     </ClCompile>
+    <ClCompile Include="BossState_Defence.cpp">
+      <Filter>Boss</Filter>
+    </ClCompile>
+    <ClCompile Include="Time_Limit_UI.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -244,5 +248,9 @@
     <ClInclude Include="PlayerState_Die.h">
       <Filter>Player</Filter>
     </ClInclude>
+    <ClInclude Include="BossState_Defence.h">
+      <Filter>Boss</Filter>
+    </ClInclude>
+    <ClInclude Include="Time_Limit_UI.h" />
   </ItemGroup>
 </Project>

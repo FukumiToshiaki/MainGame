@@ -9,6 +9,7 @@ class Enemy_Melee;
 class Enemy_Long;
 class Enemy_Boss;
 class BossPattern;
+class Time_Limit_UI;
 class Game : public IGameObject
 {
 public:
@@ -18,15 +19,17 @@ public:
 	void Update() override;
 	void GameOverState();
 	void GameClearState();
+	void TimeOver();
 	void Render(RenderContext& rc) override;
 	//ゲームのステート
 	enum EnGameState {
-		enIdle,
+		enNormal,
+		enTimeOver,
 		enGameClear,
 		enGameOver,
 	};
 private:
-	EnGameState m_gameState = enIdle;	//ゲームのステート
+	EnGameState m_gameState = enNormal;	//ゲームのステート
 
 	Model m_model;			// モデル
 	Vector3 m_pos;		// 座標
@@ -43,6 +46,7 @@ private:
 	Enemy_Long* m_enemy_Long = nullptr;
 	Enemy_Sky* m_enemy_Sky = nullptr;
 	BossPattern* m_enemy_Boss = nullptr;
+	Time_Limit_UI* m_time_Limit_UI = nullptr;
 	//BossPattern* m_bossPattren = nullptr;
 	Vector3						m_forward = Vector3::AxisZ;
 	std::vector<SPointLight*>	m_pointLightList;			//ポイントライト。

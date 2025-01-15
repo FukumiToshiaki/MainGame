@@ -12,6 +12,7 @@
 #include "GameClear.h"
 #include "GameOver.h"
 #include "BossPattern.h"
+#include "Time_Limit_UI.h"
 
 Game::~Game()
 {
@@ -23,22 +24,24 @@ Game::~Game()
 	DeleteGO(m_enemy_melee);
 	DeleteGO(m_enemy_Shield);
 	DeleteGO(m_enemy_Sky);
+	DeleteGO(m_time_Limit_UI);
 }
 bool Game::Start()
 {
 	m_map = NewGO<Map>(0,"map");
 	//m_LightTest = NewGO<Light_Test>(0);
 	m_playerCamera = NewGO<PlayerCamera>(0);
-	m_enemy_Shield = NewGO<Enemy_Shield>(0, "enemy_shield");
-	m_enemy_melee = NewGO<Enemy_Melee>(0, "enemy_melee");
-	m_enemy_Sky = NewGO<Enemy_Sky>(0, "enemy_sky");
-	m_enemy_Long = NewGO<Enemy_Long>(0, "enemy_long");
+	//m_enemy_Shield = NewGO<Enemy_Shield>(0, "enemy_shield");
+	//m_enemy_melee = NewGO<Enemy_Melee>(0, "enemy_melee");
+	//m_enemy_Sky = NewGO<Enemy_Sky>(0, "enemy_sky");
+	//m_enemy_Long = NewGO<Enemy_Long>(0, "enemy_long");
 	//m_enemy_Boss = NewGO<Enemy_Boss>(0, "enemy_boss");
 	m_enemy_Boss = NewGO<BossPattern>(0, "enemy_boss");
 	m_player = NewGO<Player>(0, "player");
+	m_time_Limit_UI = NewGO<Time_Limit_UI>(0, "time_limit");
 	//m_modelRender.SetPosition(m_position);
 
-	//PhysicsWorld::GetInstance()->EnableDrawDebugWireFrame();
+//	PhysicsWorld::GetInstance()->EnableDrawDebugWireFrame();
 	return true;
 }
 
@@ -51,9 +54,13 @@ void Game::Update()
 	if (m_player->GetHP() <= 0) {
 		m_gameState = enGameOver;
 	}
+	if (m_time_Limit_UI->GetTime_Limit() < 0) {
+		m_gameState = enTimeOver;
+	}
 	switch (m_gameState)
 	{
-	case Game::enIdle:
+	case Game::enTimeOver:
+		TimeOver();
 		break;
 	case Game::enGameClear:
 		GameClearState();
@@ -66,7 +73,6 @@ void Game::Update()
 
 void Game::GameOverState()
 {
-	m_player->SetisDie(true);
 	if (m_player->GetisOver()) {
 		if (g_pad[0]->IsTrigger(enButtonA)) {
 			GameOver* gameOver = NewGO<GameOver>(0, "gameover");
@@ -77,13 +83,19 @@ void Game::GameOverState()
 
 void Game::GameClearState()
 {
-	m_enemy_Boss->SetisDie(true);
+	m_enemy_Boss->ChangeState(Enemy_Boss::enState_Die);
 	if (m_enemy_Boss->GetisClear()) {
 		if (g_pad[0]->IsTrigger(enButtonA)) {
 			GameClear* gameClear = NewGO<GameClear>(0, "gameclear");
 			DeleteGO(this);
 		}
 	}
+}
+
+void Game::TimeOver()
+{
+		GameOver* gameOver = NewGO<GameOver>(0, "gameover");
+		DeleteGO(this);
 }
 
 void Game::Render(RenderContext& rc)

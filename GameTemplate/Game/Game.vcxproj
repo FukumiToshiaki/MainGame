@@ -226,6 +226,7 @@
     <ClCompile Include="BossPattern.cpp" />
     <ClCompile Include="BossState_Biting.cpp" />
     <ClCompile Include="BossState_Damage.cpp" />
+    <ClCompile Include="BossState_Defence.cpp" />
     <ClCompile Include="BossState_Die.cpp" />
     <ClCompile Include="BossState_Fly.cpp" />
     <ClCompile Include="BossState_FlyAttack.cpp" />
@@ -272,12 +273,14 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Preview|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="system\system.cpp" />
+    <ClCompile Include="Time_Limit_UI.cpp" />
     <ClCompile Include="Title.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BossPattern.h" />
     <ClInclude Include="BossState_Biting.h" />
     <ClInclude Include="BossState_Damage.h" />
+    <ClInclude Include="BossState_Defence.h" />
     <ClInclude Include="BossState_Die.h" />
     <ClInclude Include="BossState_Fly.h" />
     <ClInclude Include="BossState_FlyAttack.h" />
@@ -319,6 +322,7 @@
     <ClInclude Include="PlayerStatus.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="system\system.h" />
+    <ClInclude Include="Time_Limit_UI.h" />
     <ClInclude Include="Title.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
