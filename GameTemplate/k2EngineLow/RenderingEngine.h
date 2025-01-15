@@ -86,6 +86,9 @@ namespace nsK2EngineLow {
 		//シャドウマップ描画処理
 		void RenderShadowMap(RenderContext& rc);
 
+		//フォント描画
+		void FontRender(RenderContext& rc);
+
 		//実行
 		void Execute(RenderContext& rc);
 

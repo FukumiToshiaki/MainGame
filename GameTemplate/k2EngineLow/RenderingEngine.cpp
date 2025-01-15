@@ -142,10 +142,10 @@ namespace nsK2EngineLow {
 
     void RenderingEngine::RenderShadowMap(RenderContext& rc)
     {
-
         for (auto& renderObj : m_renderObjects)
         {
             renderObj->OnRenderShadowMap(rc, g_Light->GetLightData()->mPVL);
         }
     }
+
 }
