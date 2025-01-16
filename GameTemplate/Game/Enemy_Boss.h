@@ -141,10 +141,10 @@ public:
 		return m_diff;
 	}
 
-	float GetFlyTime()
-	{
-		return m_testFlyTime;
-	}
+	//float GetFlyTime()
+	//{
+	//	return m_testFlyTime;
+	//}
 	//void SetDiff(Vector3 diff)
 	//{
 	//	m_diff = diff;
@@ -173,7 +173,7 @@ protected:
 	int m_flyBoneId = 0;
 	float m_angle = 0.0f;
 	float m_radius = 2.0f;
-	float m_testFlyTime = 3.0f;
+	//float m_testFlyTime = 3.0f;
 	/// <summary>
 	/// ÉuÅ[Éãå^
 	/// </summary>

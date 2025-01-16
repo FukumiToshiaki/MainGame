@@ -70,7 +70,7 @@ bool Enemy_Boss::Start()
 	m_animationClipArray[enState_Move].SetLoopFlag(true);
 	m_animationClipArray[enState_Die].SetLoopFlag(false);
 	m_animationClipArray[enState_Fly].SetLoopFlag(true);
-	m_animationClipArray[enState_Attack_Fly].SetLoopFlag(false);
+	m_animationClipArray[enState_Attack_Fly].SetLoopFlag(true);
 	m_animationClipArray[enState_Takeoff].SetLoopFlag(false);
 	m_animationClipArray[enState_Landing].SetLoopFlag(false);
 
@@ -326,15 +326,15 @@ void Enemy_Boss::FlyAttackCollision()
 	);
 	collisionObject->SetName("boss_attack_fly");
 }
-void Enemy_Boss::FlyTime()
-{
-	if (m_state == enState_Fly)
-	{
-		return;
-	}
-	m_testFlyTime -= g_gameTime->GetFrameDeltaTime();
-
-}
+//void Enemy_Boss::FlyTime()
+//{
+	//if (m_state == enState_Fly)
+	//{
+	//	return;
+	//}
+	//m_testFlyTime -= g_gameTime->GetFrameDeltaTime();
+//
+//}
 void Enemy_Boss::OnAnimationEvent(const wchar_t* clipName, const wchar_t* eventName)
 {
 	//ƒL[‚Ì–¼‘O‚ªBoss_Attack_Melee_start‚Ìê‡

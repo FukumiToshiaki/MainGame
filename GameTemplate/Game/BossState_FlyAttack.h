@@ -13,6 +13,6 @@ public:
 
 private:
 	int m_enNextState; // takeoffI—¹‚É‘JˆÚ‚·‚éó‘Ô
-
+	float m_flyTime = 2.0f;
 };
 

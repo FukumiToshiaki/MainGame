@@ -10,5 +10,7 @@ public:
 
 	void Update() override;
 
+private:
+	float m_walkTime = 3.0f;
 };
 

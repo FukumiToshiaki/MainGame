@@ -62,12 +62,12 @@ private:
 	/// bool
 	/// </summary>
 	bool m_isBifurcation = false;
-
+	bool m_istest = false;
 	/// <summary>
 	/// ïœêî
 	/// </summary>
 	float m_coolTime = 5.0f;
-	float m_coolTimeLastMode = 3.0f;
+	//float m_coolTimeLastMode = 3.0f;
 	float m_shootAttack = 4.0f;
 	int m_pattern = 0;
 	int m_shootPoint = 0;
