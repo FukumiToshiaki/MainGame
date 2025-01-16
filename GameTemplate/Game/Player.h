@@ -184,7 +184,7 @@ public:
 		return m_enemyNo;
 	}
 
-	int GetHP()
+	float GetHP()
 	{
 		return m_testHP;
 	}
@@ -225,9 +225,10 @@ private:
 /// •Ï”
 /// </summary>
 	int m_enemyNo = 0;
-	float m_testHP = 10;
 	int m_count = -1;
 	int m_targetCount = -1;
+	float m_testHP = 10.0f;
+	float m_hitCoolTime = 1.0f;
 	float m_longAttackCoolTime = 5.0f;
 /// <summary>
 /// ƒu[ƒ‹Œ^

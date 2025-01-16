@@ -10,4 +10,7 @@ void PlayerState_Walk::Animation()
 
 void PlayerState_Walk::Update()
 {
+	if (!m_player->GetIsPlayingAnimation()) {
+		m_player->ChangeState(Player::enState_Idle);
+	}
 }

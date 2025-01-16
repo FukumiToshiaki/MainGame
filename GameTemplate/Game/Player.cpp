@@ -24,7 +24,10 @@
 #define PLAYER_MOVESPEED 500.0f
 #define SCALE 2.0f
 #define LONGATTACKCOOLTIME 5.0f
-
+#define HITCOOLTIME 2.5f
+#define MELEEATTACKDAMAGE 4
+#define TAILATTACKDAMAGE 2
+#define FLYATTACKDAMAGE 6
 void Player::InitSkeleton()
 {
 	//m_skeleton.Init("Assets/modelData/unityChan.tks");
@@ -267,6 +270,7 @@ void Player::ChangeState(EnState changeState)
 		break;
 	case Player::enState_LongAttack:
 		m_Iplayer_State = new PlayerState_AttackLong(this);
+		break;
 	case Player::enState_Die:
 		m_Iplayer_State = new PlayerState_Die(this);
 		break;
@@ -276,7 +280,7 @@ void Player::ChangeState(EnState changeState)
 
 void Player::Update()
 {
-	
+	m_hitCoolTime -= g_gameTime->GetFrameDeltaTime();
 
 	Move();
 	Rotation();
@@ -313,7 +317,7 @@ void Player::Update()
 
 void Player::Move()
 {
-	if (m_state == enState_Die) {
+	if (m_state == enState_Die || m_state == enState_Damage) {
 		return;
 	}
 	if (m_state == enState_Attack_Biting || m_state == enState_GuradBreak || m_state == enState_WalkAttack || m_state == enState_LongAttack) {
@@ -348,7 +352,10 @@ void Player::Move()
 	forward *= m_stickL.z * PLAYER_MOVESPEED;
 
 	if (m_stickL.x != 0.0f || m_stickL.z != 0.0f) {
-		m_state = enState_Walk;
+		ChangeState(Player::enState_Walk);
+	}
+	else {
+		ChangeState(Player::enState_Idle);
 	}
 	////移動速度にスティックの入力量を加算する。
 	m_moveSpeed += right + forward;
@@ -386,7 +393,7 @@ void Player::Rotation()
 void Player::Attack_Biting()
 {
 	if (g_pad[0]->IsTrigger(enButtonRB2) && m_state != enState_Walk && !m_isNowAttack) {
-		m_state = enState_Attack_Biting;
+		ChangeState(Player::enState_Attack_Biting);
 	}
 	//攻撃判定中なら
 	if (m_isUnderAttack) {
@@ -403,7 +410,7 @@ void Player::WalkAttack()
 	if (g_pad[0]->IsTrigger(enButtonRB2) && !m_isNowAttack) {
 		if (m_stickL.x != 0.0f || m_stickL.z != 0.0f)
 		{
-			m_state = enState_WalkAttack;
+			ChangeState(Player::enState_WalkAttack);
 		}
 	}
 	if (m_state == enState_WalkAttack)
@@ -418,15 +425,52 @@ void Player::WalkAttack()
 void Player::Defense()
 {
 	if (g_pad[0]->IsPress(enButtonRB1) && !m_isNowAttack) {
-		m_state = enState_Defense;
+		ChangeState(Player::enState_Defense);
 		m_moveSpeed.x = 0.0f;
 		m_moveSpeed.z = 0.0f;
 	}
+	if (m_state != enState_Defense) {
+		return;
+	}
+	if (m_hitCoolTime >= 0) {
+		return;
+	}
+	// 攻撃コリジョンと衝突しているかを調べる
+	const auto& collisionList_MeleeAttack = g_collisionObjectManager->FindCollisionObjects("boss_attack_melee" /*"player_walk_attack" "player_biting_attack"*/);
+	for (auto& collision : collisionList_MeleeAttack) {
+		if (collision->IsHit(m_collision)) {
+			//ダメージ
+			m_testHP -= MELEEATTACKDAMAGE / 2;
+			m_hitCoolTime = HITCOOLTIME;
+			return;
+		}
+	}
+	// 攻撃コリジョンと衝突しているかを調べる
+	const auto& collisionList_TailAttack = g_collisionObjectManager->FindCollisionObjects("boss_attack_tail");
+	for (auto& collision : collisionList_TailAttack) {
+		if (collision->IsHit(m_collision)) {
+			//ダメージ
+			m_testHP -= TAILATTACKDAMAGE / 2;
+			m_hitCoolTime = HITCOOLTIME;
+			return;
+		}
+	}
+	// 攻撃コリジョンと衝突しているかを調べる
+	const auto& collisionList_Attack = g_collisionObjectManager->FindCollisionObjects("boss_attack_fly" /*"player_walk_attack" "player_biting_attack"*/);
+	for (auto& collision : collisionList_Attack) {
+		if (collision->IsHit(m_collision)) {
+			//ダメージ
+			m_testHP -= FLYATTACKDAMAGE / 2;
+			m_hitCoolTime = HITCOOLTIME;
+			return;
+		}
+	}
+
 }
 void Player::GuardBreak()
 {
 	if (g_pad[0]->IsTrigger(enButtonY) && !m_isNowAttack) {
-		m_state = enState_GuradBreak;
+		ChangeState(Player::enState_GuradBreak);
 	}
 	if (m_state == enState_GuradBreak) {
 		m_moveSpeed.x = 0.0f;
@@ -439,17 +483,20 @@ void Player::GuardBreak()
 }
 void Player::Hit()
 {
-	if (m_state == enState_Damage) {
+	if (m_state == enState_Damage || m_state == enState_Defense) {
 		return;
 	}
-
+	if (m_hitCoolTime >= 0) {
+		return;
+	}
 	// 攻撃コリジョンと衝突しているかを調べる
 	const auto& collisionList_MeleeAttack = g_collisionObjectManager->FindCollisionObjects("boss_attack_melee" /*"player_walk_attack" "player_biting_attack"*/);
 	for (auto& collision : collisionList_MeleeAttack) {
 		if (collision->IsHit(m_collision)) {
 			//ダメージ
-			m_state = enState_Damage;
-			m_testHP--;
+			ChangeState(Player::enState_Damage);
+			m_testHP-= MELEEATTACKDAMAGE;
+			m_hitCoolTime = HITCOOLTIME;
 			return;
 		}
 	}
@@ -458,8 +505,9 @@ void Player::Hit()
 	for (auto& collision : collisionList_TailAttack) {
 		if (collision->IsHit(m_collision)) {
 			//ダメージ
-			m_state = enState_Damage;
-			m_testHP--;
+			ChangeState(Player::enState_Damage);
+			m_testHP-=TAILATTACKDAMAGE;
+			m_hitCoolTime = HITCOOLTIME;
 			return;
 		}
 	}
@@ -468,8 +516,9 @@ void Player::Hit()
 	for (auto& collision : collisionList_Attack) {
 		if (collision->IsHit(m_collision)) {
 			//ダメージ
-			m_state = enState_Damage;
-			m_testHP--;
+			ChangeState(Player::enState_Damage);
+			m_testHP-=FLYATTACKDAMAGE;
+			m_hitCoolTime = HITCOOLTIME;
 			return;
 		}
 	}
@@ -488,12 +537,15 @@ void Player::TakeAim()
 	//	}
 	//}
 	if (m_count == 0) {
-		std::sort(m_enemyList.begin(), m_enemyList.end(),
-			[this](EnemyBase* a, EnemyBase* b)
-			{
-				return a->ToEnemyTargetLength(this->Get_PlayerPos()) < b->ToEnemyTargetLength(this->Get_PlayerPos());
-			}
-		);
+		//std::sort(m_enemyList.begin(), m_enemyList.end(),
+		//	[this](EnemyBase* a, EnemyBase* b)
+		//	{
+		//		return a->ToEnemyTargetLength(this->Get_PlayerPos()) < b->ToEnemyTargetLength(this->Get_PlayerPos());
+		//	}
+		//);
+		[this](Enemy_Boss* a) {
+			return a->ToEnemyTargetLength(this->Get_PlayerPos()) /*< b->ToEnemyTargetLength(this->Get_PlayerPos())*/;
+			};
 		m_count++;
 	}
 	
@@ -538,18 +590,18 @@ void Player::TakeAim()
 }
 void Player::AddEnemy_List(EnemyBase* enemybase)
 {
-	m_enemyList.emplace_back(enemybase);
+	//m_enemyList.emplace_back(enemybase);
 }
 void Player::RemoveEnemy_List(EnemyBase* enemybase)
 {
-	std::vector<EnemyBase*>::iterator it = std::find(
-		m_enemyList.begin(),
-		m_enemyList.end(),
-		enemybase
-	);
-	if (it != m_enemyList.end()) {
-		m_enemyList.erase(it);
-	}
+	//std::vector<EnemyBase*>::iterator it = std::find(
+	//	m_enemyList.begin(),
+	//	m_enemyList.end(),
+	//	enemybase
+	//);
+	//if (it != m_enemyList.end()) {
+	//	m_enemyList.erase(it);
+	//}
 }
 void Player::LockOn()
 {
@@ -581,7 +633,7 @@ void Player::LongAttack()
 {
 	if (m_longAttackCoolTime <= 0) {
 		if (g_pad[0]->IsTrigger(enButtonLB1)) {
-			m_state = enState_LongAttack;
+			ChangeState(Player::enState_LongAttack);
 			EffectEmitter* effectEmitter = NewGO<EffectEmitter>(0, "long_attack");
 			effectEmitter->Init(0);
 			effectEmitter->SetScale(Vector3::One * 10.0f);
