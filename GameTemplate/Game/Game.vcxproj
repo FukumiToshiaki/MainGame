@@ -257,6 +257,7 @@
     <ClCompile Include="Map.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="PlayerCamera.cpp" />
+    <ClCompile Include="PlayerState_Arching.cpp" />
     <ClCompile Include="PlayerState_AttackBiting.cpp" />
     <ClCompile Include="PlayerState_AttackLong.cpp" />
     <ClCompile Include="PlayerState_Damage.cpp" />
@@ -264,6 +265,7 @@
     <ClCompile Include="PlayerState_Die.cpp" />
     <ClCompile Include="PlayerState_GuardBreak.cpp" />
     <ClCompile Include="PlayerState_Idle.cpp" />
+    <ClCompile Include="PlayerState_Run.cpp" />
     <ClCompile Include="PlayerState_Walk.cpp" />
     <ClCompile Include="PlayerState_WalkAttack.cpp" />
     <ClCompile Include="PlayerStatus.cpp" />
@@ -310,6 +312,7 @@
     <ClInclude Include="Map.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="PlayerCamera.h" />
+    <ClInclude Include="PlayerState_Arching.h" />
     <ClInclude Include="PlayerState_AttackBiting.h" />
     <ClInclude Include="PlayerState_AttackLong.h" />
     <ClInclude Include="PlayerState_Damage.h" />
@@ -317,6 +320,7 @@
     <ClInclude Include="PlayerState_Die.h" />
     <ClInclude Include="PlayerState_GuardBreak.h" />
     <ClInclude Include="PlayerState_Idle.h" />
+    <ClInclude Include="PlayerState_Run.h" />
     <ClInclude Include="PlayerState_Walk.h" />
     <ClInclude Include="PlayerState_WalkAttack.h" />
     <ClInclude Include="PlayerStatus.h" />

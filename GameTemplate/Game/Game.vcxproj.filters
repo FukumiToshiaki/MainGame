@@ -133,6 +133,12 @@
       <Filter>Boss</Filter>
     </ClCompile>
     <ClCompile Include="Time_Limit_UI.cpp" />
+    <ClCompile Include="PlayerState_Arching.cpp">
+      <Filter>Player</Filter>
+    </ClCompile>
+    <ClCompile Include="PlayerState_Run.cpp">
+      <Filter>Player</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -252,5 +258,11 @@
       <Filter>Boss</Filter>
     </ClInclude>
     <ClInclude Include="Time_Limit_UI.h" />
+    <ClInclude Include="PlayerState_Arching.h">
+      <Filter>Player</Filter>
+    </ClInclude>
+    <ClInclude Include="PlayerState_Run.h">
+      <Filter>Player</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
