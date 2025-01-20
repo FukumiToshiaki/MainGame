@@ -9,8 +9,8 @@ void BossState_FlyAttack::Animation()
 	);
 	if (m_flyTime <= 0) {
 		m_enemy_Boss->ChangeState(Enemy_Boss::enState_Landing);
-		m_flyTime = rand() % 4;
-		m_enemy_Boss->SetUnderFlyAttack(false);
+		m_flyTime = rand() % 3;
+		m_enemy_Boss->SetisUnderFlyAttack(false);
 	}
 }
 

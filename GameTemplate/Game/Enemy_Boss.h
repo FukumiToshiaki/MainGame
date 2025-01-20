@@ -38,11 +38,15 @@ public:
 	void FlyAttack();
 	//空中突進の当たり判定
 	void FlyAttackCollision();
-	//滞空時間
-	void FlyTime();
+	//ガードの判定
+	void Defence();
+	//ガードのコリジョン
+	void DefenceCollision();
 	// アニメーションイベント用の関数。
 	void OnAnimationEvent(const wchar_t* clipName, const wchar_t* eventName);
-
+	//距離をとる関数
+	void FlyDistance();
+	
 	// アニメーションクリップの番号を表す列挙型。
 	enum EnAnimationClip {
 		enState_Idle_Animation,
@@ -106,17 +110,17 @@ public:
 
 	
 
-	void SetUnderMelee(bool UnderMelee)
+	void SetisUnderMelee(bool UnderMelee)
 	{
 		m_isUnderAttackMelee = UnderMelee;
 	}
 
-	void SetUnderTail(bool UnderTail)
+	void SetisUnderTail(bool UnderTail)
 	{
 		m_isUnderTail = UnderTail;
 	}
 
-	void SetUnderFlyAttack(bool UnderFlyAttack)
+	void SetisUnderFlyAttack(bool UnderFlyAttack)
 	{
 		m_isUnderFlyAttack = UnderFlyAttack;
 	}
@@ -141,6 +145,10 @@ public:
 		return m_diff;
 	}
 
+	void SetidUnderDefencePattern(bool UnderDefence)
+	{
+		m_isUnderDefence = UnderDefence;
+	}
 	//float GetFlyTime()
 	//{
 	//	return m_testFlyTime;
@@ -169,10 +177,11 @@ protected:
 	/// </summary>
 	int m_attack_Rand = 0;
 	int m_attack_Count = -1;
-	int m_testHP = 1;
+	int m_testHP = 10;
 	int m_flyBoneId = 0;
 	float m_angle = 0.0f;
 	float m_radius = 2.0f;
+	float m_hitCoolTime = 2.0f;
 	//float m_testFlyTime = 3.0f;
 	/// <summary>
 	/// ブール型
@@ -183,6 +192,7 @@ protected:
 	bool m_isUnderFlyAttack = false;	//攻撃中ならtrue
 	bool m_isClear = false;				//クリア判定
 	bool m_isUnderPattern = false;		//行動中ならtrue
+	bool m_isUnderDefence = false;		//防御中ならtrue
 
 	ModelRender m_modelRender;
 	Player* m_player = nullptr;
@@ -196,6 +206,7 @@ protected:
 	Quaternion	m_rotation;							//回転
 	Quaternion m_wait;
 	AnimationClip m_animationClipArray[enAnimClip_Num];	// アニメーションクリップ
+	CharacterController m_charaCon;	//キャラクターコントローラー
 
 };
 

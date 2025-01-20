@@ -28,7 +28,7 @@ Game::~Game()
 }
 bool Game::Start()
 {
-	//m_map = NewGO<Map>(0,"map");
+	m_map = NewGO<Map>(0,"map");
 	//m_LightTest = NewGO<Light_Test>(0);
 	m_playerCamera = NewGO<PlayerCamera>(0);
 	//m_enemy_Shield = NewGO<Enemy_Shield>(0, "enemy_shield");
@@ -41,7 +41,7 @@ bool Game::Start()
 	m_time_Limit_UI = NewGO<Time_Limit_UI>(0, "time_limit");
 	//m_modelRender.SetPosition(m_position);
 
-	PhysicsWorld::GetInstance()->EnableDrawDebugWireFrame();
+	//PhysicsWorld::GetInstance()->EnableDrawDebugWireFrame();
 	return true;
 }
 

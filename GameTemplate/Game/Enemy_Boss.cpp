@@ -24,17 +24,21 @@
 #define START_POS_Y 0.0f
 #define START_POS_Z 500.0f
 #define SCALE 4.5f
-#define FLYATTACK_SPEED 10.0f
+#define FLYATTACK_SPEED 5.0f
 #define DISTANCE_POS 1400.0f
-#define BITING_DISTANCE 500.0f
+#define BITING_DISTANCE 1000.0f
 #define REST_DISTANCE 1200.0f
-#define BOSS_FORWARD 500.0f
-#define COLLISION_TAIL 600.0f
-#define COLLISION_FLYATTACK 700.0f
+#define BOSS_FORWARD 600.0f
+#define COLLISION_TAIL 400.0f
+#define COLLISION_FLYATTACK 600.0f
 #define COLLISION_MELEE 300.0f
-#define COLLISION 670.0f
-#define TAIL_DISTANCE 900.0f
-#define ATTACK_RAND 4
+#define COLLISION 500.0f
+#define COLLISION_DEFENCE 300.0f
+#define GUARDBREAK_DAMAGE 3
+#define BITATTACKDAMAGE 1
+#define WALKATTACKDAMAGE 2
+#define HITCOOLTIME 1.5f
+
 namespace
 {
 }
@@ -113,7 +117,7 @@ bool Enemy_Boss::Start()
 	m_rotation.SetRotationY(135.0f);
 	m_pos = { START_POS_X, START_POS_Y, START_POS_Z };
 	ChangeState(enState_Idle);
-	//PhysicsWorld::GetInstance()->EnableDrawDebugWireFrame();
+	m_charaCon.Init(COLLISION, COLLISION, m_pos);
 
 	//空を飛んでいるときのボーンを受け取る
 	m_flyBoneId = m_modelRender.FindBoneID(L"ValleyFat");
@@ -221,9 +225,15 @@ void Enemy_Boss::Rest()
 }
 void Enemy_Boss::Hit()
 {
-	if (m_state==enState_Damage) {
+	m_hitCoolTime -= g_gameTime->GetFrameDeltaTime();
+
+	if (m_state==enState_Damage||m_state==enState_Defence) {
 		return;
 	}
+	if (m_hitCoolTime >= 0) {
+		return;
+	}
+
 	// 攻撃コリジョンと衝突しているかを調べる
 	
 	//ダッシュアタック
@@ -234,7 +244,8 @@ void Enemy_Boss::Hit()
 		if (collision_GuardBreak->IsHit(m_collision)) {
 			//ダメージ
 			ChangeState(enState_Damage);
-			m_testHP=m_testHP - 2;
+			m_hitCoolTime = HITCOOLTIME;
+			m_testHP -= GUARDBREAK_DAMAGE;
 			return;
 		}
 	}
@@ -244,7 +255,8 @@ void Enemy_Boss::Hit()
 		if (collision_WalkAttack->IsHit(m_collision)) {
 			//ダメージ
 			ChangeState(enState_Damage);
-			m_testHP--;
+			m_hitCoolTime = HITCOOLTIME;
+			m_testHP -= WALKATTACKDAMAGE;
 			return;
 		}
 	}
@@ -254,7 +266,8 @@ void Enemy_Boss::Hit()
 		if (collision_MeleeAttack->IsHit(m_collision)) {
 			//ダメージ
 			ChangeState(enState_Damage);
-			m_testHP--;
+			m_hitCoolTime = HITCOOLTIME;
+			m_testHP -= BITATTACKDAMAGE;
 			return;
 		}
 	}
@@ -266,7 +279,7 @@ void Enemy_Boss::MeleeAttackCollision()
 	auto collisionObject = NewGO<CollisionObject>(0);
 	Vector3 collisionPosition = m_pos;
 	//座標をボスの少し前に設定
-	collisionPosition -= m_forward * BOSS_FORWARD;
+	collisionPosition += m_forward * BOSS_FORWARD;
 	//球状のコリジョンを作成
 	collisionObject->CreateSphere(collisionPosition,//座標
 		Quaternion::Identity,//回転
@@ -326,15 +339,70 @@ void Enemy_Boss::FlyAttackCollision()
 	);
 	collisionObject->SetName("boss_attack_fly");
 }
-//void Enemy_Boss::FlyTime()
-//{
-	//if (m_state == enState_Fly)
-	//{
-	//	return;
-	//}
-	//m_testFlyTime -= g_gameTime->GetFrameDeltaTime();
-//
-//}
+void Enemy_Boss::Defence()
+{
+	if (m_state!=enState_Defence) {
+		return;
+	}
+	DefenceCollision();
+
+}
+void Enemy_Boss::DefenceCollision()
+{
+	//コリジョンオブジェクトを作成する
+	auto collisionObject = NewGO<CollisionObject>(0);
+	Vector3 collisionPosition = m_pos;
+	//座標をボスの少し前に設定
+	collisionPosition += m_forward * BOSS_FORWARD;
+	//球状のコリジョンを作成
+	collisionObject->CreateSphere(collisionPosition,//座標
+		Quaternion::Identity,//回転
+		COLLISION_DEFENCE//半径
+	);
+	collisionObject->SetName("boss_defence");
+
+	if (m_hitCoolTime >= 0) {
+		return;
+	}
+
+	// 攻撃コリジョンと衝突しているかを調べる
+	//ガードブレイク時はダメージが増える
+	const auto& collisionList_GuardBreak = g_collisionObjectManager->FindCollisionObjects("player_guardbreak" /*"player_walk_attack" "player_biting_attack"*/);
+
+	for (auto& collision_GuardBreak : collisionList_GuardBreak) {
+		if (collision_GuardBreak->IsHit(collisionObject)) {
+			//ダメージ
+			ChangeState(enState_Damage);
+			m_testHP -= GUARDBREAK_DAMAGE * 1.5f;
+			m_hitCoolTime = HITCOOLTIME;
+			return;
+		}
+	}
+	const auto& collisionList_WalkAttack = g_collisionObjectManager->FindCollisionObjects/*("player_guardbreak"*/("player_walk_attack" /*"player_biting_attack"*/);
+
+	for (auto& collision_WalkAttack : collisionList_WalkAttack) {
+		if (collision_WalkAttack->IsHit(collisionObject)) {
+			//ダメージは０でカウンター
+			ChangeState(enState_Attack_Biting);
+			m_player->ChangeState(Player::enState_Arching);
+			m_hitCoolTime = HITCOOLTIME;
+			return;
+		}
+	}
+	const auto& collisionList_MeleeAttack = g_collisionObjectManager->FindCollisionObjects(/*"player_guardbreak"*/ /*"player_walk_attack"*/ "player_biting_attack");
+
+	for (auto& collision_MeleeAttack : collisionList_MeleeAttack) {
+		if (collision_MeleeAttack->IsHit(collisionObject)) {
+			//ダメージは０でカウンター
+			ChangeState(enState_Attack_Tail);
+			m_player->ChangeState(Player::enState_Arching);
+			m_hitCoolTime = HITCOOLTIME;
+			return;
+		}
+	}
+
+
+}
 void Enemy_Boss::OnAnimationEvent(const wchar_t* clipName, const wchar_t* eventName)
 {
 	//キーの名前がBoss_Attack_Melee_startの場合
@@ -375,6 +443,21 @@ void Enemy_Boss::OnAnimationEvent(const wchar_t* clipName, const wchar_t* eventN
 		//攻撃を終わる
 		m_isUnderFlyAttack = false;
 	}
+
+	//キーの名前がBoss_Attack_Melee_startの場合
+	if (wcscmp(eventName, L"Boss_Defence_start") == 0)
+	{
+		//防御中にする
+		m_isUnderDefence = true;
+	}
+
+}
+void Enemy_Boss::FlyDistance()
+{
+	if (m_state != enState_Attack_Fly) {
+		return;
+	}
+	m_pos += m_moveSpeed * 3.0f;
 
 }
 void Enemy_Boss::ChangeState(EnState changeState, int integerArgument0)
@@ -432,48 +515,11 @@ void Enemy_Boss::ChangeState(EnState changeState, int integerArgument0)
 void Enemy_Boss::Update()
 {
 	m_pos += m_moveSpeed * g_gameTime->GetFrameDeltaTime();//動きを一定にするため
-	//m_isScream = true;
-	//m_isBiting = true;
-	//Biting();
-	//m_attackCoolTime -= g_gameTime->GetFrameDeltaTime();
-		//攻撃速度
-	/*if (m_attackCoolTime >= 0.0f) {
-		m_attack_Rand = rand() % ATTACK_RAND;
-		m_attackCoolTime = ATTACK_COOLTIME;
-	}
-
-	switch (m_attack_Rand)
-	{
-	case 0:
-		break;
-	case 1:
-		Shoot();
-		break;
-	case 2:
-		break;
-	case 3:
-		break;
-	}*/
 	//コリジョンの当たり判定
 	m_collisionPos = m_pos;
 	m_collisionPos.y += 300.0f;
 	m_collisionPos.z += 300.0f;
 	m_modelRender.SetPosition(m_collisionPos);
-
-
-	//if ((g_pad[0]->IsTrigger(enButtonX))) {
-	//	test += 1;
-	//}
-	//if (test >= 11)
-	//{
-	//	test = 0;
-	//}
-	//if ((g_pad[0]->IsTrigger(enButtonLB1))) {
-	//	ChangeState(enState_Move);
-	//}
-	//if ((g_pad[0]->IsTrigger(enButtonLB2))) {
-	//	ChangeState(enState_Idle);
-	//}
 	m_Iboss_State->Animation();
 	m_Iboss_State->Update();
 	Rotation();
@@ -481,22 +527,24 @@ void Enemy_Boss::Update()
 	FlyAttackMove();
 	Biting();
 	TailAttack();
+	Defence();
 	FlyAttack();
 	m_modelRender.SetRotation(m_rotation);
 	m_skeleton.Update(m_model.GetWorldMatrix());
-	m_modelRender.SetPosition(m_pos);
+	m_pos = m_charaCon.Execute(m_moveSpeed, g_gameTime->GetFrameDeltaTime());
+	m_charaCon.SetPosition(m_pos);
 	m_collision->SetPosition(m_collisionPos);
 	m_collision->Update();
+	m_modelRender.SetPosition(m_pos);
 	m_modelRender.Update();
 	//ボーンの座標を受け取るプログラムテスト
 Matrix matrix = m_modelRender.GetBone(m_flyBoneId)->GetWorldMatrix();
 m_collision->SetPosition(m_pos);
 m_collision->SetRotation(m_rotation);
-m_collision->Update();
 m_collision->SetWorldMatrix(matrix);
+m_collision->Update();
 
 }
-
 void Enemy_Boss::Render(RenderContext& rc)
 {
 	//モデルを描画する。

@@ -18,7 +18,7 @@
 #define ATTACK_COOLTIME 5.0f
 #define LASTATTACK_COOLTIME 4.0f
 #define MELEE_DISTANCE 1500.0f
-#define CHASE_SPEED 10.0f
+#define CHASE_SPEED 500.0f
 
 BossPattern::~BossPattern()
 {
@@ -38,16 +38,6 @@ void BossPattern::Update()
 	// 基底クラスのUpdateを呼ぶ
 	Enemy_Boss::Update();
 
-	//if (m_state == enState_Idle && m_player->GetHP() < 3) {
-	//	m_coolTime = LASTATTACK_COOLTIME;
-	//}
-	//else if (m_state == enState_Idle && m_testHP < 3) {
-	//	m_coolTime = LASTATTACK_COOLTIME;
-	//}
-	//else {
-	//	m_coolTime = ATTACK_COOLTIME;
-	//}
-
 	CoolTime();
 
 	BossPatternMode();
@@ -61,15 +51,15 @@ void BossPattern::Update()
 		AttackModeLast();
 			m_attack_Rand = 0;
 			m_isUnderPattern = false;
-			m_coolTime = LASTATTACK_COOLTIME;
+			m_coolTime = rand() % 3;
 		return;
 	}
 	else if (m_testHP < 3) {
 		DefenseModeLast();
 			m_attack_Rand = 0;
 			m_isUnderPattern = false;
-			m_coolTime = LASTATTACK_COOLTIME;
-		return;
+			m_coolTime = rand() % 3;
+			return;
 	}
 
 	switch (m_pattern)
@@ -92,7 +82,7 @@ void BossPattern::Update()
 	}
 	m_attack_Rand = 0;
 	m_isUnderPattern = false;
-	m_coolTime = ATTACK_COOLTIME;
+	m_coolTime = rand() % 5;
 	//MeleePattern();
 	//LongPattern();
 	////trueなら近距離に行く
@@ -191,13 +181,13 @@ void BossPattern::DistancePattern()
 
 void BossPattern::AttackModeLast()
 {
-	//フラグが立っていないなら計算する必要がないので、早期リターン
-	if (!m_isUnderPattern) {
-		return;
-	}
-	if (m_testHP >= 3) {
-		return;
-	}
+	////フラグが立っていないなら計算する必要がないので、早期リターン
+	//if (!m_isUnderPattern) {
+	//	return;
+	//}
+	//if (m_testHP >= 3) {
+	//	return;
+	//}
 	//m_meleePoint = this->MeleePattern();
 	//体力によってランダムの数字が変わる
 	//switch (m_meleePoint)
@@ -268,46 +258,46 @@ void BossPattern::AttackModeLast()
 
 		//trueなら近距離用のパターン
 	if (m_isBifurcation) {
-		//13以上なら距離をとる
-		if (m_attack_Rand >= 13) {
-			ChangeState(Enemy_Boss::enState_Takeoff);
-		}
+		////13以上なら距離をとる
+		//if (m_attack_Rand >= 13) {
+		//	ChangeState(Enemy_Boss::enState_Takeoff);
+		//}
 		//11以上ならガード
-		else if (m_attack_Rand >= 11) {
+		if (m_attack_Rand >= 0) {
 			ChangeState(Enemy_Boss::enState_Defence);
 		}
-		//7以上なら噛みつき
-		else if (m_attack_Rand >= 7) {
-			ChangeState(Enemy_Boss::enState_Attack_Biting);
-		}
-		//4以上ならブレス
-		else if (m_attack_Rand >= 4) {
-			ChangeState(Enemy_Boss::enState_Attack_Shoot);
-		}
-		//4未満なら尻尾攻撃
-		else {
-			ChangeState(Enemy_Boss::enState_Attack_Tail);
-		}
+		////7以上なら噛みつき
+		//else if (m_attack_Rand >= 7) {
+		//	ChangeState(Enemy_Boss::enState_Attack_Biting);
+		//}
+		////4以上ならブレス
+		//else if (m_attack_Rand >= 4) {
+		//	ChangeState(Enemy_Boss::enState_Attack_Shoot);
+		//}
+		////4未満なら尻尾攻撃
+		//else {
+		//	ChangeState(Enemy_Boss::enState_Attack_Tail);
+		//}
 	}
 	//falseなら遠距離パターンに
 	else {
-		////12以上なら空ブレス
-		//if (m_attack_Rand >= 12) {
-		//	ChangeState(Enemy_Boss::enState_Takeoff, Enemy_Boss::enState_Attack_FlyShoot);
-		//}
+		//12以上なら空ブレス
+		if (m_attack_Rand >= 12) {
+			ChangeState(Enemy_Boss::enState_Takeoff, Enemy_Boss::enState_Attack_FlyShoot);
+		}
 		//9以上なら滑空突進
-		//else 
-			if (m_attack_Rand >= 9) {
+		else 
+			if (m_attack_Rand >= 10) {
 			ChangeState(Enemy_Boss::enState_Takeoff, Enemy_Boss::enState_Attack_Fly);
 		}
-		////6以上ならブレス
-		//else if (m_attack_Rand >= 6) {
-		//	ChangeState(Enemy_Boss::enState_Attack_Shoot);
-		//}
-		////6未満なら近づく
-		//else {
-		//	ChangeState(Enemy_Boss::enState_Move);
-		//}
+		//6以上ならブレス
+		else if (m_attack_Rand >= 6) {
+			ChangeState(Enemy_Boss::enState_Attack_Shoot);
+		}
+		//6未満なら近づく
+		else {
+			ChangeState(Enemy_Boss::enState_Move);
+		}
 	}
 }
 
@@ -333,7 +323,7 @@ void BossPattern::DefenseModeLast()
 	//}
 		//trueなら近距離用のパターン
 	if (m_isBifurcation) {
-		//9以上なら距離をとる
+		//10以上なら距離をとる
 		if (m_attack_Rand >= 0) {
 			ChangeState(Enemy_Boss::enState_Takeoff, Enemy_Boss::enState_Fly);
 		}
@@ -346,7 +336,7 @@ void BossPattern::DefenseModeLast()
 		//	ChangeState(Enemy_Boss::enState_Attack_Shoot);
 		//}
 		////2以上ならガード
-		//else if (m_attack_Rand >= 2) {
+		//if (m_attack_Rand >= 2) {
 		//	ChangeState(Enemy_Boss::enState_Defence);
 		//}
 		////2未満なら尻尾攻撃
@@ -356,23 +346,23 @@ void BossPattern::DefenseModeLast()
 	}
 	//falseなら遠距離パターンに
 	else {
-		////9以上なら空ブレス
-		//if (m_attack_Rand >= 8) {
-		//	ChangeState(Enemy_Boss::enState_Takeoff, Enemy_Boss::enState_Attack_FlyShoot);
-		//}
-		////5以上なら滑空突進
-		//else 
+		//9以上なら空ブレス
+		if (m_attack_Rand >= 8) {
+			ChangeState(Enemy_Boss::enState_Takeoff, Enemy_Boss::enState_Attack_FlyShoot);
+		}
+		//5以上なら滑空突進
+		else 
 		if (m_attack_Rand >= 6) {
 			ChangeState(Enemy_Boss::enState_Takeoff, Enemy_Boss::enState_Attack_Fly);
 		}
-		////1以上ならブレス
-		//else if (m_attack_Rand >= 1) {
-		//	ChangeState(Enemy_Boss::enState_Attack_Shoot);
-		//}
+		//1以上ならブレス
+		else if (m_attack_Rand >= 1) {
+			ChangeState(Enemy_Boss::enState_Attack_Shoot);
+		}
 		//1未満なら近づく
-		//else {
-		//	ChangeState(Enemy_Boss::enState_Move);
-		//}
+		else {
+			ChangeState(Enemy_Boss::enState_Move);
+		}
 	}
 }
 
@@ -778,15 +768,15 @@ void BossPattern::SuperAttackMode()
 	//falseなら遠距離パターンに
 	else {
 		//12以上なら空ブレス
-		if (m_attack_Rand >= 12) {
+		if (m_attack_Rand >= 10) {
 			ChangeState(Enemy_Boss::enState_Takeoff, Enemy_Boss::enState_Attack_FlyShoot);
 		}
 		//9以上なら滑空突進
-		else if (m_attack_Rand >= 8) {
+		else if (m_attack_Rand >= 7) {
 			ChangeState(Enemy_Boss::enState_Takeoff, Enemy_Boss::enState_Attack_Fly);
 		}
 		//5以上ならブレス
-		else if (m_attack_Rand >= 5) {
+		else if (m_attack_Rand >= 4) {
 			ChangeState(Enemy_Boss::enState_Attack_Shoot);
 		}
 		//5未満なら近づく

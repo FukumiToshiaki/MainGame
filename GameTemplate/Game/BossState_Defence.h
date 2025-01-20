@@ -11,6 +11,6 @@ public:
 	void Update() override;
 
 private:
-
+	float m_defenceTime = 4.0f;
 };
 

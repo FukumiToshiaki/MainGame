@@ -11,6 +11,11 @@ void BossState_Damage::Animation()
 
 void BossState_Damage::Update()
 {
+	//UŒ‚’†‚Éƒ_ƒ[ƒW‚ðŽó‚¯‚Äƒ‚[ƒVƒ‡ƒ“‚ª’†’f‚µ‚½Žž‚ÉUŒ‚’†‚Ì”»’è‚ªo‚È‚¢‚æ‚¤‚É
+	m_enemy_Boss->SetisUnderMelee(false);
+	m_enemy_Boss->SetisUnderFlyAttack(false);
+	m_enemy_Boss->SetisUnderTail(false);
+
 	if (m_enemy_Boss->GetHP() <= 0) {
 		m_enemy_Boss->ChangeState(Enemy_Boss::enState_Die);
 	}
