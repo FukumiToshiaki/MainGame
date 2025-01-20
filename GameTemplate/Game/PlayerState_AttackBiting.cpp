@@ -11,6 +11,7 @@ void PlayerState_AttackBiting::Animation()
 void PlayerState_AttackBiting::Update()
 {
 	if (!m_player->GetIsPlayingAnimation()) {
+		m_player->SetisBitAttack(false);
 		m_player->ChangeState(Player::enState_Idle);
 	}
 }

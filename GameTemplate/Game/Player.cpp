@@ -17,14 +17,19 @@
 #include "PlayerState_Damage.h"
 #include "PlayerState_AttackLong.h"
 #include "PlayerState_Die.h"
+#include "PlayerState_Run.h"
+#include "PlayerState_Arching.h"
 
 #define START_POS_X 0.0f
 #define START_POS_Y 0.0f
 #define START_POS_Z -2000.0f
-#define PLAYER_MOVESPEED 500.0f
+#define PLAYER_WALKSPEED 500.0f
+#define PLAYER_RUNSPEED 1000.0f
 #define SCALE 2.0f
 #define LONGATTACKCOOLTIME 5.0f
-#define HITCOOLTIME 2.5f
+#define KNOCKBACKTIME 0.3f
+#define HITCOOLTIME 1.5f
+#define DEFENSEHITCOOLTIME 0.2f
 #define MELEEATTACKDAMAGE 4
 #define TAILATTACKDAMAGE 2
 #define FLYATTACKDAMAGE 6
@@ -50,8 +55,8 @@ bool Player::Start()
 	m_animationClipArray[enAnimClip_Walk].SetLoopFlag(true);
 	m_animationClipArray[enAnimClip_Idle].Load("Assets/animData/Pico_Anime/Player_Test_Idle.tka");
 	m_animationClipArray[enAnimClip_Idle].SetLoopFlag(true);
-	//m_animationClipArray[enAnimClip_Idle].Load("Assets/animData/Pico_Anime/Pico_Idle.tka");
-	//m_animationClipArray[enAnimClip_Idle].SetLoopFlag(true);
+	m_animationClipArray[enAnimClip_Run].Load("Assets/animData/Pico_Anime/Player_Test_Run.tka");
+	m_animationClipArray[enAnimClip_Run].SetLoopFlag(true);
 	m_animationClipArray[enAnimClip_WalkAttack].Load("Assets/animData/Pico_Anime/Player_Test_WalkAttack.tka");
 	m_animationClipArray[enAnimClip_WalkAttack].SetLoopFlag(false);
 	m_animationClipArray[enAnimClip_LongAttack].Load("Assets/animData/Pico_Anime/Player_Long_Attack.tka");
@@ -68,9 +73,11 @@ bool Player::Start()
 	m_animationClipArray[enAnimClip_Damage].SetLoopFlag(false);
 	m_animationClipArray[enAnimClip_Die].Load("Assets/animData/Pico_Anime/Player_Test_Die.tka");
 	m_animationClipArray[enAnimClip_Die].SetLoopFlag(false);
+	m_animationClipArray[enAnimClip_Arching].Load("Assets/animData/Pico_Anime/Player_Test_Arching.tka");
+	m_animationClipArray[enAnimClip_Arching].SetLoopFlag(false);
 
 
-
+	
 	m_modelRender.AddAnimationEvent([&](const wchar_t* clipName, const wchar_t* eventName) {
 		OnAnimationEvent(clipName, eventName);
 		});
@@ -193,9 +200,6 @@ void Player::OnAnimationEvent(const wchar_t* clipName, const wchar_t* eventName)
 
 void Player::BitingAttackCollision()
 {
-	/*m_forward = m_moveSpeed;
-	m_forward.Normalize();*/
-
 	//コリジョンオブジェクトを作成する
 	auto collisionObject = NewGO<CollisionObject>(0);
 	Vector3 collisionPosition = m_pos;
@@ -255,6 +259,7 @@ void Player::ChangeState(EnState changeState)
 		m_Iplayer_State = new PlayerState_Defense(this);
 		break;
 	case Player::enState_Run:
+		m_Iplayer_State = new PlayerState_Run(this);
 		break;
 	case Player::enState_Walk:
 		m_Iplayer_State = new PlayerState_Walk(this);
@@ -273,6 +278,9 @@ void Player::ChangeState(EnState changeState)
 		break;
 	case Player::enState_Die:
 		m_Iplayer_State = new PlayerState_Die(this);
+		break;
+	case Player::enState_Arching:
+		m_Iplayer_State = new PlayerState_Arching(this);
 		break;
 	}
 	m_state = changeState;
@@ -317,10 +325,16 @@ void Player::Update()
 
 void Player::Move()
 {
-	if (m_state == enState_Die || m_state == enState_Damage) {
+	if (m_state == enState_Die || m_state == enState_Damage || m_state == enState_Arching) {
 		return;
 	}
 	if (m_state == enState_Attack_Biting || m_state == enState_GuradBreak || m_state == enState_WalkAttack || m_state == enState_LongAttack) {
+		m_isNowAttack = true;
+		return;
+	}
+	if (m_state == enState_WalkAttack)
+	{
+		m_moveSpeed = m_attack_Pos * 5.0f;
 		m_isNowAttack = true;
 		return;
 	}
@@ -348,20 +362,26 @@ void Player::Move()
 	//キャラクターコントローラーを使用して、座標を更新。
 	m_pos += m_moveSpeed * g_gameTime->GetFrameDeltaTime();
 	m_modelRender.SetPosition(m_pos);
-	right *= m_stickL.x * PLAYER_MOVESPEED;
-	forward *= m_stickL.z * PLAYER_MOVESPEED;
-
-	if (m_stickL.x != 0.0f || m_stickL.z != 0.0f) {
+	//Xボタンを押されながら移動したら走る
+	if (g_pad[0]->IsPress(enButtonX)&& m_stickL.x != 0.0f || g_pad[0]->IsPress(enButtonX) && m_stickL.z != 0.0f) {
+		right *= m_stickL.x * PLAYER_RUNSPEED;
+		forward *= m_stickL.z * PLAYER_RUNSPEED;
+		ChangeState(Player::enState_Run);
+	}
+	//何も押されず移動なら歩く
+	else if (m_stickL.x != 0.0f || m_stickL.z != 0.0f) {
+		right *= m_stickL.x * PLAYER_WALKSPEED;
+		forward *= m_stickL.z * PLAYER_WALKSPEED;
 		ChangeState(Player::enState_Walk);
 	}
 	else {
+		//移動しないならIdle状態
+		right *= m_stickL.x * 0.0f;;
+		forward *= m_stickL.z * 0.0f;
 		ChangeState(Player::enState_Idle);
 	}
 	////移動速度にスティックの入力量を加算する。
 	m_moveSpeed += right + forward;
-
-	//座標を移動
-		////スケルトンを更新。
 }
 void Player::Rotation()
 {
@@ -375,7 +395,7 @@ void Player::Rotation()
 	//m_modelRender.SetRotation(m_rotation);
 	//m_forward = Vector3::AxisZ;
 	//m_rotation.Apply(m_forward);
-	if (m_moveSpeed.Length() > 0.1f) {
+	if (m_moveSpeed.Length() > 0.001f) {
 		float angle = atan2(-m_moveSpeed.x, m_moveSpeed.z);
 		m_rotation.SetRotationY(-angle);
 		m_forward = m_moveSpeed;
@@ -392,7 +412,7 @@ void Player::Rotation()
 }
 void Player::Attack_Biting()
 {
-	if (g_pad[0]->IsTrigger(enButtonRB2) && m_state != enState_Walk && !m_isNowAttack) {
+	if (g_pad[0]->IsTrigger(enButtonRB2) && m_state != enState_WalkAttack && !m_isNowAttack) {
 		ChangeState(Player::enState_Attack_Biting);
 	}
 	//攻撃判定中なら
@@ -407,16 +427,11 @@ void Player::Attack_Biting()
 }
 void Player::WalkAttack()
 {
-	if (g_pad[0]->IsTrigger(enButtonRB2) && !m_isNowAttack) {
-		if (m_stickL.x != 0.0f || m_stickL.z != 0.0f)
-		{
+	if (m_state == enState_Run)
+	{
+		if (g_pad[0]->IsTrigger(enButtonRB2) && !m_isNowAttack) {
 			ChangeState(Player::enState_WalkAttack);
 		}
-	}
-	if (m_state == enState_WalkAttack)
-	{
-		m_moveSpeed.x = 0.0f;
-		m_moveSpeed.z = 0.0f;
 	}
 	if (m_isUnderWalkAttack) {
 		WalkAttackCollision();
@@ -424,6 +439,12 @@ void Player::WalkAttack()
 }
 void Player::Defense()
 {
+	if (m_state == enState_Damage) {
+		return;
+	}
+
+	m_KnockBack = m_pos - m_enemy_Boss->GetPos();
+	m_KnockBack.Normalize();
 	if (g_pad[0]->IsPress(enButtonRB1) && !m_isNowAttack) {
 		ChangeState(Player::enState_Defense);
 		m_moveSpeed.x = 0.0f;
@@ -432,16 +453,29 @@ void Player::Defense()
 	if (m_state != enState_Defense) {
 		return;
 	}
-	if (m_hitCoolTime >= 0) {
-		return;
+
+	//if (m_hitCoolTime >= 0) {
+	//	return;
+	//}
+	if (m_knockBackTime <= 0) {
+		m_isKnockBack = false;
+		m_knockBackTime = KNOCKBACKTIME;
+	}
+	if (m_isKnockBack) {
+		m_knockBackTime -= g_gameTime->GetFrameDeltaTime();
 	}
 	// 攻撃コリジョンと衝突しているかを調べる
 	const auto& collisionList_MeleeAttack = g_collisionObjectManager->FindCollisionObjects("boss_attack_melee" /*"player_walk_attack" "player_biting_attack"*/);
 	for (auto& collision : collisionList_MeleeAttack) {
 		if (collision->IsHit(m_collision)) {
 			//ダメージ
-			m_testHP -= MELEEATTACKDAMAGE / 2;
-			m_hitCoolTime = HITCOOLTIME;
+			m_testHP -= MELEEATTACKDAMAGE / 8;
+			m_isKnockBack = true;
+			if (m_isKnockBack) {
+				m_moveSpeed = m_KnockBack * 600.0f;
+			}
+			//m_moveSpeed = m_KnockBack * 2000.0f;
+			//m_hitCoolTime = DEFENSEHITCOOLTIME;
 			return;
 		}
 	}
@@ -450,8 +484,13 @@ void Player::Defense()
 	for (auto& collision : collisionList_TailAttack) {
 		if (collision->IsHit(m_collision)) {
 			//ダメージ
-			m_testHP -= TAILATTACKDAMAGE / 2;
-			m_hitCoolTime = HITCOOLTIME;
+			m_testHP -= TAILATTACKDAMAGE / 8;			
+			m_isKnockBack = true;
+			if (m_isKnockBack) {
+				m_moveSpeed = m_KnockBack * 1300.0f;
+			}
+			//m_moveSpeed = m_KnockBack * 5000.0f;
+			//m_hitCoolTime = DEFENSEHITCOOLTIME;
 			return;
 		}
 	}
@@ -460,8 +499,13 @@ void Player::Defense()
 	for (auto& collision : collisionList_Attack) {
 		if (collision->IsHit(m_collision)) {
 			//ダメージ
-			m_testHP -= FLYATTACKDAMAGE / 2;
-			m_hitCoolTime = HITCOOLTIME;
+			m_testHP -= FLYATTACKDAMAGE / 12;
+			m_isKnockBack = true;
+			if (m_isKnockBack) {
+				m_moveSpeed = m_KnockBack * 800.0f;
+			}
+			//m_moveSpeed += m_KnockBack * 1000.0f;
+			//m_hitCoolTime = DEFENSEHITCOOLTIME;
 			return;
 		}
 	}
@@ -537,15 +581,12 @@ void Player::TakeAim()
 	//	}
 	//}
 	if (m_count == 0) {
-		//std::sort(m_enemyList.begin(), m_enemyList.end(),
-		//	[this](EnemyBase* a, EnemyBase* b)
-		//	{
-		//		return a->ToEnemyTargetLength(this->Get_PlayerPos()) < b->ToEnemyTargetLength(this->Get_PlayerPos());
-		//	}
-		//);
-		[this](Enemy_Boss* a) {
-			return a->ToEnemyTargetLength(this->Get_PlayerPos()) /*< b->ToEnemyTargetLength(this->Get_PlayerPos())*/;
-			};
+		std::sort(m_enemyList.begin(), m_enemyList.end(),
+			[this](EnemyBase* a, EnemyBase* b)
+			{
+				return a->ToEnemyTargetLength(this->Get_PlayerPos()) < b->ToEnemyTargetLength(this->Get_PlayerPos());
+			}
+		);
 		m_count++;
 	}
 	
@@ -590,18 +631,18 @@ void Player::TakeAim()
 }
 void Player::AddEnemy_List(EnemyBase* enemybase)
 {
-	//m_enemyList.emplace_back(enemybase);
+	m_enemyList.emplace_back(enemybase);
 }
 void Player::RemoveEnemy_List(EnemyBase* enemybase)
 {
-	//std::vector<EnemyBase*>::iterator it = std::find(
-	//	m_enemyList.begin(),
-	//	m_enemyList.end(),
-	//	enemybase
-	//);
-	//if (it != m_enemyList.end()) {
-	//	m_enemyList.erase(it);
-	//}
+	std::vector<EnemyBase*>::iterator it = std::find(
+		m_enemyList.begin(),
+		m_enemyList.end(),
+		enemybase
+	);
+	if (it != m_enemyList.end()) {
+		m_enemyList.erase(it);
+	}
 }
 void Player::LockOn()
 {

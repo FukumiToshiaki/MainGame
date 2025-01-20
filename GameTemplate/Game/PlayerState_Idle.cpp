@@ -11,4 +11,5 @@ void PlayerState_Idle::Animation()
 
 void PlayerState_Idle::Update()
 {
+
 }

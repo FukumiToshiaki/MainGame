@@ -12,6 +12,7 @@ void PlayerState_AttackLong::Animation()
 void PlayerState_AttackLong::Update()
 {
 	if (!m_player->GetIsPlayingAnimation()) {
+		m_player->SetisLongAttack(false);
 		m_player->ChangeState(Player::enState_Idle);
 	}
 }

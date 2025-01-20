@@ -13,5 +13,6 @@ void PlayerState_WalkAttack::Update()
 {
 	if (!m_player->GetIsPlayingAnimation()) {
 		m_player->ChangeState(Player::enState_Idle);
+		m_player->SetisWalkAttack(false);
 	}
 }

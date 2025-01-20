@@ -69,6 +69,7 @@ public:
 		enAnimClip_LongAttack,
 		enAnimClip_Damage,
 		enAnimClip_Die,
+		enAnimClip_Arching,
 		enAnimClip_Num,		// 3 :アニメーションクリップの数。アニメーションを追加するならこの上に作る
 
 	};
@@ -83,6 +84,7 @@ public:
 		enState_GuradBreak,
 		enState_Damage,
 		enState_LongAttack,
+		enState_Arching,
 		enState_Die,
 	};
 	EnState m_state = enState_Idle;
@@ -173,6 +175,18 @@ public:
 		m_isOver = Over;
 	}
 
+	void SetisWalkAttack(bool WalkAttack) {
+		m_isUnderWalkAttack = WalkAttack;
+	}
+	void SetisBitAttack(bool BitAttack) {
+		m_isUnderAttack = BitAttack;
+	}
+	void SetisGuradBreak(bool GuradBreak) {
+		m_isUnderGuradBreak = GuradBreak;
+	}
+	void SetisLongAttack(bool LongAttack) {
+		m_isUnderLongAttack = LongAttack;
+	}
 
 	const bool GetIsLockOn() const
 	{
@@ -202,12 +216,13 @@ private:
 /// ベクター
 /// </summary>
 	Vector3 m_pos;		// 座標
-	Vector3 m_moveSpeed;									//移動速度。
+	Vector3 m_moveSpeed = Vector3::Zero;									//移動速度。
 	Vector3	m_forward = Vector3::AxisZ;
 	Vector3 m_scale = Vector3::One;			//大きさ。
 	Vector3 m_stickL;
 	Vector3 m_attack_Pos;
 	Vector3 m_targetPosition = Vector3::Zero;
+	Vector3 m_KnockBack;
 	std::vector<EnemyBase*> m_enemyList;
 /// <summary>
 /// クラス
@@ -228,12 +243,14 @@ private:
 	int m_count = -1;
 	int m_targetCount = -1;
 	float m_testHP = 10.0f;
-	float m_hitCoolTime = 1.0f;
+	float m_hitCoolTime = 1.5f;
 	float m_longAttackCoolTime = 5.0f;
+	float m_knockBackTime = 0.3f;
 /// <summary>
 /// ブール型
 /// </summary>
 	bool m_isNowAttack = false;//攻撃中ならtrue
+	bool m_isKnockBack = false;
 	//bool m_isAttack_Biting = false;	//
 	//bool m_isWalk = false;			//
 	//bool m_isWalkAttack = false;	//

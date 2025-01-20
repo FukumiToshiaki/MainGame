@@ -32,4 +32,8 @@ void PlayerState_Defense::Update()
 		//m_isDefense = false;
 		//m_isDefenseEnd = false;
 	}
+	if (m_player->GetHP() <= 0) {
+		m_player->ChangeState(Player::enState_Die);
+	}
+
 }
