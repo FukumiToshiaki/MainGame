@@ -1,10 +1,10 @@
 #include "stdafx.h"
 #include "EnemyBase.h"
 #include "BossPattern.h"
-
 #include "Enemy_Boss.h"
 #include "Player.h"
 #include "Game.h"
+#include "BossFlyPoint.h"
 #include "BossState_Idle.h"
 #include "BossState_Walk.h"
 #include "BossState_Biting.h"
@@ -19,26 +19,27 @@
 #include "BossState_Scream.h"
 #include "BossState_Die.h"
 #include "BossState_Defence.h"
+#include "BossState_Rest.h"
 
 #define START_POS_X 0.0f
 #define START_POS_Y 0.0f
 #define START_POS_Z 500.0f
 #define SCALE 4.5f
-#define FLYATTACK_SPEED 5.0f
-#define DISTANCE_POS 1400.0f
-#define BITING_DISTANCE 1000.0f
-#define REST_DISTANCE 1200.0f
 #define BOSS_FORWARD 600.0f
-#define COLLISION_TAIL 400.0f
-#define COLLISION_FLYATTACK 600.0f
-#define COLLISION_MELEE 300.0f
-#define COLLISION 500.0f
-#define COLLISION_DEFENCE 300.0f
-#define GUARDBREAK_DAMAGE 3
-#define BITATTACKDAMAGE 1
-#define WALKATTACKDAMAGE 2
+#define COLLISION 600.0f
+#define GUARDBREAK_DAMAGE 4.5f
+#define BITATTACKDAMAGE 1.5f
+#define WALKATTACKDAMAGE 3
 #define HITCOOLTIME 1.5f
-
+//#define FLYATTACK_SPEED 5.0f
+//#define DISTANCE_POS 1400.0f
+//#define BITING_DISTANCE 1000.0f
+//#define REST_DISTANCE 1200.0f
+//#define COLLISION_TAIL 400.0f
+//#define COLLISION_FLYATTACK 450.0f
+//#define COLLISION_MELEE 300.0f
+//#define COLLISION_DEFENCE 700.0f
+//#define COLLISION_SCREAM 5500.0f
 namespace
 {
 }
@@ -50,49 +51,51 @@ void Enemy_Boss::InitSkeleton()
 bool Enemy_Boss::Start()
 {
 	const Vector3 m_scale = { SCALE,SCALE,SCALE }; //大きさ
-	//const Vector3 m_corre = { 0.0f,40.0f,0.0f };//位置修正
-	
 	//コリジョンの判定を移動させる
 	m_collisionPos = m_pos;
 	m_collisionPos.y += 300.0f;
 	m_collisionPos.z -= 300.0f;
-	m_modelRender.SetPosition(m_collisionPos);
+	//m_modelRender.SetPosition(m_collisionPos);
+	EffectEngine::GetInstance()->ResistEffect(2, u"Assets/Effect/Boss_Shoot_Start.efk");
+	EffectEngine::GetInstance()->ResistEffect(3, u"Assets/Effect/Boss_Shoot.efk");
 
 	m_modelRender.SetPosition(m_pos);
 	m_modelRender.SetScale(m_scale);
 	m_modelRender.SetRotation(m_rotation);
 
-	m_animationClipArray[enState_Idle].SetLoopFlag(true);
-	m_animationClipArray[enState_Attack_Biting].SetLoopFlag(false);
-	m_animationClipArray[enState_Attack_Shoot].SetLoopFlag(false);
-	m_animationClipArray[enState_Attack_Tail].SetLoopFlag(false);
-	m_animationClipArray[enState_Attack_Scream].SetLoopFlag(false);
-	m_animationClipArray[enState_Attack_FlyShoot].SetLoopFlag(false);
-	m_animationClipArray[enState_Damage].SetLoopFlag(false);
-	m_animationClipArray[enState_Defence].SetLoopFlag(false);
-	m_animationClipArray[enState_Rest].SetLoopFlag(true);
-	m_animationClipArray[enState_Move].SetLoopFlag(true);
-	m_animationClipArray[enState_Die].SetLoopFlag(false);
-	m_animationClipArray[enState_Fly].SetLoopFlag(true);
-	m_animationClipArray[enState_Attack_Fly].SetLoopFlag(true);
-	m_animationClipArray[enState_Takeoff].SetLoopFlag(false);
-	m_animationClipArray[enState_Landing].SetLoopFlag(false);
+	m_animationClipArray[enState_Idle_Animation].SetLoopFlag(true);
+	m_animationClipArray[enState_Attack_Biting_Animation].SetLoopFlag(false);
+	m_animationClipArray[enState_Attack_Shoot_Animation].SetLoopFlag(false);
+	m_animationClipArray[enState_Attack_Tail_Animation].SetLoopFlag(false);
+	m_animationClipArray[enState_Attack_Scream_Animation].SetLoopFlag(false);
+	m_animationClipArray[enState_Attack_FlyShoot_Animation].SetLoopFlag(false);
+	m_animationClipArray[enState_Damage_Animation].SetLoopFlag(false);
+	m_animationClipArray[enState_Defence_Animation].SetLoopFlag(false);
+	m_animationClipArray[enState_Defence_Counter_Animation].SetLoopFlag(true);
+	m_animationClipArray[enState_Rest_Animation].SetLoopFlag(true);
+	m_animationClipArray[enState_Move_Animation].SetLoopFlag(true);
+	m_animationClipArray[enState_Die_Animation].SetLoopFlag(false);
+	m_animationClipArray[enState_Fly_Animation].SetLoopFlag(true);
+	m_animationClipArray[enState_Attack_Fly_Animation].SetLoopFlag(true);
+	m_animationClipArray[enState_Takeoff_Animation].SetLoopFlag(false);
+	m_animationClipArray[enState_Landing_Animation].SetLoopFlag(false);
 
-		m_animationClipArray[enState_Idle].Load("Assets/animData/Dragon_Frag/Dragon_Idle.tka");
-		m_animationClipArray[enState_Attack_Biting].Load("Assets/animData/Dragon_Frag/Dragon_adjcent.tka");
-		m_animationClipArray[enState_Attack_Shoot].Load("Assets/animData/Dragon_Frag/Dragon_Shoot.tka");
-		m_animationClipArray[enState_Attack_Tail].Load("Assets/animData/Dragon_Frag/Dragon_Tail.tka");
-		m_animationClipArray[enState_Attack_Scream].Load("Assets/animData/Dragon_Frag/Dragon_Scream.tka");
-		m_animationClipArray[enState_Attack_FlyShoot].Load("Assets/animData/Dragon_Frag/Dragon_FlyShoot.tka");
-		m_animationClipArray[enState_Damage].Load("Assets/animData/Dragon_Frag/Dragon_Gethit.tka");
-		m_animationClipArray[enState_Defence].Load("Assets/animData/Dragon_Frag/Dragon_Defense.tka");
-		m_animationClipArray[enState_Rest].Load("Assets/animData/Dragon_Frag/Dragon_Sleep.tka");
-		m_animationClipArray[enState_Move].Load("Assets/animData/Dragon_Frag/Dragon_Walk.tka");
-		m_animationClipArray[enState_Die].Load("Assets/animData/Dragon_Frag/Dragon_Die.tka");
-		m_animationClipArray[enState_Fly].Load("Assets/animData/Dragon_Frag/Dragon_Fly.tka");
-		m_animationClipArray[enState_Attack_Fly].Load("Assets/animData/Dragon_Frag/Dragon_Fly_Forward.tka");
-		m_animationClipArray[enState_Takeoff].Load("Assets/animData/Dragon_Frag/Dragon_Takeoff.tka");
-		m_animationClipArray[enState_Landing].Load("Assets/animData/Dragon_Frag/Dragon_Land.tka");
+		m_animationClipArray[enState_Idle_Animation].Load("Assets/animData/Dragon_Frag/Dragon_Idle.tka");
+		m_animationClipArray[enState_Attack_Biting_Animation].Load("Assets/animData/Dragon_Frag/Dragon_adjcent.tka");
+		m_animationClipArray[enState_Attack_Shoot_Animation].Load("Assets/animData/Dragon_Frag/Dragon_Shoot.tka");
+		m_animationClipArray[enState_Attack_Tail_Animation].Load("Assets/animData/Dragon_Frag/Dragon_Tail.tka");
+		m_animationClipArray[enState_Attack_Scream_Animation].Load("Assets/animData/Dragon_Frag/Dragon_Scream.tka");
+		m_animationClipArray[enState_Attack_FlyShoot_Animation].Load("Assets/animData/Dragon_Frag/Dragon_FlyShoot.tka");
+		m_animationClipArray[enState_Damage_Animation].Load("Assets/animData/Dragon_Frag/Dragon_Gethit.tka");
+		m_animationClipArray[enState_Defence_Animation].Load("Assets/animData/Dragon_Frag/Dragon_Defense.tka");
+		m_animationClipArray[enState_Defence_Counter_Animation].Load("Assets/animData/Dragon_Frag/Dragon_Defense_Counter.tka");
+		m_animationClipArray[enState_Rest_Animation].Load("Assets/animData/Dragon_Frag/Dragon_Sleep.tka");
+		m_animationClipArray[enState_Move_Animation].Load("Assets/animData/Dragon_Frag/Dragon_Walk.tka");
+		m_animationClipArray[enState_Die_Animation].Load("Assets/animData/Dragon_Frag/Dragon_Die.tka");
+		m_animationClipArray[enState_Fly_Animation].Load("Assets/animData/Dragon_Frag/Dragon_Fly.tka");
+		m_animationClipArray[enState_Attack_Fly_Animation].Load("Assets/animData/Dragon_Frag/Dragon_Fly_Forward.tka");
+		m_animationClipArray[enState_Takeoff_Animation].Load("Assets/animData/Dragon_Frag/Dragon_Takeoff.tka");
+		m_animationClipArray[enState_Landing_Animation].Load("Assets/animData/Dragon_Frag/Dragon_Land.tka");
 
 		//case 10:
 		//	m_animationClipArray[enState_Die].Load("Assets/animData/Dragon_Frag/Dragon_Idle.tka");
@@ -109,21 +112,24 @@ bool Enemy_Boss::Start()
 	m_player = FindGO<Player>("player");
 	m_player->AddEnemy_List(this);
 	m_game = FindGO<Game>("game");
+	//コリジョンの作成
 	m_collision = NewGO<CollisionObject>(0);
 	m_collision->CreateSphere(m_collisionPos, Quaternion::Identity, COLLISION);
 	m_collision->SetIsEnableAutoDelete(false);
 	m_collision->SetName("boss");
 	m_collision->SetIsEnable(true);
 	m_rotation.SetRotationY(135.0f);
+	//スタート位置
 	m_pos = { START_POS_X, START_POS_Y, START_POS_Z };
+	//最初のステートはIdleに
 	ChangeState(enState_Idle);
-	m_charaCon.Init(COLLISION, COLLISION, m_pos);
+	m_charaCon.Init(10.0f, 1.0f, m_pos);
+
 
 	//空を飛んでいるときのボーンを受け取る
 	m_flyBoneId = m_modelRender.FindBoneID(L"ValleyFat");
 	return true;
 }
-
 void Enemy_Boss::InitAnimation()
 {
 	m_animation.Init(
@@ -134,21 +140,10 @@ void Enemy_Boss::InitAnimation()
 	//アニメーションを進める。
 	m_animation.Progress(g_gameTime->GetFrameDeltaTime());
 }
-void Enemy_Boss::Rotation()
+void Enemy_Boss::Rotation(int rotation)
 {
-	////弾丸を移動方向に向かせるプログラム
-	////移動速度を↓に入れるとできる
-	//if (m_isDistance || m_isBiting || m_isShoot) {
-	//	m_moveSpeed.z *= -1.0f;
-	//}
-	//if (m_moveSpeed.Length() > 0.1f) {
-	//	float angle = atan2(-m_moveSpeed.x, -m_moveSpeed.z);
-	//	m_rotation.SetRotationY(-angle);
-	//}
-	//m_modelRender.SetRotation(m_rotation);
-	//m_rotation.Apply(m_forward);
-	if (fabsf(m_moveSpeed.x) < 0.001f
-		&& fabsf(m_moveSpeed.z) < 0.001f) {
+	if (fabsf(m_moveSpeed.x) < rotation
+		&& fabsf(m_moveSpeed.z) < rotation) {
 		//m_moveSpeed.xとm_moveSpeed.zの絶対値がともに0.001以下の時
 		//このフレームではキャラは移動していないので旋回する必要はない。
 		return;
@@ -158,86 +153,111 @@ void Enemy_Boss::Rotation()
 	m_forward = Vector3::AxisZ;
 	m_rotation.Apply(m_forward);
 }
-void Enemy_Boss::Biting()
+//void Enemy_Boss::FlyAttackMove()
+//{
+//	if (m_state!=enState_Attack_Fly)
+//	{
+//		return;
+//	}
+//	//m_pos += m_moveSpeed * FLYATTACK_SPEED;
+//	////プレイヤーの追跡の変数
+//	//m_distance = m_player->Get_PlayerPos() - m_pos;
+//	//m_diff = m_player->Get_PlayerPos() - m_pos;
+//	//m_diff.Normalize();
+//}
+void Enemy_Boss::Shoot(int movespeed)
 {
-	//if (m_distance.Length()<=BITING_DISTANCE) {
-	//	m_isBiting = true;
-	//	m_moveSpeed = { 0.0f,0.0f,0.0f };
-	//	m_isDistance = false;
-	//	m_moveSpeed = m_diff;
-	//}
-	////追跡中に攻撃範囲に入ったら噛みつき
-	//else {
-	//	m_isBiting = false;
-	//}
-	if (m_isUnderAttackMelee) {
-		//噛みつき用のコリジョンの作成
-		MeleeAttackCollision();
-	}
-}
-void Enemy_Boss::FlyAttackMove()
-{
-	if (m_state!=enState_Attack_Fly)
-	{
-		return;
-	}
-	m_pos += m_moveSpeed * FLYATTACK_SPEED;
-	////プレイヤーの追跡の変数
-	//m_distance = m_player->Get_PlayerPos() - m_pos;
-	//m_diff = m_player->Get_PlayerPos() - m_pos;
-	//m_diff.Normalize();
+	////ブレスのロックオン
+	//m_moveSpeed_Shoot = m_player->Get_PlayerPos() - m_pos;
+	//m_moveSpeed_Shoot.Normalize();
+	//m_shootPos = m_player->Get_PlayerPos() - m_pos;;
+	//Vector3 diff = m_moveSpeed_Shoot * movespeed;
 
-	////if (m_state == enState_Move)
-	////{
-	////}
-	//if (m_distance.Length()<=DISTANCE_POS) {
-	//	
-	//	m_isShoot = false;
-	//	m_isDistance = true;
-	//	m_moveSpeed = m_diff* CHASE_SPEED;
-
-	//	Quaternion qRot;
-	//	qRot.SetRotationDeg(Vector3::AxisY, CHASE_SPEED);
-	//	qRot.Apply(m_moveSpeed);
-	//	//Vector3 testX;
-	//	//testX.Cross(Vector3::AxisY, m_moveSpeed);
-	//	//testX.Normalize();
-	//	qRot.SetRotationDegY(CHASE_SPEED);
-	//	qRot.Apply(m_moveSpeed);
-	//	
+	//if (m_shootPos.Length() <= 150.0f) {
+	//	EffectEmitter* Boss_Shoot = NewGO<EffectEmitter>(3, "boss_shoot");
+	//	Boss_Shoot->Init(3);
+	//	Boss_Shoot->SetScale(Vector3::One * 10.0f);
+	//	Boss_Shoot->SetPosition(diff);
+	//	Boss_Shoot->Play();
 	//}
-	//else {
-	//	m_moveSpeed = { 0.0f,0.0f,0.0f };
-	//	m_isDistance = false;
-	////	m_isShoot = true;
+	//if (m_state != enState_Attack_Shoot) {
+	//	return;
 	//}
-
-}
-void Enemy_Boss::Shoot()
-{
-	//if (m_isShoot) {
-	//	m_moveSpeed = m_diff;
+	//if (!m_isShoot) {
+	//	EffectEmitter* Boss_Shoot_Start = NewGO<EffectEmitter>(2, "boss_shoot_start");
+	//	Boss_Shoot_Start->Init(2);
+	//	Boss_Shoot_Start->SetScale(Vector3::One * 10.0f);
+	//	Boss_Shoot_Start->SetPosition(diff);
+	//	Boss_Shoot_Start->Play();
+	//	m_isShoot = true;
 	//}
 }
 void Enemy_Boss::Rest()
 {
 	
 }
-void Enemy_Boss::Hit()
+void Enemy_Boss::Hit(int damagemagnification)
 {
+	//ヒット時のクールタイム
 	m_hitCoolTime -= g_gameTime->GetFrameDeltaTime();
 
-	if (m_state==enState_Damage||m_state==enState_Defence) {
+	//攻撃を受けているとき
+	if (m_state == enState_Attack_Scream)
+	{
 		return;
 	}
+	//必殺技中はreturn
+	if (m_state == enState_Damage || m_state == enState_Defence) {
+		return;
+	}
+	//ヒット時ならreturn
 	if (m_hitCoolTime >= 0) {
 		return;
 	}
 
-	// 攻撃コリジョンと衝突しているかを調べる
-	
-	//ダッシュアタック
-	//近接攻撃
+	//攻撃コリジョンと衝突しているかを調べる
+	//咆哮後の隙の時
+	if (m_state == enState_Rest) {
+		//ガードブレイクが当たった時
+		const auto& collisionList_GuardBreak = g_collisionObjectManager->FindCollisionObjects("player_guardbreak" /*"player_walk_attack" "player_biting_attack"*/);
+
+		for (auto& collision_GuardBreak : collisionList_GuardBreak) {
+			if (collision_GuardBreak->IsHit(m_collision)) {
+				//ダメージ
+				ChangeState(enState_Damage);
+				m_hitCoolTime = HITCOOLTIME;
+				m_testHP -= GUARDBREAK_DAMAGE* damagemagnification;
+				return;
+			}
+		}
+		//ダッシュアタックが当たった時
+		const auto& collisionList_WalkAttack = g_collisionObjectManager->FindCollisionObjects/*("player_guardbreak"*/("player_walk_attack" /*"player_biting_attack"*/);
+
+		for (auto& collision_WalkAttack : collisionList_WalkAttack) {
+			if (collision_WalkAttack->IsHit(m_collision)) {
+				//ダメージ
+				ChangeState(enState_Damage);
+				m_hitCoolTime = HITCOOLTIME;
+				m_testHP -= WALKATTACKDAMAGE* damagemagnification;
+				return;
+			}
+		}
+		//近接攻撃が当たった時
+		const auto& collisionList_MeleeAttack = g_collisionObjectManager->FindCollisionObjects(/*"player_guardbreak"*/ /*"player_walk_attack"*/ "player_biting_attack");
+
+		for (auto& collision_MeleeAttack : collisionList_MeleeAttack) {
+			if (collision_MeleeAttack->IsHit(m_collision)) {
+				//ダメージ
+				ChangeState(enState_Damage);
+				m_hitCoolTime = HITCOOLTIME;
+				m_testHP -= BITATTACKDAMAGE * damagemagnification;
+				return;
+			}
+		}
+	}
+
+	//通常時
+	//ガードブレイクが当たった時
 	const auto& collisionList_GuardBreak = g_collisionObjectManager->FindCollisionObjects("player_guardbreak" /*"player_walk_attack" "player_biting_attack"*/);
 
 	for (auto& collision_GuardBreak : collisionList_GuardBreak) {
@@ -249,6 +269,7 @@ void Enemy_Boss::Hit()
 			return;
 		}
 	}
+	//ダッシュアタックが当たった時
 	const auto& collisionList_WalkAttack = g_collisionObjectManager->FindCollisionObjects/*("player_guardbreak"*/("player_walk_attack" /*"player_biting_attack"*/);
 
 	for (auto& collision_WalkAttack : collisionList_WalkAttack) {
@@ -260,6 +281,7 @@ void Enemy_Boss::Hit()
 			return;
 		}
 	}
+	//近接攻撃が当たった時
 	const auto& collisionList_MeleeAttack = g_collisionObjectManager->FindCollisionObjects(/*"player_guardbreak"*/ /*"player_walk_attack"*/ "player_biting_attack");
 
 	for (auto& collision_MeleeAttack : collisionList_MeleeAttack) {
@@ -271,9 +293,15 @@ void Enemy_Boss::Hit()
 			return;
 		}
 	}
-	//const auto& collisionList_BitingAttack=g_collisionObjectManager->
 }
-void Enemy_Boss::MeleeAttackCollision()
+void Enemy_Boss::MeleeAttack()
+{
+	if (m_isUnderAttackMelee) {
+		//噛みつき用のコリジョンの作成
+		MeleeAttackCollision(300.0f);
+	}
+}
+void Enemy_Boss::MeleeAttackCollision(int collision_melee)
 {
 	//コリジョンオブジェクトを作成する
 	auto collisionObject = NewGO<CollisionObject>(0);
@@ -283,29 +311,18 @@ void Enemy_Boss::MeleeAttackCollision()
 	//球状のコリジョンを作成
 	collisionObject->CreateSphere(collisionPosition,//座標
 		Quaternion::Identity,//回転
-		COLLISION_MELEE//半径
+		collision_melee//半径
 	);
 	collisionObject->SetName("boss_attack_melee");
 
 }
 void Enemy_Boss::TailAttack()
 {
-	////追跡中に攻撃範囲に入ったら薙ぎ払い
-	//if (m_distance.Length()<=TAIL_DISTANCE)
-	//{
-	//	m_isTail = true;
-	//	m_moveSpeed = { 0.0f,0.0f,0.0f };
-	//	m_isDistance = false;
-	//	m_moveSpeed = m_diff;
-	//}
-	//else if (m_isDistance) {
-	//	m_isTail = false;
-	//}
 	if (m_isUnderTail) {
-		TailAttackCollision();
+		TailAttackCollision(400.0f);
 	}
 }
-void Enemy_Boss::TailAttackCollision()
+void Enemy_Boss::TailAttackCollision(int collision_tail)
 {
 	//コリジョンオブジェクトを作成する
 	auto collisionObject = NewGO<CollisionObject>(0);
@@ -315,27 +332,33 @@ void Enemy_Boss::TailAttackCollision()
 	//球状のコリジョンを作成
 	collisionObject->CreateSphere(collisionPosition,//座標
 		Quaternion::Identity,//回転
-		COLLISION_TAIL//半径
+		collision_tail//半径
 	);
 	collisionObject->SetName("boss_attack_tail");
 }
-void Enemy_Boss::FlyAttack()
+void Enemy_Boss::FlyAttack(float movespeed)
 {
-	if (m_isUnderFlyAttack) {
-		FlyAttackCollision();
+	if (m_state != enState_Attack_Fly) {
+		return;
 	}
+	if (m_isUnderFlyAttack) {
+		FlyAttackCollision(450.0f);
+	}
+	m_pos += m_moveSpeed * movespeed;
+
+
 }
-void Enemy_Boss::FlyAttackCollision()
+void Enemy_Boss::FlyAttackCollision(int collision_flyattack)
 {
 	//コリジョンオブジェクトを作成する
 	auto collisionObject = NewGO<CollisionObject>(0);
 	Vector3 collisionPosition = m_pos;
 	//座標をボスの少し前に設定
-	collisionPosition += m_forward * BOSS_FORWARD;
+	
 	//球状のコリジョンを作成
 	collisionObject->CreateSphere(collisionPosition,//座標
 		Quaternion::Identity,//回転
-		COLLISION_FLYATTACK//半径
+		collision_flyattack//半径
 	);
 	collisionObject->SetName("boss_attack_fly");
 }
@@ -344,20 +367,20 @@ void Enemy_Boss::Defence()
 	if (m_state!=enState_Defence) {
 		return;
 	}
-	DefenceCollision();
+	DefenceCollision(1.5f,550.0f);
 
 }
-void Enemy_Boss::DefenceCollision()
+void Enemy_Boss::DefenceCollision(int break_magnification,int collision_defense)
 {
 	//コリジョンオブジェクトを作成する
 	auto collisionObject = NewGO<CollisionObject>(0);
 	Vector3 collisionPosition = m_pos;
 	//座標をボスの少し前に設定
-	collisionPosition += m_forward * BOSS_FORWARD;
+	//collisionPosition;
 	//球状のコリジョンを作成
 	collisionObject->CreateSphere(collisionPosition,//座標
 		Quaternion::Identity,//回転
-		COLLISION_DEFENCE//半径
+		collision_defense//半径
 	);
 	collisionObject->SetName("boss_defence");
 
@@ -373,7 +396,7 @@ void Enemy_Boss::DefenceCollision()
 		if (collision_GuardBreak->IsHit(collisionObject)) {
 			//ダメージ
 			ChangeState(enState_Damage);
-			m_testHP -= GUARDBREAK_DAMAGE * 1.5f;
+			m_testHP -= GUARDBREAK_DAMAGE * break_magnification;
 			m_hitCoolTime = HITCOOLTIME;
 			return;
 		}
@@ -444,20 +467,68 @@ void Enemy_Boss::OnAnimationEvent(const wchar_t* clipName, const wchar_t* eventN
 		m_isUnderFlyAttack = false;
 	}
 
-	//キーの名前がBoss_Attack_Melee_startの場合
+	//キーの名前がBoss_Defence_startの場合
 	if (wcscmp(eventName, L"Boss_Defence_start") == 0)
 	{
 		//防御中にする
 		m_isUnderDefence = true;
 	}
 
+	//キーの名前がBoss_Attack_Scream_startの場合
+	if (wcscmp(eventName, L"Boss_Attack_Scream_start") == 0)
+	{
+		//攻撃中にする
+		m_isUnderScream = true;
+	}
+	//キーの名前がBoss_Attack_Scream_endの場合
+	else if (wcscmp(eventName, L"Boss_Attack_Scream_end") == 0)
+	{
+		//攻撃を終わる
+		m_isUnderScream = false;
+	}
+
+	
 }
-void Enemy_Boss::FlyDistance()
+void Enemy_Boss::FlyPos(float movespeed)
 {
-	if (m_state != enState_Attack_Fly) {
+	if (m_state != enState_Fly) {
 		return;
 	}
-	m_pos += m_moveSpeed * 3.0f;
+	BossFlyPoint::FlyPoint* flypoint;
+	flypoint = m_game->GetBossFlyPoint()->GetFlyPoint(m_pos);
+		//ボスからフライポイントに向かうベクトルを求める
+		Vector3 diff = flypoint->m_pos - m_pos;
+		//ベクトルのNormalizeする
+		diff.Normalize();
+		//移動速度をいれる
+		m_moveSpeed = diff * movespeed;
+}
+void Enemy_Boss::Scream()
+{
+
+	if (m_state != enState_Attack_Scream) {
+		return;
+	}
+	if (m_isUnderScream) {
+		ScreamCollision(5500.0f);
+	}
+	m_moveSpeed.x = 0.0f;
+	m_moveSpeed.z = 0.0f;
+	m_isScream = true;
+}
+void Enemy_Boss::ScreamCollision(int collision_scream)
+{
+	//コリジョンオブジェクトを作成する
+	auto collisionObject = NewGO<CollisionObject>(0);
+	Vector3 collisionPosition = m_pos;
+	//座標をボスの少し前に設定
+
+	//球状のコリジョンを作成
+	collisionObject->CreateSphere(collisionPosition,//座標
+		Quaternion::Identity,//回転
+		collision_scream//半径
+	);
+	collisionObject->SetName("boss_attack_scream");
 
 }
 void Enemy_Boss::ChangeState(EnState changeState, int integerArgument0)
@@ -490,6 +561,7 @@ void Enemy_Boss::ChangeState(EnState changeState, int integerArgument0)
 		m_Iboss_State = new BossState_Defence(this);
 		break;
 	case Enemy_Boss::enState_Rest:
+		m_Iboss_State = new BossState_Rest(this);
 		break;
 	case Enemy_Boss::enState_Move:
 		m_Iboss_State = new BossState_Walk(this);
@@ -516,19 +588,19 @@ void Enemy_Boss::Update()
 {
 	m_pos += m_moveSpeed * g_gameTime->GetFrameDeltaTime();//動きを一定にするため
 	//コリジョンの当たり判定
-	m_collisionPos = m_pos;
-	m_collisionPos.y += 300.0f;
-	m_collisionPos.z += 300.0f;
 	m_modelRender.SetPosition(m_collisionPos);
 	m_Iboss_State->Animation();
 	m_Iboss_State->Update();
-	Rotation();
-	Hit();
-	FlyAttackMove();
-	Biting();
+	Rotation(0.001f);
+	Hit(2.5f);
+	//FlyAttackMove();
+	MeleeAttack();
 	TailAttack();
-	Defence();
-	FlyAttack();
+	Defence(); 
+	FlyPos(500.0f);
+	FlyAttack(10.0f);
+	Scream();
+	Shoot(100.0f);
 	m_modelRender.SetRotation(m_rotation);
 	m_skeleton.Update(m_model.GetWorldMatrix());
 	m_pos = m_charaCon.Execute(m_moveSpeed, g_gameTime->GetFrameDeltaTime());
@@ -537,13 +609,12 @@ void Enemy_Boss::Update()
 	m_collision->Update();
 	m_modelRender.SetPosition(m_pos);
 	m_modelRender.Update();
-	//ボーンの座標を受け取るプログラムテスト
-Matrix matrix = m_modelRender.GetBone(m_flyBoneId)->GetWorldMatrix();
-m_collision->SetPosition(m_pos);
-m_collision->SetRotation(m_rotation);
-m_collision->SetWorldMatrix(matrix);
-m_collision->Update();
-
+	//ボーンの座標を受け取るプログラム
+	Matrix matrix = m_modelRender.GetBone(m_flyBoneId)->GetWorldMatrix();
+	m_collision->SetPosition(m_pos);
+	m_collision->SetRotation(m_rotation);
+	m_collision->SetWorldMatrix(matrix);
+	m_collision->Update();
 }
 void Enemy_Boss::Render(RenderContext& rc)
 {
