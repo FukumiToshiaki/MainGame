@@ -5,7 +5,7 @@
 void BossState_Fly::Animation()
 {
 	m_enemy_Boss->GetModelRender().PlayAnimation(
-		Enemy_Boss::enState_Fly, 0.2f
+		Enemy_Boss::enState_Fly_Animation, 0.2f
 	);
 	if (m_flyTime<=0) {
 		// 次のステートに遷移する

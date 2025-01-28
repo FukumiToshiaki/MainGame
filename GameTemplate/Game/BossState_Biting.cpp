@@ -6,7 +6,7 @@
 void BossState_Biting::Animation()
 {
 	m_enemy_Boss->GetModelRender().PlayAnimation(
-		Enemy_Boss::enState_Attack_Biting,0.2f
+		Enemy_Boss::enState_Attack_Biting_Animation,0.2f
 	);
 	if (!m_enemy_Boss->GetIsPlayingAnimation()) {
 		m_enemy_Boss->ChangeState(Enemy_Boss::enState_Idle);

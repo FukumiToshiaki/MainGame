@@ -5,7 +5,7 @@
 void BossState_Walk::Animation()
 {
 	m_enemy_Boss->GetModelRender().PlayAnimation(
-		Enemy_Boss::enState_Move, 0.2f
+		Enemy_Boss::enState_Move_Animation, 0.2f
 	);
 	if (m_walkTime <= 0.0f || !m_enemy_Boss->GetIsPlayingAnimation()) {
 		// 次のステートに遷移する

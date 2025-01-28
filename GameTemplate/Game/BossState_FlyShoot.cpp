@@ -5,7 +5,7 @@
 void BossState_FlyShoot::Animation()
 {
 	m_enemy_Boss->GetModelRender().PlayAnimation(
-		Enemy_Boss::enState_Attack_FlyShoot, 0.2f
+		Enemy_Boss::enState_Attack_FlyShoot_Animation, 0.2f
 	);
 	if (m_enemy_Boss->GetIsPlayingAnimation() == false)
 	{

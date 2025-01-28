@@ -5,7 +5,7 @@
 void BossState_Die::Animation()
 {
 	m_enemy_Boss->GetModelRender().PlayAnimation(
-		Enemy_Boss::enState_Die, 0.2f
+		Enemy_Boss::enState_Die_Animation, 0.2f
 	);
 }
 

@@ -12,5 +12,6 @@ public:
 
 private:
 	float m_defenceTime = 4.0f;
+	bool m_isDefenseStart = false;
 };
 

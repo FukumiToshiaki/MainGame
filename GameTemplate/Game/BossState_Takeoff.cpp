@@ -5,9 +5,9 @@
 void BossState_Takeoff::Animation()
 {
 	m_enemy_Boss->GetModelRender().PlayAnimation(
-		Enemy_Boss::enState_Takeoff, 0.2f
+		Enemy_Boss::enState_Takeoff_Animation, 0.2f
 	);
-	if (m_enemy_Boss->GetIsPlayingAnimation() == false) {
+	if (!m_enemy_Boss->GetIsPlayingAnimation()) {
 		// 次のステートに遷移する
 		m_enemy_Boss->ChangeState((Enemy_Boss::EnState)m_enNextState);
 	}

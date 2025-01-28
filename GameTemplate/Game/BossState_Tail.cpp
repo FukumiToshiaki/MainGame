@@ -5,7 +5,7 @@
 void BossState_Tail::Animation()
 {
 	m_enemy_Boss->GetModelRender().PlayAnimation(
-		Enemy_Boss::enState_Attack_Tail, 0.2f
+		Enemy_Boss::enState_Attack_Tail_Animation, 0.2f
 	);
 	if (!m_enemy_Boss->GetIsPlayingAnimation()) {
 		m_enemy_Boss->ChangeState(Enemy_Boss::enState_Idle);

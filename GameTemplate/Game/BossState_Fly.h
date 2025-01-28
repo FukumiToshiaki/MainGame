@@ -14,5 +14,5 @@ public:
 
 private:
 	Enemy_Boss::EnState m_enNextState; // takeoffI—¹‚É‘JˆÚ‚·‚éó‘Ô
-	float m_flyTime = 2.0f;
+	float m_flyTime = 5.0f;
 };

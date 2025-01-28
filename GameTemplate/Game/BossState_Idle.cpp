@@ -5,7 +5,7 @@
 void BossState_Idle::Animation()
 {
 	m_enemy_Boss->GetModelRender().PlayAnimation(
-		Enemy_Boss::enState_Idle,0.2f
+		Enemy_Boss::enState_Idle_Animation,0.2f
 	);
 
 }

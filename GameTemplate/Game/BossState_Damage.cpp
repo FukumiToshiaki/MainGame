@@ -5,7 +5,7 @@
 void BossState_Damage::Animation()
 {
 	m_enemy_Boss->GetModelRender().PlayAnimation(
-		Enemy_Boss::enState_Damage, 0.2f
+		Enemy_Boss::enState_Damage_Animation, 0.2f
 	);
 }
 
