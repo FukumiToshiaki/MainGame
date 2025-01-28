@@ -39,7 +39,7 @@ bool Game::Start()
 	m_enemy_Boss = NewGO<BossPattern>(0, "enemy_boss");
 	m_player = NewGO<Player>(0, "player");
 	m_time_Limit_UI = NewGO<Time_Limit_UI>(0, "time_limit");
-	//m_modelRender.SetPosition(m_position);
+	m_bossFlyPoint.Update({ 0.0f,0.0f,0.0f });
 
 	//PhysicsWorld::GetInstance()->EnableDrawDebugWireFrame();
 	return true;

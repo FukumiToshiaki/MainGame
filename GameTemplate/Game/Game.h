@@ -1,4 +1,7 @@
 #pragma once
+
+#include "BossFlyPoint.h"
+
 class Map;
 class Player;
 class PlayerCamera;
@@ -28,8 +31,14 @@ public:
 		enGameClear,
 		enGameOver,
 	};
+
+	BossFlyPoint* GetBossFlyPoint()
+	{
+		return &m_bossFlyPoint;
+	}
 private:
 	EnGameState m_gameState = enNormal;	//ゲームのステート
+	BossFlyPoint m_bossFlyPoint;
 
 	Model m_model;			// モデル
 	Vector3 m_pos;		// 座標
