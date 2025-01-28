@@ -24,9 +24,8 @@ void PlayerState_Defense::Animation()
 
 void PlayerState_Defense::Update()
 {
-	if (!m_player->GetIsPlayingAnimation()) {
+	if (!g_pad[0]->IsPress(enButtonRB1)) {
 		m_player->ChangeState(Player::enState_Idle);
-
 		//下の処理はアニメーションのブールを戻す
 		//m_isDefenseStart = false;
 		//m_isDefense = false;
@@ -34,6 +33,7 @@ void PlayerState_Defense::Update()
 	}
 	if (m_player->GetHP() <= 0) {
 		m_player->ChangeState(Player::enState_Die);
+		m_player->SetisDefense(false);
 	}
 
 }

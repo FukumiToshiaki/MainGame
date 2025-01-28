@@ -16,7 +16,6 @@ void PlayerState_Damage::Update()
 	m_player->SetisGuradBreak(false);
 	m_player->SetisWalkAttack(false);
 	m_player->SetisLongAttack(false);
-
 	if (m_player->GetHP() <= 0) {
 		m_player->ChangeState(Player::enState_Die);
 	}

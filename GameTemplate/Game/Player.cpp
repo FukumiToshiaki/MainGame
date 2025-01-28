@@ -1,4 +1,4 @@
-#include "stdafx.h"
+ï»¿#include "stdafx.h"
 #include "Player.h"
 #include "Game.h"
 #include "EnemyBase.h"
@@ -26,13 +26,15 @@
 #define PLAYER_WALKSPEED 500.0f
 #define PLAYER_RUNSPEED 1000.0f
 #define SCALE 2.0f
+#define PLAYER_FORWARD 150.0f
 #define LONGATTACKCOOLTIME 5.0f
-#define KNOCKBACKTIME 0.3f
-#define HITCOOLTIME 1.5f
-#define DEFENSEHITCOOLTIME 0.2f
-#define MELEEATTACKDAMAGE 4
+#define KNOCKBACKTIME 0.5f
+#define HITCOOLTIME 1.0f
+#define KNOCKBACKTIME_SCREAM 0.2f
 #define TAILATTACKDAMAGE 2
+#define MELEEATTACKDAMAGE 4
 #define FLYATTACKDAMAGE 6
+#define SCREAMATTACKDAMAGE 8
 void Player::InitSkeleton()
 {
 	//m_skeleton.Init("Assets/modelData/unityChan.tks");
@@ -46,9 +48,9 @@ bool Player::Start()
 
 	EffectEngine::GetInstance()->ResistEffect(0, u"Assets/Effect/Player_LongAttack.efk");
 
-	const Vector3 m_scale = { SCALE,SCALE,SCALE }; //‘å‚«‚³
+	const Vector3 m_scale = { SCALE,SCALE,SCALE }; //å¤§ãã•
 
-	//ƒAƒjƒ[ƒVƒ‡ƒ“ƒNƒŠƒbƒv‚ğƒ[ƒh‚·‚éB
+	//ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³ã‚¯ãƒªãƒƒãƒ—ã‚’ãƒ­ãƒ¼ãƒ‰ã™ã‚‹ã€‚
 	m_animationClipArray[enAnimClip_Attack].Load("Assets/animData/Pico_Anime/Player_Test_Attack.tka");
 	m_animationClipArray[enAnimClip_Attack].SetLoopFlag(false);
 	m_animationClipArray[enAnimClip_Walk].Load("Assets/animData/Pico_Anime/Player_Test_Walk.tka");
@@ -61,12 +63,12 @@ bool Player::Start()
 	m_animationClipArray[enAnimClip_WalkAttack].SetLoopFlag(false);
 	m_animationClipArray[enAnimClip_LongAttack].Load("Assets/animData/Pico_Anime/Player_Long_Attack.tka");
 	m_animationClipArray[enAnimClip_LongAttack].SetLoopFlag(false);
-	m_animationClipArray[enAnimClip_DefenceStart].Load("Assets/animData/Pico_Anime/Player_Test_DefenseStart.tka");
-	m_animationClipArray[enAnimClip_DefenceStart].SetLoopFlag(false);
+	//m_animationClipArray[enAnimClip_DefenceStart].Load("Assets/animData/Pico_Anime/Player_Test_Defense.tka");
+	//m_animationClipArray[enAnimClip_DefenceStart].SetLoopFlag(false);
 	m_animationClipArray[enAnimClip_Defense].Load("Assets/animData/Pico_Anime/Player_Test_Defense.tka");
 	m_animationClipArray[enAnimClip_Defense].SetLoopFlag(true);
-	m_animationClipArray[enAnimClip_DefenceEnd].Load("Assets/animData/Pico_Anime/Player_Test_DefenseEnd.tka");
-	m_animationClipArray[enAnimClip_DefenceEnd].SetLoopFlag(false);
+	//m_animationClipArray[enAnimClip_DefenceEnd].Load("Assets/animData/Pico_Anime/Player_Test_DefenseEnd.tka");
+	//m_animationClipArray[enAnimClip_DefenceEnd].SetLoopFlag(false);
 	m_animationClipArray[enAnimClip_GuardBreak].Load("Assets/animData/Pico_Anime/Player_Test_GuardBreak.tka");
 	m_animationClipArray[enAnimClip_GuardBreak].SetLoopFlag(false);
 	m_animationClipArray[enAnimClip_Damage].Load("Assets/animData/Pico_Anime/Player_Test_Damage.tka");
@@ -85,27 +87,11 @@ bool Player::Start()
 	m_modelRender.Init("Assets/modelData/Player_Test/Player_Test.tkm", m_animationClipArray, enAnimClip_Num);
 	//m_modelRender.Init("Assets/modelData/PlayerData/PicoChan.tkm", m_animationClipArray, enAnimClip_Num);
 	m_spriteRender.Init("Assets/sprite/lock.DDS", 400, 400);
-	//ƒAƒjƒ[ƒVƒ‡ƒ“‚È‚µ‚È‚ç“®‚­
-	//m_modelRender.Init("Assets/modelData/Player_Test/Player_Test.tkm");
-
-	//m_animationClipArray[enAnimClip_Idle].Load("Assets/animData/idle.tka");
-	//m_animationClipArray[enAnimClip_Idle].SetLoopFlag(true);
-
-	//m_modelRender.Init("Assets/modelData/unityChan.tkm", m_animationClipArray, enAnimClip_Num, enModelUpAxisY);
-
-	//ƒXƒPƒ‹ƒgƒ“‚ğƒ[ƒhB
-	//InitSkeleton();
-	//ƒ‚ƒfƒ‹‚ğ‰Šú‰»B
-	//ƒAƒjƒ[ƒVƒ‡ƒ“‚ğ‰Šú‰»B//
-	//InitAnimation();
-	//ƒXƒP[ƒ‹
+	//ã‚¹ã‚±ãƒ¼ãƒ«
 	m_pos = { START_POS_X, START_POS_Y, START_POS_Z };
 	m_modelRender.SetPosition(m_pos);
 	m_modelRender.SetScale(m_scale);
 	m_modelRender.SetRotation(m_rotation);
-	//m_modelRender.Update();
-	//m_attack_Pos = m_pos;
-	//m_attack_Pos.x += 100.0f;
 	m_charaCon.Init(25.0f, 40.0f, m_pos);
 
 	m_game = FindGO<Game>("game");
@@ -116,15 +102,15 @@ bool Player::Start()
 	m_enemy_Sky = FindGO<Enemy_Sky>("enemy_sky");
 
 	ChangeState(enState_Idle);
-	////“–‚½‚è”»’è‚Ìì¬B
+	////å½“ãŸã‚Šåˆ¤å®šã®ä½œæˆã€‚
 	m_collision = NewGO<CollisionObject>(0);
 	m_collision->CreateSphere(m_pos, Quaternion::Identity, 100.0f);
 	m_collision->SetName("player_collsion");
 	m_collision->SetIsEnableAutoDelete(false);
 
-	////èñ‚Ìƒ{[ƒ“‚ğó‚¯æ‚é
+	////æ‰‹é¦–ã®ãƒœãƒ¼ãƒ³ã‚’å—ã‘å–ã‚‹
 	//m_TestBoneId = m_modelRender.FindBoneID(L"mixamorig:RightHand");
-	////UŒ‚—pƒRƒŠƒWƒ‡ƒ“‚ğ—pˆÓ
+	////æ”»æ’ƒç”¨ã‚³ãƒªã‚¸ãƒ§ãƒ³ã‚’ç”¨æ„
 	//m_testAttackCollision = NewGO<CollisionObject>(0);
 	//m_testAttackCollision->CreateBox(m_attack_Pos, Quaternion::Identity, { 120.0f,20.0f,20.0f });
 	//m_testAttackCollision->SetName("player_attack");
@@ -135,110 +121,115 @@ bool Player::Start()
 
 void Player::InitAnimation()
 {
-	//m_animationClipArray[enAnimClip_Run].Load("Assets/animData/walk.tka");
-	//m_animationClipArray[enAnimClip_Run].SetLoopFlag(true);
-	//ƒAƒjƒ[ƒVƒ‡ƒ“‚ğ‰Šú‰»B
+	//ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³ã‚’åˆæœŸåŒ–ã€‚
 	m_animation.Init(
-		m_skeleton,			//ƒAƒjƒ[ƒVƒ‡ƒ“‚ğ—¬‚µ‚ŞƒXƒPƒ‹ƒgƒ“B
-		m_animationClipArray,	//ƒAƒjƒ[ƒVƒ‡ƒ“ƒNƒŠƒbƒvB
-		enAnimClip_Num		//ƒAƒjƒ[ƒVƒ‡ƒ“‚Ì”B
+		m_skeleton,			//ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³ã‚’æµã—è¾¼ã‚€ã‚¹ã‚±ãƒ«ãƒˆãƒ³ã€‚
+		m_animationClipArray,	//ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³ã‚¯ãƒªãƒƒãƒ—ã€‚
+		enAnimClip_Num		//ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³ã®æ•°ã€‚
 	);
-	////ƒAƒjƒ[ƒVƒ‡ƒ“‚ği‚ß‚éB
+	////ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³ã‚’é€²ã‚ã‚‹ã€‚
 	m_animation.Progress(g_gameTime->GetFrameDeltaTime());
 }
 
 void Player::OnAnimationEvent(const wchar_t* clipName, const wchar_t* eventName)
 {
-	//ƒL[‚Ì–¼‘O‚ªattack_start‚Ìê‡
+	//ã‚­ãƒ¼ã®åå‰ãŒattack_startã®å ´åˆ
 	if (wcscmp(eventName, L"attack_start") == 0)
 	{
-		//UŒ‚’†‚É‚·‚é
+		//æ”»æ’ƒä¸­ã«ã™ã‚‹
 		m_isUnderAttack = true;
 	}
-	//ƒL[‚Ì–¼‘O‚ªattack_end‚Ìê‡
+	//ã‚­ãƒ¼ã®åå‰ãŒattack_endã®å ´åˆ
 	else if (wcscmp(eventName, L"attack_end") == 0) {
-		//UŒ‚‚ğI‚í‚é
+		//æ”»æ’ƒã‚’çµ‚ã‚ã‚‹
 		m_isUnderAttack = false;
 	}
 
-	//ƒL[‚Ì–¼‘O‚ªattack_start‚Ìê‡
+	//ã‚­ãƒ¼ã®åå‰ãŒattack_startã®å ´åˆ
 	if (wcscmp(eventName, L"walkattack_start") == 0)
 	{
-		//UŒ‚’†‚É‚·‚é
+		//æ”»æ’ƒä¸­ã«ã™ã‚‹
 		m_isUnderWalkAttack = true;
 	}
-	//ƒL[‚Ì–¼‘O‚ªattack_end‚Ìê‡
+	//ã‚­ãƒ¼ã®åå‰ãŒattack_endã®å ´åˆ
 	else if (wcscmp(eventName, L"walkattack_end") == 0) {
-		//UŒ‚‚ğI‚í‚é
+		//æ”»æ’ƒã‚’çµ‚ã‚ã‚‹
 		m_isUnderWalkAttack = false;
 	}
 
-	//ƒL[‚Ì–¼‘O‚ªGuradBreak_start‚Ìê‡
+	//ã‚­ãƒ¼ã®åå‰ãŒGuradBreak_startã®å ´åˆ
 	if (wcscmp(eventName, L"GuradBreak_start") == 0)
 	{
-		//UŒ‚’†‚É‚·‚é
+		//æ”»æ’ƒä¸­ã«ã™ã‚‹
 		m_isUnderGuradBreak = true;
 	}
-	//ƒL[‚Ì–¼‘O‚ªGuradBreak_end‚Ìê‡
+	//ã‚­ãƒ¼ã®åå‰ãŒGuradBreak_endã®å ´åˆ
 	else if (wcscmp(eventName, L"GuradBreak_end") == 0) {
-		//UŒ‚‚ğI‚í‚é
+		//æ”»æ’ƒã‚’çµ‚ã‚ã‚‹
 		m_isUnderGuradBreak = false;
 	}
-	//ƒL[‚Ì–¼‘O‚ªLongAttack_start‚Ìê‡
+	//ã‚­ãƒ¼ã®åå‰ãŒLongAttack_startã®å ´åˆ
 	if (wcscmp(eventName, L"LongAttack_start") == 0)
 	{
-		//UŒ‚’†‚É‚·‚é
+		//æ”»æ’ƒä¸­ã«ã™ã‚‹
 		m_isUnderLongAttack = true;
 	}
-	//ƒL[‚Ì–¼‘O‚ªLongAttack_end‚Ìê‡
+	//ã‚­ãƒ¼ã®åå‰ãŒLongAttack_endã®å ´åˆ
 	else if (wcscmp(eventName, L"LongAttack_end") == 0) {
-		//UŒ‚‚ğI‚í‚é
+		//æ”»æ’ƒã‚’çµ‚ã‚ã‚‹
 		m_isUnderLongAttack = false;
+	}
+
+	//ã‚­ãƒ¼ã®åå‰ãŒDefense_startã®å ´åˆ
+	if (wcscmp(eventName, L"Defense_start") == 0)
+	{
+		//é˜²å¾¡ä¸­ã«ã™ã‚‹
+		m_isUnderDefense = true;
 	}
 
 }
 
 void Player::BitingAttackCollision()
 {
-	//ƒRƒŠƒWƒ‡ƒ“ƒIƒuƒWƒFƒNƒg‚ğì¬‚·‚é
+	//ã‚³ãƒªã‚¸ãƒ§ãƒ³ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’ä½œæˆã™ã‚‹
 	auto collisionObject = NewGO<CollisionObject>(0);
 	Vector3 collisionPosition = m_pos;
-	//À•W‚ğƒvƒŒƒCƒ„[‚Ì­‚µ‘O‚Éİ’è
-	collisionPosition += m_forward * 150.0f;
-	//‹…ó‚ÌƒRƒŠƒWƒ‡ƒ“‚ğì¬
-	collisionObject->CreateSphere(collisionPosition,//À•W
-		Quaternion::Identity,//‰ñ“]
-		100.0f//”¼Œa
+	//åº§æ¨™ã‚’ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®å°‘ã—å‰ã«è¨­å®š
+	collisionPosition += m_forward * PLAYER_FORWARD;
+	//çƒçŠ¶ã®ã‚³ãƒªã‚¸ãƒ§ãƒ³ã‚’ä½œæˆ
+	collisionObject->CreateSphere(collisionPosition,//åº§æ¨™
+		Quaternion::Identity,//å›è»¢
+		100.0f//åŠå¾„
 	);
 	collisionObject->SetName("player_biting_attack");
 }
 
 void Player::WalkAttackCollision()
 {
-	//ƒRƒŠƒWƒ‡ƒ“ƒIƒuƒWƒFƒNƒg‚ğì¬‚·‚é
+	//ã‚³ãƒªã‚¸ãƒ§ãƒ³ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’ä½œæˆã™ã‚‹
 	auto collisionObject = NewGO<CollisionObject>(0);
 	Vector3 collisionPosition = m_pos;
-	//À•W‚ğƒvƒŒƒCƒ„[‚Ì­‚µ‘O‚Éİ’è
-	collisionPosition += m_forward * 150.0f;
-	//‹…ó‚ÌƒRƒŠƒWƒ‡ƒ“‚ğì¬
-	collisionObject->CreateSphere(collisionPosition,//À•W
-		Quaternion::Identity,//‰ñ“]
-		100.0f//”¼Œa
+	//åº§æ¨™ã‚’ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®å°‘ã—å‰ã«è¨­å®š
+	collisionPosition += m_forward * PLAYER_FORWARD;
+	//çƒçŠ¶ã®ã‚³ãƒªã‚¸ãƒ§ãƒ³ã‚’ä½œæˆ
+	collisionObject->CreateSphere(collisionPosition,//åº§æ¨™
+		Quaternion::Identity,//å›è»¢
+		100.0f//åŠå¾„
 	);
 	collisionObject->SetName("player_walk_attack");
 }
 
 void Player::GuradBreakCollision()
 {
-	//ƒRƒŠƒWƒ‡ƒ“ƒIƒuƒWƒFƒNƒg‚ğì¬‚·‚é
+	//ã‚³ãƒªã‚¸ãƒ§ãƒ³ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’ä½œæˆã™ã‚‹
 	auto collisionObject = NewGO<CollisionObject>(0);
 	Vector3 collisionPosition = m_pos;
-	//À•W‚ğƒvƒŒƒCƒ„[‚Ì­‚µ‘O‚Éİ’è
-	collisionPosition += m_forward * 150.0f;
-	//‹…ó‚ÌƒRƒŠƒWƒ‡ƒ“‚ğì¬
-	collisionObject->CreateSphere(collisionPosition,//À•W
-		Quaternion::Identity,//‰ñ“]
-		100.0f//”¼Œa
+	//åº§æ¨™ã‚’ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®å°‘ã—å‰ã«è¨­å®š
+	collisionPosition += m_forward * PLAYER_FORWARD;
+	//çƒçŠ¶ã®ã‚³ãƒªã‚¸ãƒ§ãƒ³ã‚’ä½œæˆ
+	collisionObject->CreateSphere(collisionPosition,//åº§æ¨™
+		Quaternion::Identity,//å›è»¢
+		100.0f//åŠå¾„
 	);
 	collisionObject->SetName("player_guardbreak");
 
@@ -288,20 +279,6 @@ void Player::ChangeState(EnState changeState)
 
 void Player::Update()
 {
-	m_hitCoolTime -= g_gameTime->GetFrameDeltaTime();
-
-	Move();
-	Rotation();
-	WalkAttack();
-	Attack_Biting();
-	Defense();
-	GuardBreak();
-	Hit();
-	TakeAim();
-	LockOn();
-	LongAttack();
-	//// ‰ñ“]
-	//m_rotation.AddRotationY(g_pad[0]->GetRStickXF() * 0.05f);
 	m_Iplayer_State->Animation();
 	m_Iplayer_State->Update();
 	//InitAnimation();
@@ -314,7 +291,25 @@ void Player::Update()
 	m_modelRender.SetPosition(m_pos);
 	m_modelRender.Update();
 
-	////ƒ{[ƒ“‚ÌÀ•W‚ğó‚¯æ‚éƒvƒƒOƒ‰ƒ€ƒeƒXƒg
+	if (m_state == enState_Die) {
+		m_moveSpeed.x = 0.0f;
+		m_moveSpeed.z = 0.0f;
+		return;
+	}
+	m_hitCoolTime -= g_gameTime->GetFrameDeltaTime();
+
+	Move(500.0f,1000.0f,5.0f);
+	Rotation(0.001f);
+	WalkAttack();
+	Attack_Biting();
+	Defense();
+	GuardBreak();
+	Hit(0.1f);
+	TakeAim(4000.0f,100.0f);
+	LockOn();
+	LongAttack(137,200,30.0f);
+	//// å›è»¢
+	////ãƒœãƒ¼ãƒ³ã®åº§æ¨™ã‚’å—ã‘å–ã‚‹ãƒ—ãƒ­ã‚°ãƒ©ãƒ ãƒ†ã‚¹ãƒˆ
 	//Matrix matrix = m_modelRender.GetBone(m_TestBoneId)->GetWorldMatrix();
 	//m_testAttackCollision->SetPosition(m_attack_Pos);
 	//m_testAttackCollision->SetRotation(m_rotation);
@@ -323,79 +318,85 @@ void Player::Update()
 
 }
 
-void Player::Move()
+void Player::Move(int walk_speed, int run_speed, int walkattack_speed)
 {
-	if (m_state == enState_Die || m_state == enState_Damage || m_state == enState_Arching) {
+	//æ­»ã‚“ã§ã„ãŸã‚Šãƒ€ãƒ¡ãƒ¼ã‚¸ã‚„ã‚ˆã‚ã‘ä¸­ã‹return
+	if (m_state == enState_Die || m_state == enState_Damage ||  m_state == enState_Arching) {
 		return;
 	}
-	if (m_state == enState_Attack_Biting || m_state == enState_GuradBreak || m_state == enState_WalkAttack || m_state == enState_LongAttack) {
+	//æ”»æ’ƒä¸­ãªã‚‰return
+	if (m_state == enState_Attack_Biting || m_state == enState_GuradBreak ||m_state == enState_LongAttack) {
 		m_isNowAttack = true;
 		return;
 	}
+	//ãƒ€ãƒƒã‚·ãƒ¥ã‚¢ã‚¿ãƒƒã‚¯ä¸­ãªã‚‰å°‘ã—é€²ã‚€
 	if (m_state == enState_WalkAttack)
 	{
-		m_moveSpeed = m_attack_Pos * 5.0f;
+		m_moveSpeed = m_attack_Pos * walkattack_speed;
 		m_isNowAttack = true;
 		return;
 	}
+	//æ”»æ’ƒã®åˆ¤å®šã‚’ãƒªã‚»ãƒƒãƒˆ
 	m_isNowAttack = false;
-	//xz‚ÌˆÚ“®‘¬“x‚ğ0.0f‚É‚·‚éB
+	//xzã®ç§»å‹•é€Ÿåº¦ã‚’0.0fã«ã™ã‚‹ã€‚
 	m_moveSpeed.x = 0.0f;
 	m_moveSpeed.z = 0.0f;
-
-	//‰e‚ÌƒeƒXƒg—p
 	m_moveSpeed.y = 0.0f;
 	
-	//¶ƒXƒeƒBƒbƒN‚Ì“ü—Í—Ê‚ğæ“¾B
+	//å·¦ã‚¹ãƒ†ã‚£ãƒƒã‚¯ã®å…¥åŠ›é‡ã‚’å–å¾—ã€‚
 	m_stickL.x = g_pad[0]->GetLStickXF();
 	m_stickL.z = g_pad[0]->GetLStickYF();
 
-	//ƒJƒƒ‰‚Ì‘O•ûŒü‚Æ‰E•ûŒü‚ÌƒxƒNƒgƒ‹‚ğ‚Á‚Ä‚­‚éB
+	//ã‚«ãƒ¡ãƒ©ã®å‰æ–¹å‘ã¨å³æ–¹å‘ã®ãƒ™ã‚¯ãƒˆãƒ«ã‚’æŒã£ã¦ãã‚‹ã€‚
 	Vector3 forward = g_camera3D->GetForward();
 	Vector3 right = g_camera3D->GetRight();
-	//y•ûŒü‚É‚ÍˆÚ“®‚³‚¹‚È‚¢B
+	//yæ–¹å‘ã«ã¯ç§»å‹•ã•ã›ãªã„ã€‚
 	forward.y = 0.0f;
 	right.y = 0.0f;
 
 	forward.Normalize();
 	right.Normalize();
-	//ƒLƒƒƒ‰ƒNƒ^[ƒRƒ“ƒgƒ[ƒ‰[‚ğg—p‚µ‚ÄAÀ•W‚ğXVB
+	//ã‚­ãƒ£ãƒ©ã‚¯ã‚¿ãƒ¼ã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ©ãƒ¼ã‚’ä½¿ç”¨ã—ã¦ã€åº§æ¨™ã‚’æ›´æ–°ã€‚
 	m_pos += m_moveSpeed * g_gameTime->GetFrameDeltaTime();
 	m_modelRender.SetPosition(m_pos);
-	//Xƒ{ƒ^ƒ“‚ğ‰Ÿ‚³‚ê‚È‚ª‚çˆÚ“®‚µ‚½‚ç‘–‚é
+	//Xãƒœã‚¿ãƒ³ã‚’æŠ¼ã•ã‚ŒãªãŒã‚‰ç§»å‹•ã—ãŸã‚‰èµ°ã‚‹
 	if (g_pad[0]->IsPress(enButtonX)&& m_stickL.x != 0.0f || g_pad[0]->IsPress(enButtonX) && m_stickL.z != 0.0f) {
-		right *= m_stickL.x * PLAYER_RUNSPEED;
-		forward *= m_stickL.z * PLAYER_RUNSPEED;
+		right *= m_stickL.x * run_speed;
+		forward *= m_stickL.z * run_speed;
 		ChangeState(Player::enState_Run);
 	}
-	//‰½‚à‰Ÿ‚³‚ê‚¸ˆÚ“®‚È‚ç•à‚­
+	//ä½•ã‚‚æŠ¼ã•ã‚Œãšç§»å‹•ãªã‚‰æ­©ã
 	else if (m_stickL.x != 0.0f || m_stickL.z != 0.0f) {
-		right *= m_stickL.x * PLAYER_WALKSPEED;
-		forward *= m_stickL.z * PLAYER_WALKSPEED;
+		right *= m_stickL.x * walk_speed;
+		forward *= m_stickL.z * walk_speed;
 		ChangeState(Player::enState_Walk);
 	}
 	else {
-		//ˆÚ“®‚µ‚È‚¢‚È‚çIdleó‘Ô
+		//ç§»å‹•ã—ãªã„ãªã‚‰IdleçŠ¶æ…‹
 		right *= m_stickL.x * 0.0f;;
 		forward *= m_stickL.z * 0.0f;
 		ChangeState(Player::enState_Idle);
 	}
-	////ˆÚ“®‘¬“x‚ÉƒXƒeƒBƒbƒN‚Ì“ü—Í—Ê‚ğ‰ÁZ‚·‚éB
+	////ç§»å‹•é€Ÿåº¦ã«ã‚¹ãƒ†ã‚£ãƒƒã‚¯ã®å…¥åŠ›é‡ã‚’åŠ ç®—ã™ã‚‹ã€‚
 	m_moveSpeed += right + forward;
 }
-void Player::Rotation()
+void Player::Rotation(int rotation)
 {
 	//if (fabsf(m_moveSpeed.x) < 0.001f
 	//	&& fabsf(m_moveSpeed.z) < 0.001f) {
-	//	//m_moveSpeed.x‚Æm_moveSpeed.z‚Ìâ‘Î’l‚ª‚Æ‚à‚É0.001ˆÈ‰º‚Æ‚¢‚¤‚±‚Æ‚Í
-	//	//‚±‚ÌƒtƒŒ[ƒ€‚Å‚ÍƒLƒƒƒ‰‚ÍˆÚ“®‚µ‚Ä‚¢‚È‚¢‚Ì‚Åù‰ñ‚·‚é•K—v‚Í‚È‚¢B
+	//	//m_moveSpeed.xã¨m_moveSpeed.zã®çµ¶å¯¾å€¤ãŒã¨ã‚‚ã«0.001ä»¥ä¸‹ã¨ã„ã†ã“ã¨ã¯
+	//	//ã“ã®ãƒ•ãƒ¬ãƒ¼ãƒ ã§ã¯ã‚­ãƒ£ãƒ©ã¯ç§»å‹•ã—ã¦ã„ãªã„ã®ã§æ—‹å›ã™ã‚‹å¿…è¦ã¯ãªã„ã€‚
 	//	return;
 	//}
 	//m_rotation.SetRotationYFromDirectionXZ(m_moveSpeed);
 	//m_modelRender.SetRotation(m_rotation);
 	//m_forward = Vector3::AxisZ;
 	//m_rotation.Apply(m_forward);
-	if (m_moveSpeed.Length() > 0.001f) {
+	
+	//m_moveSpeed.xã¨m_moveSpeed.zã®çµ¶å¯¾å€¤ãŒã¨ã‚‚ã«0.001ä»¥ä¸‹ã®æ™‚
+	//ã“ã®ãƒ•ãƒ¬ãƒ¼ãƒ ã§ã¯ã‚­ãƒ£ãƒ©ã¯ç§»å‹•ã—ã¦ã„ãªã„ã®ã§æ—‹å›ã™ã‚‹å¿…è¦ã¯ãªã„ã€‚
+	if (m_moveSpeed.Length() > rotation) {
+
 		float angle = atan2(-m_moveSpeed.x, m_moveSpeed.z);
 		m_rotation.SetRotationY(-angle);
 		m_forward = m_moveSpeed;
@@ -412,12 +413,14 @@ void Player::Rotation()
 }
 void Player::Attack_Biting()
 {
+	//ãƒœã‚¿ãƒ³ãŒæŠ¼ã•ã‚ŒãŸã¨ãã«æ”»æ’ƒä¸­ã˜ã‚ƒãªã
+	// ãƒ€ãƒƒã‚·ãƒ¥ã‚¢ã‚¿ãƒƒã‚¯ã§ãªã‘ã‚Œã°
 	if (g_pad[0]->IsTrigger(enButtonRB2) && m_state != enState_WalkAttack && !m_isNowAttack) {
 		ChangeState(Player::enState_Attack_Biting);
 	}
-	//UŒ‚”»’è’†‚È‚ç
+	//æ”»æ’ƒåˆ¤å®šä¸­ãªã‚‰
 	if (m_isUnderAttack) {
-		//UŒ‚—p‚ÌƒRƒŠƒWƒ‡ƒ“‚ğì¬‚·‚é
+		//æ”»æ’ƒç”¨ã®ã‚³ãƒªã‚¸ãƒ§ãƒ³ã‚’ä½œæˆã™ã‚‹
 		BitingAttackCollision();
 	}
 		if (m_state == enState_Attack_Biting) {
@@ -427,8 +430,10 @@ void Player::Attack_Biting()
 }
 void Player::WalkAttack()
 {
+	//èµ°ã£ã¦ã„ã‚‹ã¨ã
 	if (m_state == enState_Run)
 	{
+		//ãƒœã‚¿ãƒ³ãŒæŠ¼ã•ã‚ŒãŸã¨ãã«æ”»æ’ƒä¸­ã§ãªã‘ã‚Œã°ãƒ€ãƒƒã‚·ãƒ¥ã‚¢ã‚¿ãƒƒã‚¯
 		if (g_pad[0]->IsTrigger(enButtonRB2) && !m_isNowAttack) {
 			ChangeState(Player::enState_WalkAttack);
 		}
@@ -439,73 +444,116 @@ void Player::WalkAttack()
 }
 void Player::Defense()
 {
+	//ãƒ€ãƒ¡ãƒ¼ã‚¸ã‚¹ãƒ†ãƒ¼ãƒˆä¸­ãªã‚‰return
 	if (m_state == enState_Damage) {
 		return;
 	}
-
-	m_KnockBack = m_pos - m_enemy_Boss->GetPos();
-	m_KnockBack.Normalize();
+	//ãƒœã‚¿ãƒ³ãŒæŠ¼ã•ã‚ŒãŸã¨ãã«æ”»æ’ƒä¸­ã§ãªã‘ã‚Œã°Defense
 	if (g_pad[0]->IsPress(enButtonRB1) && !m_isNowAttack) {
 		ChangeState(Player::enState_Defense);
 		m_moveSpeed.x = 0.0f;
 		m_moveSpeed.z = 0.0f;
 	}
-	if (m_state != enState_Defense) {
-		return;
+	else {
+		//é˜²å¾¡ã®ã‚³ãƒªã‚¸ãƒ§ãƒ³ã‚’ãƒªã‚»ãƒƒãƒˆ
+		m_isUnderDefense = false;
 	}
+	if (m_isUnderDefense) {
+		DefenseCollision(500.0f, 2, 1300.0f, 4, 1200.0f, 6, 800.0f, 8, 0.2);
+	}
+	//ãƒãƒƒã‚¯ãƒãƒƒã‚¯ã«ä½¿ã†Vector
+	m_KnockBack = m_pos - m_enemy_Boss->GetPos();
+	m_KnockBack.Normalize();
+}
+void Player::DefenseCollision(int melee_knockback,int melee_magnification,int tail_knockback,int tail_magnification,
+	int flyattack_knockback,int flyattack_magnification, int scream_knockback,int scream_magnification,float scream_hittime)
+{
 
-	//if (m_hitCoolTime >= 0) {
-	//	return;
-	//}
+	//ã‚³ãƒªã‚¸ãƒ§ãƒ³ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’ä½œæˆã™ã‚‹
+	auto collisionObject = NewGO<CollisionObject>(0);
+	Vector3 collisionPosition = m_pos;
+	//åº§æ¨™ã‚’ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®å°‘ã—å‰ã«è¨­å®š
+	collisionPosition += m_forward * 60.0f;
+	//çƒçŠ¶ã®ã‚³ãƒªã‚¸ãƒ§ãƒ³ã‚’ä½œæˆ
+	collisionObject->CreateSphere(collisionPosition,//åº§æ¨™
+		Quaternion::Identity,//å›è»¢
+		120.0f//åŠå¾„
+	);
+	collisionObject->SetName("player_defense");
+
+	//ãƒãƒƒã‚¯ãƒãƒƒã‚¯ã‚¿ã‚¤ãƒãƒ¼ãŒ0ä»¥ä¸‹ãªã‚‰ãƒãƒƒã‚¯ãƒãƒƒã‚¯
 	if (m_knockBackTime <= 0) {
 		m_isKnockBack = false;
-		m_knockBackTime = KNOCKBACKTIME;
 	}
+	//æ”»æ’ƒã‚’å—ã‘ãŸã‚‰ã‚¿ã‚¤ãƒãƒ¼ã‚¹ã‚¿ãƒ¼ãƒˆ
 	if (m_isKnockBack) {
 		m_knockBackTime -= g_gameTime->GetFrameDeltaTime();
 	}
-	// UŒ‚ƒRƒŠƒWƒ‡ƒ“‚ÆÕ“Ë‚µ‚Ä‚¢‚é‚©‚ğ’²‚×‚é
-	const auto& collisionList_MeleeAttack = g_collisionObjectManager->FindCollisionObjects("boss_attack_melee" /*"player_walk_attack" "player_biting_attack"*/);
+	if (m_isKnockBack) {
+		return;
+	}
+
+	//åš™ã¿ã¤ã
+	const auto& collisionList_MeleeAttack = g_collisionObjectManager->FindCollisionObjects("boss_attack_melee");
 	for (auto& collision : collisionList_MeleeAttack) {
-		if (collision->IsHit(m_collision)) {
-			//ƒ_ƒ[ƒW
-			m_testHP -= MELEEATTACKDAMAGE / 8;
+		if (collision->IsHit(collisionObject)) {
+			//ãƒ€ãƒ¡ãƒ¼ã‚¸
+			m_testHP -= MELEEATTACKDAMAGE / melee_magnification;
 			m_isKnockBack = true;
+			//ã‚¿ã‚¤ãƒãƒ¼ã®ãƒªã‚»ãƒƒãƒˆ
+			m_knockBackTime = KNOCKBACKTIME;
+			//ãƒãƒƒã‚¯ãƒãƒƒã‚¯è·é›¢
 			if (m_isKnockBack) {
-				m_moveSpeed = m_KnockBack * 600.0f;
+				m_moveSpeed = m_KnockBack * melee_knockback;
 			}
-			//m_moveSpeed = m_KnockBack * 2000.0f;
-			//m_hitCoolTime = DEFENSEHITCOOLTIME;
 			return;
 		}
 	}
-	// UŒ‚ƒRƒŠƒWƒ‡ƒ“‚ÆÕ“Ë‚µ‚Ä‚¢‚é‚©‚ğ’²‚×‚é
+	//å•†å“æ”»æ’ƒ
 	const auto& collisionList_TailAttack = g_collisionObjectManager->FindCollisionObjects("boss_attack_tail");
 	for (auto& collision : collisionList_TailAttack) {
-		if (collision->IsHit(m_collision)) {
-			//ƒ_ƒ[ƒW
-			m_testHP -= TAILATTACKDAMAGE / 8;			
+		if (collision->IsHit(collisionObject)) {
+			//ãƒ€ãƒ¡ãƒ¼ã‚¸
+			m_testHP -= TAILATTACKDAMAGE / tail_magnification;			
 			m_isKnockBack = true;
+			//ã‚¿ã‚¤ãƒãƒ¼ã®ãƒªã‚»ãƒƒãƒˆ
+			m_knockBackTime = KNOCKBACKTIME;
+			//ãƒãƒƒã‚¯ãƒãƒƒã‚¯è·é›¢
 			if (m_isKnockBack) {
-				m_moveSpeed = m_KnockBack * 1300.0f;
+				m_moveSpeed = m_KnockBack * tail_knockback;
 			}
-			//m_moveSpeed = m_KnockBack * 5000.0f;
-			//m_hitCoolTime = DEFENSEHITCOOLTIME;
 			return;
 		}
 	}
-	// UŒ‚ƒRƒŠƒWƒ‡ƒ“‚ÆÕ“Ë‚µ‚Ä‚¢‚é‚©‚ğ’²‚×‚é
-	const auto& collisionList_Attack = g_collisionObjectManager->FindCollisionObjects("boss_attack_fly" /*"player_walk_attack" "player_biting_attack"*/);
-	for (auto& collision : collisionList_Attack) {
-		if (collision->IsHit(m_collision)) {
-			//ƒ_ƒ[ƒW
-			m_testHP -= FLYATTACKDAMAGE / 12;
+	//æ»‘ç©ºçªé€²
+	const auto& collisionList_FlyAttack = g_collisionObjectManager->FindCollisionObjects("boss_attack_fly");
+	for (auto& collision : collisionList_FlyAttack) {
+		if (collision->IsHit(collisionObject)) {
+			//ãƒ€ãƒ¡ãƒ¼ã‚¸
+			m_testHP -= FLYATTACKDAMAGE / flyattack_magnification;
 			m_isKnockBack = true;
+			//ã‚¿ã‚¤ãƒãƒ¼ã®ãƒªã‚»ãƒƒãƒˆ
+			m_knockBackTime = KNOCKBACKTIME;
+			//ãƒãƒƒã‚¯ãƒãƒƒã‚¯è·é›¢
 			if (m_isKnockBack) {
-				m_moveSpeed = m_KnockBack * 800.0f;
+				m_moveSpeed = m_KnockBack * flyattack_knockback;
 			}
-			//m_moveSpeed += m_KnockBack * 1000.0f;
-			//m_hitCoolTime = DEFENSEHITCOOLTIME;
+			return;
+		}
+	}
+	//å’†å“®
+	const auto& collisionList_ScreamAttack = g_collisionObjectManager->FindCollisionObjects("boss_attack_scream");
+	for (auto& collision : collisionList_ScreamAttack) {
+		if (collision->IsHit(collisionObject)) {
+			//ãƒ€ãƒ¡ãƒ¼ã‚¸
+			m_testHP -= SCREAMATTACKDAMAGE / scream_magnification;
+			m_isKnockBack = true;
+			//ã‚¿ã‚¤ãƒãƒ¼ã®ãƒªã‚»ãƒƒãƒˆ
+			m_knockBackTime = scream_hittime;
+			//ãƒãƒƒã‚¯ãƒãƒƒã‚¯è·é›¢
+			if (m_isKnockBack) {
+				m_moveSpeed = m_KnockBack * scream_knockback;
+			}
 			return;
 		}
 	}
@@ -513,73 +561,91 @@ void Player::Defense()
 }
 void Player::GuardBreak()
 {
+	//ãƒœã‚¿ãƒ³ãŒæŠ¼ã•ã‚ŒãŸã¨ãã«æ”»æ’ƒä¸­ã§ã¯ãªã„ãªã‚‰æ”»æ’ƒ
 	if (g_pad[0]->IsTrigger(enButtonY) && !m_isNowAttack) {
 		ChangeState(Player::enState_GuradBreak);
 	}
 	if (m_state == enState_GuradBreak) {
+		//ãã®å ´ã«æ­¢ã¾ã‚‰ã›ã‚‹
 		m_moveSpeed.x = 0.0f;
 		m_moveSpeed.z = 0.0f;
-		//m_rotation = { 0.0f,0.0f,0.0f,0.0f };
 	}
 	if (m_isUnderGuradBreak)	{
 		GuradBreakCollision();
 	}
 }
-void Player::Hit()
+void Player::Hit(float screamhitcooltime)
 {
-	if (m_state == enState_Damage || m_state == enState_Defense) {
+	//ãƒ’ãƒƒãƒˆä¸­ãªã‚‰return
+	if (m_state == enState_Damage||m_isUnderDefense) {
 		return;
 	}
+	//ãƒ’ãƒƒãƒˆã‚¯ãƒ¼ãƒ«ã‚¿ã‚¤ãƒ ãŒçµ‚ã‚ã£ã¦ãªã„ãªã‚‰return
 	if (m_hitCoolTime >= 0) {
 		return;
 	}
-	// UŒ‚ƒRƒŠƒWƒ‡ƒ“‚ÆÕ“Ë‚µ‚Ä‚¢‚é‚©‚ğ’²‚×‚é
-	const auto& collisionList_MeleeAttack = g_collisionObjectManager->FindCollisionObjects("boss_attack_melee" /*"player_walk_attack" "player_biting_attack"*/);
+	// æ”»æ’ƒã‚³ãƒªã‚¸ãƒ§ãƒ³ã¨è¡çªã—ã¦ã„ã‚‹ã‹ã‚’èª¿ã¹ã‚‹
+	//å™›ã¿ã¤ã
+	const auto& collisionList_MeleeAttack = g_collisionObjectManager->FindCollisionObjects("boss_attack_melee");
 	for (auto& collision : collisionList_MeleeAttack) {
 		if (collision->IsHit(m_collision)) {
-			//ƒ_ƒ[ƒW
+			//ãƒ€ãƒ¡ãƒ¼ã‚¸
 			ChangeState(Player::enState_Damage);
 			m_testHP-= MELEEATTACKDAMAGE;
+			//ã‚¯ãƒ¼ãƒ«ã‚¿ã‚¤ãƒ 
 			m_hitCoolTime = HITCOOLTIME;
+			//ãƒ€ãƒ¡ãƒ¼ã‚¸ä¸­ã«å‹•ã‹ãªã„ã‚ˆã†ã«
+			m_moveSpeed = Vector3::Zero;
 			return;
 		}
 	}
-	// UŒ‚ƒRƒŠƒWƒ‡ƒ“‚ÆÕ“Ë‚µ‚Ä‚¢‚é‚©‚ğ’²‚×‚é
+	//å°»å°¾æ”»æ’ƒ
 	const auto& collisionList_TailAttack = g_collisionObjectManager->FindCollisionObjects("boss_attack_tail");
 	for (auto& collision : collisionList_TailAttack) {
 		if (collision->IsHit(m_collision)) {
-			//ƒ_ƒ[ƒW
+			//ãƒ€ãƒ¡ãƒ¼ã‚¸
 			ChangeState(Player::enState_Damage);
 			m_testHP-=TAILATTACKDAMAGE;
+			//ã‚¯ãƒ¼ãƒ«ã‚¿ã‚¤ãƒ 
 			m_hitCoolTime = HITCOOLTIME;
+			//ãƒ€ãƒ¡ãƒ¼ã‚¸ä¸­ã«å‹•ã‹ãªã„ã‚ˆã†ã«
+			m_moveSpeed = Vector3::Zero;
 			return;
 		}
 	}
-	// UŒ‚ƒRƒŠƒWƒ‡ƒ“‚ÆÕ“Ë‚µ‚Ä‚¢‚é‚©‚ğ’²‚×‚é
-	const auto& collisionList_Attack = g_collisionObjectManager->FindCollisionObjects("boss_attack_fly" /*"player_walk_attack" "player_biting_attack"*/);
-	for (auto& collision : collisionList_Attack) {
+	//æ»‘ç©ºçªé€²
+	const auto& collisionList_FlyAttack = g_collisionObjectManager->FindCollisionObjects("boss_attack_fly");
+	for (auto& collision : collisionList_FlyAttack) {
 		if (collision->IsHit(m_collision)) {
-			//ƒ_ƒ[ƒW
+			//ãƒ€ãƒ¡ãƒ¼ã‚¸
 			ChangeState(Player::enState_Damage);
 			m_testHP-=FLYATTACKDAMAGE;
+			//ã‚¯ãƒ¼ãƒ«ã‚¿ã‚¤ãƒ 
 			m_hitCoolTime = HITCOOLTIME;
+			//ãƒ€ãƒ¡ãƒ¼ã‚¸ä¸­ã«å‹•ã‹ãªã„ã‚ˆã†ã«
+			m_moveSpeed = Vector3::Zero;
 			return;
 		}
 	}
+	//å’†å“®
+	const auto& collisionList_ScreamAttack = g_collisionObjectManager->FindCollisionObjects("boss_attack_scream");
+	for (auto& collision : collisionList_ScreamAttack) {
+		if (collision->IsHit(m_collision)&&m_isUnderDefense) {
+			//ãƒ€ãƒ¡ãƒ¼ã‚¸
+			ChangeState(Player::enState_Damage);
+			m_testHP -= SCREAMATTACKDAMAGE;
+			//ã‚¯ãƒ¼ãƒ«ã‚¿ã‚¤ãƒ 
+			m_hitCoolTime = screamhitcooltime;
+			//ãƒ€ãƒ¡ãƒ¼ã‚¸ä¸­ã«å‹•ã‹ãªã„ã‚ˆã†ã«
+			m_moveSpeed = Vector3::Zero;
+			return;
+		}
+	}
+
 }
-void Player::TakeAim()
+void Player::TakeAim(int maximum,int smallest)
 {
 	Vector3 NearenemyPosition;
-	//float NearLength = 10000.0f;
-	//for (auto enemy : m_enemyList) {
-	//	Vector3 enemyPosition;
-	//	enemyPosition = enemy->GetPos() - m_pos;
-	//	float Length = enemyPosition.Length();
-	//	if (NearLength >= Length) {
-	//		NearenemyPosition = enemyPosition;
-	//		NearLength = Length;
-	//	}
-	//}
 	if (m_count == 0) {
 		std::sort(m_enemyList.begin(), m_enemyList.end(),
 			[this](EnemyBase* a, EnemyBase* b)
@@ -600,11 +666,11 @@ void Player::TakeAim()
 	}
 	NearenemyPosition = m_enemyList[m_targetCount]->GetPos();
 
-		Vector3 diff = NearenemyPosition;
-	//ƒvƒŒƒCƒ„[‚ÆƒGƒlƒ~[‚ªˆê’èˆÈã—£‚ê‚Ä‚¢‚½‚ç
-	//ƒ^[ƒQƒbƒeƒBƒ“ƒO‚µ‚È‚¢
-	//‹ß‚·‚¬‚Ä‚àƒ^[ƒQƒbƒeƒBƒ“ƒO‚µ‚È‚¢
-	if (diff.Length() >= 3000.0f || diff.Length() <= 20.0f)
+		Vector3 diff = m_pos-NearenemyPosition;
+	//ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã¨ã‚¨ãƒãƒŸãƒ¼ãŒä¸€å®šä»¥ä¸Šé›¢ã‚Œã¦ã„ãŸã‚‰
+	//ã‚¿ãƒ¼ã‚²ãƒƒãƒ†ã‚£ãƒ³ã‚°ã—ãªã„
+	//è¿‘ã™ãã¦ã‚‚ã‚¿ãƒ¼ã‚²ãƒƒãƒ†ã‚£ãƒ³ã‚°ã—ãªã„
+	if (diff.Length() >= maximum || diff.Length() <= smallest)
 	{
 		m_isTakeAim = false;
 		return;
@@ -613,11 +679,11 @@ void Player::TakeAim()
 	diff.Normalize();
 
 	float angle = acosf(m_forward.Dot(diff));
-	//ƒvƒŒƒCƒ„[‚Ì³–ÊƒxƒNƒgƒ‹‚ÆB
-	//ƒvƒŒƒCƒ„[‚©‚çƒGƒlƒ~[‚ÉŒü‚©‚¤ƒxƒNƒgƒ‹‚ÌB
-	//Šp“x‚ª90“xˆÈã‚©‚ÂB
-	//ƒƒbƒNƒIƒ“ó‘Ô‚Å‚È‚©‚Á‚½‚çB
-	//ƒ^[ƒQƒbƒeƒBƒ“ƒO‚µ‚È‚¢B
+	//ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®æ­£é¢ãƒ™ã‚¯ãƒˆãƒ«ã¨ã€‚
+	//ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã‹ã‚‰ã‚¨ãƒãƒŸãƒ¼ã«å‘ã‹ã†ãƒ™ã‚¯ãƒˆãƒ«ã®ã€‚
+	//è§’åº¦ãŒ90åº¦ä»¥ä¸Šã‹ã¤ã€‚
+	//ãƒ­ãƒƒã‚¯ã‚ªãƒ³çŠ¶æ…‹ã§ãªã‹ã£ãŸã‚‰ã€‚
+	//ã‚¿ãƒ¼ã‚²ãƒƒãƒ†ã‚£ãƒ³ã‚°ã—ãªã„ã€‚
 	if (angle > Math::PI * 2 && m_isLockOn == false) {
 		m_isTakeAim = false;
 		return;
@@ -646,12 +712,14 @@ void Player::RemoveEnemy_List(EnemyBase* enemybase)
 }
 void Player::LockOn()
 {
+	//ãƒ­ãƒƒã‚¯ã‚ªãƒ³ã™ã‚‹
 	if (g_pad[0]->IsTrigger(enButtonA))
 	{
 		m_isLockOn = true;
 		m_targetCount++;
 		m_count++;
 	}
+	//ãƒ­ãƒƒã‚¯ã‚ªãƒ³ã‚’æˆ»ã™
 	else if (g_pad[0]->IsTrigger(enButtonB))
 	{
 		m_isLockOn = false;
@@ -659,8 +727,8 @@ void Player::LockOn()
 		m_count = -1;
 	}
 
-	//ƒ^[ƒQƒbƒeƒBƒ“ƒO‚ª‚³‚ê‚Ä‚¢‚È‚©‚Á‚½‚çB
-	//ƒƒbƒNƒIƒ“‚µ‚È‚¢B
+	//ã‚¿ãƒ¼ã‚²ãƒƒãƒ†ã‚£ãƒ³ã‚°ãŒã•ã‚Œã¦ã„ãªã‹ã£ãŸã‚‰ã€‚
+	//ãƒ­ãƒƒã‚¯ã‚ªãƒ³ã—ãªã„ã€‚
 	if (m_isTakeAim == false)
 	{
 		m_isLockOn = false;
@@ -670,20 +738,69 @@ void Player::LockOn()
 	}
 
 }
-void Player::LongAttack()
+void Player::LongAttack(int hitstartframe,int hitendframe,int effect_speed)
 {
+	///
+	Quaternion qRot;
+	Vector3 diff = m_enemy_Boss->GetPos() - m_pos;
+	diff.Normalize();
+	Vector3 PosZ = Vector3::AxisZ;
+	qRot.SetRotation(PosZ, diff);
+	///
+	m_longAttackCoolTime -= g_gameTime->GetFrameDeltaTime();
+	//ã‚¯ãƒ¼ãƒ«ã‚¿ã‚¤ãƒ ãŒã‚ã‘ã¦ã„ã‚‹ãªã‚‰true
 	if (m_longAttackCoolTime <= 0) {
-		if (g_pad[0]->IsTrigger(enButtonLB1)) {
+		//æ”»æ’ƒä¸­ã§ã¯ãªãLB1
+		if (g_pad[0]->IsTrigger(enButtonLB1)&&!m_isNowAttack) {
 			ChangeState(Player::enState_LongAttack);
-			EffectEmitter* effectEmitter = NewGO<EffectEmitter>(0, "long_attack");
+			effectEmitter = NewGO<EffectEmitter>(0, "long_attack");
 			effectEmitter->Init(0);
 			effectEmitter->SetScale(Vector3::One * 10.0f);
 			effectEmitter->SetPosition(m_pos);
+			//ãƒœã‚¹ã«å‘ã‹ã£ã¦é£›ã°ã™ãŸã‚ã®å›è»¢ã‚¯ã‚©ãƒ¼ã‚¿ãƒ‹ã‚ªãƒ³ã‚’è¨ˆç®—ã™ã‚‹
+			//qRot.Apply(diff);
 			effectEmitter->Play();
+			m_isEffect = true;
 			m_longAttackCoolTime = LONGATTACKCOOLTIME;
 		}
+	}		
+	if (effectEmitter != nullptr) {
+		effectEmitter->SetRotation(qRot);
 	}
-	m_longAttackCoolTime -= g_gameTime->GetFrameDeltaTime();
+	//ã‚¨ãƒ•ã‚§ã‚¯ãƒˆã‚«ã‚¦ãƒ³ã‚¿ãƒ¼ã‚’1ãƒ•ãƒ¬ãƒ¼ãƒ ã«1è¶³ã™
+	if (m_isEffect) {
+		m_effectCount++;
+	}
+
+	//ã‚¨ãƒ•ã‚§ã‚¯ãƒˆã‚«ã‚¦ãƒ³ã‚¿ãƒ¼ãŒæ•°å€¤ã®é–“ã«ã‚ã‚‹ãªã‚‰å½“ãŸã‚Šåˆ¤å®šã‚’ã¤ã‘ã‚‹
+	if (m_effectCount >= hitstartframe && m_effectCount <= hitendframe) {
+		//ã‚³ãƒªã‚¸ãƒ§ãƒ³ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’ä½œæˆã™ã‚‹
+		auto collisionObject = NewGO<CollisionObject>(0);
+		//åº§æ¨™ã‚’ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®å°‘ã—å‰ã«è¨­å®š
+		if (m_effectCount == hitstartframe) {
+			m_longAttackPos = m_pos;
+		}
+		Vector3 diff = m_enemy_Boss->GetPos() - m_pos;
+		diff.Normalize();
+		m_longAttackPos += diff * effect_speed;
+		//çƒçŠ¶ã®ã‚³ãƒªã‚¸ãƒ§ãƒ³ã‚’ä½œæˆ
+		collisionObject->CreateSphere(m_longAttackPos,//åº§æ¨™
+			qRot,//å›è»¢
+			50.0f//åŠå¾„
+		);
+		collisionObject->SetName("player_long_attack");
+	}
+	//ã‚«ã‚¦ãƒ³ãƒˆã‚’è¶…ãˆãŸã‚‰0ã«æˆ»ã™
+	if (m_effectCount > hitendframe) {
+		m_effectCount = 0;
+		m_isEffect = false;
+	}
+
+	if (m_isEffect && m_effectCount <= hitstartframe) {
+		//ãã®å ´ã«æ­¢ã¾ã‚‰ã›ã‚‹
+		m_moveSpeed.x = 0.0f;
+		m_moveSpeed.z = 0.0f;
+	}
 }
 void Player::Render(RenderContext& rc)
 {

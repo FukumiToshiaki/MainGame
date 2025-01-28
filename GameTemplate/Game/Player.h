@@ -20,35 +20,47 @@ public:
 		Vector3 position;
 
 	};
+	//スタート関数
 	bool Start() override;
+	//アップデート関数
 	void Update() override;
+	//モデルレンダー
 	void Render(RenderContext& rc) override;
-	void Move();
-	void Rotation();
+	//移動の関数
+	void Move(int walk_speed, int run_speed, int walkattack_speed);
+	//回転関数
+	void Rotation(int rotation);
+	//近距離攻撃の関数
 	void Attack_Biting();
+	//ダッシュアタックの関数
 	void WalkAttack();
+	//防御関数
 	void Defense();
+	//防御コリジョンの関数
+	void DefenseCollision(int melee_knockback, int melee_magnification, int tail_knockback, int tail_magnification,
+		int flyattack_knockback, int flyattack_magnification, int scream_knockback, int scream_magnification,float scream_hittime);
+	//ガードブレイク関数
 	void GuardBreak();
-	void Hit();
+	//ヒット関数
+	void Hit(float screamhitcooltime);
 	//エイム
-	void TakeAim();
+	void TakeAim(int maximum, int smallest);
+	//エネミーのリスト
 	void AddEnemy_List(EnemyBase* enemybase);
 	void RemoveEnemy_List(EnemyBase* enemybase);
 	//LockOnPosition* TakeAim(Vector3 position);
 	//ロックオン
 	void LockOn();
 	//遠距離攻撃
-	void LongAttack();
+	void LongAttack(int hitstartframe,int hitendframe,int effect_speed);
 	// スケルトンを初期化
 	void InitSkeleton();
 	// モデルを初期化。
 	//void InitModel();
 	// アニメーションを初期化。
 	void InitAnimation();
-
 	// アニメーションイベント用の関数。
 	void OnAnimationEvent(const wchar_t* clipName, const wchar_t* eventName);
-	
 	//アニメーションコリジョン近接攻撃の関数
 	void BitingAttackCollision();
 	//アニメーションコリジョンダッシュ攻撃の関数
@@ -61,9 +73,9 @@ public:
 		enAnimClip_Run,		// 1 : 走りアニメーション。
 		enAnimClip_Attack,	// 2 :剣で攻撃
 		enAnimClip_Walk,
-		enAnimClip_DefenceStart,
+		//enAnimClip_DefenceStart,
 		enAnimClip_Defense,
-		enAnimClip_DefenceEnd,
+		//enAnimClip_DefenceEnd,
 		enAnimClip_WalkAttack,
 		enAnimClip_GuardBreak,
 		enAnimClip_LongAttack,
@@ -96,6 +108,10 @@ public:
 		return m_pos;
 	}
 
+	void SetMoveSpeed(Vector3 MoveSpeed) {
+		m_moveSpeed = MoveSpeed;
+	}
+
 	ModelRender& GetModelRender()
 	{
 		return m_modelRender;
@@ -105,66 +121,6 @@ public:
 	{
 		return m_modelRender.IsPlayingAnimation();
 	}
-
-	//bool GetIsAttack_Biting()
-	//{
-	//	return m_isAttack_Biting;
-	//}
-	//void SetIsAttack_Biting(const bool Attack_Biting) {
-	//	m_isAttack_Biting = Attack_Biting;
-	//}
-
-	//bool GetIsWalk()
-	//{
-	//	return m_isWalk;
-	//}
-
-	//bool GetIsWalkAttack()
-	//{
-	//	return m_isWalkAttack;
-	//}
-	//void SetIsWalkAttack(const bool WalkAttack) {
-	//	m_isWalkAttack = WalkAttack;
-	//}
-
-	//bool GetIsLongAttack()
-	//{
-	//	return m_isLongAttack;
-	//}
-	//bool GetIsDefense()
-	//{
-	//	return m_isDefense;
-	//}
-	//void SetIsDefense(const bool Defense)
-	//{
-	//	m_isDefense = Defense;
-	//}
-
-	//bool GetIsGuradBreak()
-	//{
-	//	return m_isGuardBreak;
-	//}
-	//void SetIsGuradBreak(const bool Break)
-	//{
-	//	m_isGuardBreak = Break;
-	//}
-
-	//bool GetisDamage()
-	//{
-	//	return m_isDamage;
-	//}
-	//void SetisDamage(const bool damage) {
-	//	m_isDamage = damage;
-	//}
-
-	//bool GetisDie()
-	//{
-	//	return m_isDie;
-	//}
-	//void SetisDie(bool Die)
-	//{
-	//	m_isDie = Die;
-	//}
 
 	bool GetisOver()
 	{
@@ -187,7 +143,9 @@ public:
 	void SetisLongAttack(bool LongAttack) {
 		m_isUnderLongAttack = LongAttack;
 	}
-
+	void SetisDefense(bool defense) {
+		m_isUnderDefense = defense;
+	}
 	const bool GetIsLockOn() const
 	{
 		return m_isLockOn;
@@ -215,14 +173,24 @@ private:
 /// <summary>
 /// ベクター
 /// </summary>
-	Vector3 m_pos;		// 座標
-	Vector3 m_moveSpeed = Vector3::Zero;									//移動速度。
+	// 座標
+	Vector3 m_pos = Vector3::Zero;;
+	//移動速度。
+	Vector3 m_moveSpeed = Vector3::Zero;	
+	//向き
 	Vector3	m_forward = Vector3::AxisZ;
-	Vector3 m_scale = Vector3::One;			//大きさ。
-	Vector3 m_stickL;
-	Vector3 m_attack_Pos;
+	//大きさ
+	Vector3 m_scale = Vector3::One;			
+	//スティック
+	Vector3 m_stickL = Vector3::Zero;;
+	Vector3 m_attack_Pos = Vector3::Zero;;
+	//敵のポジション
 	Vector3 m_targetPosition = Vector3::Zero;
-	Vector3 m_KnockBack;
+	//ノックバック
+	Vector3 m_KnockBack = Vector3::Zero;;
+	//遠距離攻撃のポジション
+	Vector3 m_longAttackPos = Vector3::Zero;;
+	//敵のリスト
 	std::vector<EnemyBase*> m_enemyList;
 /// <summary>
 /// クラス
@@ -239,17 +207,27 @@ private:
 	/// <summary>
 /// 変数
 /// </summary>
+	//敵のナンバー
 	int m_enemyNo = 0;
+	//エイムの切り替え
 	int m_count = -1;
+	//ターゲット
 	int m_targetCount = -1;
-	float m_testHP = 10.0f;
+	//エフェクトカウンター
+	int m_effectCount = 0;
+	//HP
+	float m_testHP = 50.0f;
+	//ヒット時のクールタイム
 	float m_hitCoolTime = 1.5f;
+	//遠距離攻撃のクールタイム
 	float m_longAttackCoolTime = 5.0f;
+	//ノックバックの判定のクールタイム
 	float m_knockBackTime = 0.3f;
 /// <summary>
 /// ブール型
 /// </summary>
 	bool m_isNowAttack = false;//攻撃中ならtrue
+	//ノックバック中か
 	bool m_isKnockBack = false;
 	//bool m_isAttack_Biting = false;	//
 	//bool m_isWalk = false;			//
@@ -261,13 +239,13 @@ private:
 	bool m_isUnderWalkAttack = false;//ダッシュ攻撃中ならtrue
 	bool m_isUnderGuradBreak = false;//ガードブレイク中ならtrue
 	bool m_isUnderLongAttack = false;//ロングアタック中ならtrue
-	//bool m_isDamage = false;		//
+	bool m_isUnderDefense = false;//ガード中ならtrue
 	bool m_isTakeAim = false;
 	bool m_isLockOn = false;
 	bool m_isLockOnCamera = false;
-	//bool m_isDie = false;
+	bool m_isEffect = false;
 	bool m_isOver = false;
-
+	bool m_istest = false;
 	Model m_model;			// モデル
 	Animation m_animation;	// アニメーション
 	AnimationClip m_animationClipArray[enAnimClip_Num];	// アニメーションクリップ
@@ -277,4 +255,5 @@ private:
 	ModelRender m_modelRender;
 	CharacterController m_charaCon;	//キャラクターコントローラー
 	PlayerStatus m_playerStatus;
+	EffectEmitter* effectEmitter = nullptr;
 };
