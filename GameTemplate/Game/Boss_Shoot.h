@@ -1,6 +1,7 @@
 #pragma once
 #include "Enemy_Boss.h"
 class Player;
+class Bullet;
 class Boss_Shoot :public IGameObject
 {
 public:
@@ -15,6 +16,9 @@ public:
 
 	 void SetisShoot(bool bossshoot) {
 		 m_isShoot = bossshoot;
+	 }
+	 bool GetisShoot() {
+		 return m_isShoot;
 	 }
 private:
 	Enemy_Boss* m_boss = nullptr;
@@ -36,6 +40,7 @@ private:
 	CollisionObject* m_shootCollision = nullptr;
 
 	Player* m_player = nullptr;
+	Bullet* m_bullet = nullptr;
 	Vector3 m_pos = Vector3::Zero;
 	EffectEmitter* m_boss_shoot = nullptr;
 };
