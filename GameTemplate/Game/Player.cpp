@@ -329,7 +329,7 @@ void Player::Update()
 	Attack_Biting();
 	Defense();
 	GuardBreak();
-	Hit(0.1f,700.0f,400.0f,300.0f);
+	Hit(0.1f,700.0f,500.0f,400.0f);
 	TakeAim(4000.0f,100.0f);
 	LockOn();
 	LongAttack(137,200,30.0f);
