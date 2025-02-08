@@ -20,6 +20,9 @@
 #include "BossState_Die.h"
 #include "BossState_Defence.h"
 #include "BossState_Rest.h"
+#include "Boss_Shoot.h"
+#include "Boss_HP_UI.h"
+#include "sound/SoundEngine.h"
 
 #define START_POS_X 0.0f
 #define START_POS_Y 0.0f
@@ -56,8 +59,8 @@ bool Enemy_Boss::Start()
 	m_collisionPos.y += 300.0f;
 	m_collisionPos.z -= 300.0f;
 	//m_modelRender.SetPosition(m_collisionPos);
-	EffectEngine::GetInstance()->ResistEffect(2, u"Assets/Effect/Boss_Shoot_Start.efk");
-	EffectEngine::GetInstance()->ResistEffect(3, u"Assets/Effect/Boss_Shoot.efk");
+	//EffectEngine::GetInstance()->ResistEffect(2, u"Assets/Effect/Boss_Shoot_Start.efk");
+	//EffectEngine::GetInstance()->ResistEffect(2, u"Assets/Effect/Boss_Shoot.efk");
 
 	m_modelRender.SetPosition(m_pos);
 	m_modelRender.SetScale(m_scale);
@@ -107,11 +110,22 @@ bool Enemy_Boss::Start()
 	m_modelRender.Init("Assets/modelData/Dragon_Frog/Doragon.tkm", m_animationClipArray, enAnimClip_Num);
 	//スケルトンをロード。
 	//InitSkeleton();
-	//アニメーションを初期化。//
+	//アニメーションを初期化。
+	
+	//ボスのHPが30%以上の時BGMの読み込み
+	g_soundEngine->ResistWaveFileBank(1, "Assets/sound/Boss_Battle.wav");
+	m_bossButtle = NewGO<SoundSource>(1);
+	m_bossButtle->Init(1);
+	m_bossButtle->Play(true);
+	//ボスのHPが30%以下の時BGMの読み込み
+	g_soundEngine->ResistWaveFileBank(2, "Assets/sound/Boss_LastBattle.wav");
+
 	//InitAnimation();
 	m_player = FindGO<Player>("player");
 	m_player->AddEnemy_List(this);
 	m_game = FindGO<Game>("game");
+	m_boss_HP_UI = FindGO<Boss_HP_UI>("boss_hp_ui");
+	m_boss_Shoot = NewGO<Boss_Shoot>(0, "boss_shoot");
 	//コリジョンの作成
 	m_collision = NewGO<CollisionObject>(0);
 	m_collision->CreateSphere(m_collisionPos, Quaternion::Identity, COLLISION);
@@ -123,7 +137,7 @@ bool Enemy_Boss::Start()
 	m_pos = { START_POS_X, START_POS_Y, START_POS_Z };
 	//最初のステートはIdleに
 	ChangeState(enState_Idle);
-	m_charaCon.Init(10.0f, 1.0f, m_pos);
+	m_charaCon.Init(500.0f, 10.0f, m_pos);
 
 
 	//空を飛んでいるときのボーンを受け取る
@@ -165,33 +179,55 @@ void Enemy_Boss::Rotation(int rotation)
 //	//m_diff = m_player->Get_PlayerPos() - m_pos;
 //	//m_diff.Normalize();
 //}
-void Enemy_Boss::Shoot(int movespeed)
-{
-	////ブレスのロックオン
-	//m_moveSpeed_Shoot = m_player->Get_PlayerPos() - m_pos;
-	//m_moveSpeed_Shoot.Normalize();
-	//m_shootPos = m_player->Get_PlayerPos() - m_pos;;
-	//Vector3 diff = m_moveSpeed_Shoot * movespeed;
-
-	//if (m_shootPos.Length() <= 150.0f) {
-	//	EffectEmitter* Boss_Shoot = NewGO<EffectEmitter>(3, "boss_shoot");
-	//	Boss_Shoot->Init(3);
-	//	Boss_Shoot->SetScale(Vector3::One * 10.0f);
-	//	Boss_Shoot->SetPosition(diff);
-	//	Boss_Shoot->Play();
-	//}
-	//if (m_state != enState_Attack_Shoot) {
-	//	return;
-	//}
-	//if (!m_isShoot) {
-	//	EffectEmitter* Boss_Shoot_Start = NewGO<EffectEmitter>(2, "boss_shoot_start");
-	//	Boss_Shoot_Start->Init(2);
-	//	Boss_Shoot_Start->SetScale(Vector3::One * 10.0f);
-	//	Boss_Shoot_Start->SetPosition(diff);
-	//	Boss_Shoot_Start->Play();
-	//	m_isShoot = true;
-	//}
-}
+//void Enemy_Boss::Shoot(int movespeed, int hitstartframe, int hitendframe)
+//{
+//	///
+//	Quaternion qRot;
+//	Vector3 diff = m_player->Get_PlayerPos() - m_pos;
+//	diff.Normalize();
+//	Vector3 PosZ = Vector3::AxisZ;
+//	qRot.SetRotation(PosZ, diff);
+//	///
+//
+//	//if (m_shootPos.Length() <= 150.0f) {
+//	//	EffectEmitter* Boss_Shoot = NewGO<EffectEmitter>(3, "boss_shoot");
+//	//	Boss_Shoot->Init(3);
+//	//	Boss_Shoot->SetScale(Vector3::One * 10.0f);
+//	//	Boss_Shoot->SetPosition(diff);
+//	//	Boss_Shoot->Play();
+//	//}
+//	if (m_state != enState_Attack_Shoot) {
+//		return;
+//	}
+//		if (!m_isShoot) {
+//			Boss_Shoot_Start = NewGO<EffectEmitter>(2, "boss_shoot");
+//			Boss_Shoot_Start->Init(2);
+//			Boss_Shoot_Start->SetScale(Vector3::One * 10.0f);
+//			Boss_Shoot_Start->SetPosition(m_pos);
+//			Boss_Shoot_Start->Play();
+//			m_isShoot = true;
+//			//エフェクトカウンターが数値の間にあるなら当たり判定をつける
+//			if (m_effectCount <= 0) {
+//				if (Boss_Shoot_Start != nullptr) {
+//					Boss_Shoot_Start->SetRotation(qRot);
+//				}
+//			}
+//			//ブレスのロックオン
+//			m_moveSpeed_Shoot = m_player->Get_PlayerPos() - m_pos;
+//			m_shootPos = m_moveSpeed_Shoot;
+//			m_moveSpeed_Shoot.Normalize();
+//			m_effectCount++;
+//		}
+//		m_shot += m_moveSpeed_Shoot * movespeed;
+//		//コリジョンオブジェクトを作成する
+//		m_shootCollision = NewGO<CollisionObject>(0);
+//		//球状のコリジョンを作成
+//		m_shootCollision->CreateSphere(m_shot,//座標
+//			qRot,//回転
+//			50.0f//半径
+//		);
+//		m_shootCollision->SetName("boss_shot");
+//}
 void Enemy_Boss::Rest()
 {
 	
@@ -227,6 +263,8 @@ void Enemy_Boss::Hit(int damagemagnification)
 				ChangeState(enState_Damage);
 				m_hitCoolTime = HITCOOLTIME;
 				m_testHP -= GUARDBREAK_DAMAGE* damagemagnification;
+				//HP_UIを減らす表示
+				m_boss_HP_UI->DecreaseHP(GUARDBREAK_DAMAGE * damagemagnification);
 				return;
 			}
 		}
@@ -239,6 +277,8 @@ void Enemy_Boss::Hit(int damagemagnification)
 				ChangeState(enState_Damage);
 				m_hitCoolTime = HITCOOLTIME;
 				m_testHP -= WALKATTACKDAMAGE* damagemagnification;
+				//HP_UIを減らす表示
+				m_boss_HP_UI->DecreaseHP(WALKATTACKDAMAGE * damagemagnification);
 				return;
 			}
 		}
@@ -251,6 +291,8 @@ void Enemy_Boss::Hit(int damagemagnification)
 				ChangeState(enState_Damage);
 				m_hitCoolTime = HITCOOLTIME;
 				m_testHP -= BITATTACKDAMAGE * damagemagnification;
+				//HP_UIを減らす表示
+				m_boss_HP_UI->DecreaseHP(BITATTACKDAMAGE * damagemagnification);
 				return;
 			}
 		}
@@ -266,6 +308,8 @@ void Enemy_Boss::Hit(int damagemagnification)
 			ChangeState(enState_Damage);
 			m_hitCoolTime = HITCOOLTIME;
 			m_testHP -= GUARDBREAK_DAMAGE;
+			//HP_UIを減らす表示
+			m_boss_HP_UI->DecreaseHP(GUARDBREAK_DAMAGE);
 			return;
 		}
 	}
@@ -278,6 +322,8 @@ void Enemy_Boss::Hit(int damagemagnification)
 			ChangeState(enState_Damage);
 			m_hitCoolTime = HITCOOLTIME;
 			m_testHP -= WALKATTACKDAMAGE;
+			//HP_UIを減らす表示
+			m_boss_HP_UI->DecreaseHP(WALKATTACKDAMAGE);
 			return;
 		}
 	}
@@ -290,6 +336,8 @@ void Enemy_Boss::Hit(int damagemagnification)
 			ChangeState(enState_Damage);
 			m_hitCoolTime = HITCOOLTIME;
 			m_testHP -= BITATTACKDAMAGE;
+			//HP_UIを減らす表示
+			m_boss_HP_UI->DecreaseHP(BITATTACKDAMAGE);
 			return;
 		}
 	}
@@ -300,6 +348,11 @@ void Enemy_Boss::MeleeAttack()
 		//噛みつき用のコリジョンの作成
 		MeleeAttackCollision(300.0f);
 	}
+}
+void Enemy_Boss::Shoot()
+{
+	m_boss_Shoot->Init(this);
+	m_boss_Shoot->Update();
 }
 void Enemy_Boss::MeleeAttackCollision(int collision_melee)
 {
@@ -344,7 +397,9 @@ void Enemy_Boss::FlyAttack(float movespeed)
 	if (m_isUnderFlyAttack) {
 		FlyAttackCollision(450.0f);
 	}
-	m_pos += m_moveSpeed * movespeed;
+	Vector3 diff = m_player->Get_PlayerPos() - m_pos;
+	diff.Normalize();
+	m_moveSpeed = diff * movespeed;
 
 
 }
@@ -487,21 +542,36 @@ void Enemy_Boss::OnAnimationEvent(const wchar_t* clipName, const wchar_t* eventN
 		m_isUnderScream = false;
 	}
 
-	
+	//キーの名前がBoss_Landing_startの場合
+	if (wcscmp(eventName, L"Boss_Landing_start") == 0)
+	{
+		//攻撃中にする
+		m_isUnderLanding = true;
+	}
+	//キーの名前がBoss_Landing_endの場合
+	else if (wcscmp(eventName, L"Boss_Landing_end") == 0)
+	{
+		//攻撃を終わる
+		m_isUnderLanding = false;
+	}
+
 }
 void Enemy_Boss::FlyPos(float movespeed)
 {
 	if (m_state != enState_Fly) {
 		return;
 	}
-	BossFlyPoint::FlyPoint* flypoint;
-	flypoint = m_game->GetBossFlyPoint()->GetFlyPoint(m_pos);
+	if (!m_isFlyKeepDistance){
+		BossFlyPoint::FlyPoint* flypoint;
+		flypoint = m_game->GetBossFlyPoint()->GetFlyPoint(m_pos);
 		//ボスからフライポイントに向かうベクトルを求める
-		Vector3 diff = flypoint->m_pos - m_pos;
+		diff = flypoint->m_pos - m_pos;
 		//ベクトルのNormalizeする
 		diff.Normalize();
-		//移動速度をいれる
-		m_moveSpeed = diff * movespeed;
+		m_isFlyKeepDistance = true;
+	}
+	//移動速度をいれる
+	m_moveSpeed = diff * movespeed;
 }
 void Enemy_Boss::Scream()
 {
@@ -521,8 +591,6 @@ void Enemy_Boss::ScreamCollision(int collision_scream)
 	//コリジョンオブジェクトを作成する
 	auto collisionObject = NewGO<CollisionObject>(0);
 	Vector3 collisionPosition = m_pos;
-	//座標をボスの少し前に設定
-
 	//球状のコリジョンを作成
 	collisionObject->CreateSphere(collisionPosition,//座標
 		Quaternion::Identity,//回転
@@ -530,6 +598,40 @@ void Enemy_Boss::ScreamCollision(int collision_scream)
 	);
 	collisionObject->SetName("boss_attack_scream");
 
+}
+void Enemy_Boss::Landing()
+{
+	if (m_state != enState_Landing) {
+		return;
+	}
+	LandingDamage(300);
+}
+void Enemy_Boss::LandingDamage(int collision_landing)
+{
+	//コリジョンオブジェクトを作成する
+	auto collisionObject = NewGO<CollisionObject>(0);
+	Vector3 collisionPosition = m_pos;
+	//球状のコリジョンを作成
+	collisionObject->CreateSphere(collisionPosition,//座標
+		Quaternion::Identity,//回転
+		collision_landing//半径
+	);
+	collisionObject->SetName("boss_attack_landing");
+}
+void Enemy_Boss::BGM()
+{
+	if (m_testHP <= 19) {
+		m_bossButtle->Stop();
+		//ボスのHPが30%以下の時BGMの再生
+		m_bossLastButtle = NewGO<SoundSource>(2);
+		if (m_bossLastButtle->IsPlaying()) {
+			m_bossLastButtle->Init(2);
+			m_bossLastButtle->Play(true);
+		}
+	}
+	else {
+
+	}
 }
 void Enemy_Boss::ChangeState(EnState changeState, int integerArgument0)
 {
@@ -586,9 +688,7 @@ void Enemy_Boss::ChangeState(EnState changeState, int integerArgument0)
 }
 void Enemy_Boss::Update()
 {
-	m_pos += m_moveSpeed * g_gameTime->GetFrameDeltaTime();//動きを一定にするため
-	//コリジョンの当たり判定
-	m_modelRender.SetPosition(m_collisionPos);
+	//m_pos += m_moveSpeed * g_gameTime->GetFrameDeltaTime();//動きを一定にするため
 	m_Iboss_State->Animation();
 	m_Iboss_State->Update();
 	Rotation(0.001f);
@@ -598,23 +698,32 @@ void Enemy_Boss::Update()
 	TailAttack();
 	Defence(); 
 	FlyPos(500.0f);
-	FlyAttack(10.0f);
+	FlyAttack(400.0f);
 	Scream();
-	Shoot(100.0f);
+	Landing();
+	BGM();
+	//Shoot();
 	m_modelRender.SetRotation(m_rotation);
 	m_skeleton.Update(m_model.GetWorldMatrix());
-	m_pos = m_charaCon.Execute(m_moveSpeed, g_gameTime->GetFrameDeltaTime());
-	m_charaCon.SetPosition(m_pos);
-	m_collision->SetPosition(m_collisionPos);
-	m_collision->Update();
-	m_modelRender.SetPosition(m_pos);
-	m_modelRender.Update();
+
 	//ボーンの座標を受け取るプログラム
 	Matrix matrix = m_modelRender.GetBone(m_flyBoneId)->GetWorldMatrix();
+	float boneYPos = matrix.m[3][1];
+	m_charaCon.SetPosition({ m_charaCon.GetPosition().x, boneYPos-350.0f, m_charaCon.GetPosition().z });
+	m_moveSpeed.y = 0.0f;
+	m_pos = m_charaCon.Execute(m_moveSpeed, g_gameTime->GetFrameDeltaTime());
+	m_pos.y = 0.0f;
+	//m_charaCon.SetPosition(m_pos);
+	//コリジョンの当たり判定
+	//m_collision->SetPosition(m_collisionPos);
+	//m_collision->Update();
+	
 	m_collision->SetPosition(m_pos);
 	m_collision->SetRotation(m_rotation);
 	m_collision->SetWorldMatrix(matrix);
 	m_collision->Update();
+	m_modelRender.SetPosition(m_pos);
+	m_modelRender.Update();
 }
 void Enemy_Boss::Render(RenderContext& rc)
 {

@@ -2,9 +2,11 @@
 class Player;
 class Game;
 class IBossState;
-//class BossPattern;
+class Boss_Shoot;
+class Boss_HP_UI;
 #include "EnemyBase.h"
 #include "BossFlyPoint.h"
+#include "sound/SoundEngine.h"
 
 class Enemy_Boss : public EnemyBase
 {
@@ -24,7 +26,7 @@ public:
 	//近距離攻撃の噛みつき
 	void MeleeAttack();
 	//遠距離攻撃の地上からのブレス
-	void Shoot(int movespeed);
+	void Shoot();//(int movespeed, int hitstartframe, int hitendframe);
 	//大技後の休憩モーション
 	void Rest();
 	//コリジョンの当たり判定
@@ -51,8 +53,12 @@ public:
 	void Scream();
 	//必殺技のコリジョン
 	void ScreamCollision(int collision_scream);
-
-	//HPが50%以下になった時
+	//着地時のダメージ
+	void Landing();
+	//着地時のコリジョン
+	void LandingDamage(int collision_landing);
+	//HPが30%以下になった時のBGM関数
+	void BGM();
 	
 	// アニメーションクリップの番号を表す列挙型。
 	enum EnAnimationClip {
@@ -91,6 +97,7 @@ public:
 		enState_Takeoff,
 		enState_Fly,
 		enState_Landing,
+		enState_Landing_Back,
 	};
 	EnState m_state = enState_Idle;
 	//ステートの管理
@@ -134,7 +141,7 @@ public:
 		m_isUnderFlyAttack = UnderFlyAttack;
 	}
 
-	int GetHP()
+	float GetHP()
 	{
 		return m_testHP;
 	}
@@ -158,6 +165,10 @@ public:
 	{
 		m_isUnderDefence = UnderDefence;
 	}
+
+	void SetEffectCount(int effectcount) {
+		m_effectCount = effectcount;
+	}
 protected:
 	/// <summary>
 	/// ベクター
@@ -169,9 +180,10 @@ protected:
 	Vector3	m_forward = Vector3::AxisZ;					//エネミーの正面ベクトル。
 	Vector3 m_collisionPos = Vector3::Zero;
 	Vector3 m_flyPos = Vector3::Zero;
-	Vector3 m_moveSpeed_Shoot = Vector3::Zero;
-	Vector3 m_shootPos = Vector3::Zero;
-
+	//Vector3 m_moveSpeed_Shoot = Vector3::Zero;
+	//Vector3 m_shootPos = Vector3::Zero;
+	//Vector3 m_shot = Vector3::Zero;
+	Vector3 diff = Vector3::Zero;
 	/// <summary>
 	/// クラス
 	/// </summary>
@@ -182,11 +194,13 @@ protected:
 	int m_attack_Rand = 0;
 	int m_attack_Count = -1;
 	//HP
-	int m_testHP = 19;
+	float m_testHP = 20.0f;
 	//飛んだ時のボーン取得のため
 	int m_flyBoneId = 0;
 	//必殺技を撃つためのカウント
 	int m_screamCount = 0;
+	//エフェクトカウンター
+	int m_effectCount = 0;
 
 	float m_angle = 0.0f;
 	float m_radius = 2.0f;
@@ -204,15 +218,21 @@ protected:
 	bool m_isUnderPattern = false;		//行動中ならtrue
 	bool m_isUnderDefence = false;		//防御中ならtrue
 	bool m_isUnderScream = false;		//必殺技中ならtrue
+	bool m_isUnderLanding = false;		//着地中ならtrue
 	bool m_isScream = false;		//
-	bool m_isShoot = false;				//ブレスを撃ったからtrue
+	//bool m_isShoot = false;				//ブレスを撃ったからtrue
+	bool m_isEffect = false;		//エフェクトが出ているならtrue
+	bool m_isFlyKeepDistance = false;	//空を飛んで距離をとっているならtrue
 
 	ModelRender m_modelRender;
 	Player* m_player = nullptr;
+	Boss_HP_UI* m_boss_HP_UI = nullptr;
 	CollisionObject* m_collision = nullptr;
 	CollisionObject* m_flyPosCollision = nullptr;
+	//CollisionObject* m_shootCollision = nullptr;
 	Game* m_game = nullptr;
 	IBossState* m_Iboss_State = nullptr;
+	Boss_Shoot* m_boss_Shoot = nullptr;
 	Animation m_animation;	// アニメーション
 	Skeleton m_skeleton;	// スケルトン
 	Model m_model;			// モデル
@@ -221,5 +241,9 @@ protected:
 	AnimationClip m_animationClipArray[enAnimClip_Num];	// アニメーションクリップ
 	CharacterController m_charaCon;	//キャラクターコントローラー
 	BossFlyPoint::FlyPoint* m_flyPoint = nullptr;
+	SoundSource* m_bossLastButtle = nullptr;
+	SoundSource* m_bossButtle = nullptr;
+
+	//EffectEmitter* Boss_Shoot_Start = nullptr;
 };
 
