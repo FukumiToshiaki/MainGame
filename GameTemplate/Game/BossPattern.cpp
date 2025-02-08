@@ -2,6 +2,7 @@
 #include "BossPattern.h"
 #include "Enemy_Boss.h"
 #include "Player.h"
+#include "Boss_Shoot.h"
 
 #include "math.h"
 #include <numeric>
@@ -31,14 +32,13 @@ BossPattern::~BossPattern()
 bool BossPattern::Start()
 {
 	Enemy_Boss::Start();
-	//m_enemy_Boss = FindGO<Enemy_Boss>("enemy_boss");
+	m_boss_Shoot = FindGO<Boss_Shoot>("boss_shoot");
 	m_player = FindGO<Player>("player");
 	return true;
 }
 
 void BossPattern::Update()
 {
-
 	//クールタイム関数
 	CoolTime();
 	//ボスの行動するための数値の関数
@@ -124,7 +124,10 @@ void BossPattern::CoolTime()
 		//trueに
 		m_iscoolTimeStart = true;
 		//ブレスの判定初期化
-		m_isShoot = false;
+		//m_isShoot = false;
+		m_effectCount = 0;
+		m_isFlyKeepDistance = false;
+		m_boss_Shoot->SetisShoot(false);
 	}
 
 	//0秒になっているなら計算する必要ない
@@ -161,7 +164,8 @@ void BossPattern::DistancePattern()
 	}
 	//プレイヤーの追跡の変数
 	m_distance = m_player->Get_PlayerPos() - m_pos;
-	m_diff = m_player->Get_PlayerPos() - m_pos;
+	m_distance.y = 0.0f;
+	m_diff = m_distance;
 	m_diff.Normalize();
 	//距離が一定数以下で
 	//Move状態なら追いかける
@@ -224,40 +228,39 @@ void BossPattern::DefenseModeLast()
 {
 		//trueなら近距離用のパターン
 	if (m_isBifurcation) {
-		//14以上なら必殺技の咆哮
-		if (m_attack_Rand >= 14) {
-			ChangeState(Enemy_Boss::enState_Attack_Scream);
-		}
+		////14以上なら必殺技の咆哮
+		//if (m_attack_Rand >= 14) {
+		//	ChangeState(Enemy_Boss::enState_Attack_Scream);
+		//}
 		//11以上なら距離をとる
-		else if (m_attack_Rand >= 0) {
+		if (m_attack_Rand >= 2) {
 			ChangeState(Enemy_Boss::enState_Takeoff, Enemy_Boss::enState_Fly);
 		}
-	//	//8以上なら嚙みつき
-	//	else if (m_attack_Rand >= 8) {
-	//		ChangeState(Enemy_Boss::enState_Attack_Biting);
-	//	}
-	//	//6以上ならブレス
-	//	else if (m_attack_Rand >= 6) {
-	//		ChangeState(Enemy_Boss::enState_Attack_Shoot);
-	//	}
-	//	//2以上ならガード
-	//	if (m_attack_Rand >= 2) {
-	//		ChangeState(Enemy_Boss::enState_Defence);
-	//	}
-	//	//2未満なら尻尾攻撃
-	//	else {
-	//		ChangeState(Enemy_Boss::enState_Attack_Tail);
-	//	}
+		////8以上なら嚙みつき
+		//else if (m_attack_Rand >= 8) {
+		//	ChangeState(Enemy_Boss::enState_Attack_Biting);
+		//}
+		////6以上ならブレス
+		//else if (m_attack_Rand >= 6) {
+		//	ChangeState(Enemy_Boss::enState_Attack_Shoot);
+		//}
+		////2以上ならガード
+		//else if (m_attack_Rand >= 3) {
+		//	ChangeState(Enemy_Boss::enState_Defence);
+		//}
+		//2未満なら尻尾攻撃
+		else {
+			ChangeState(Enemy_Boss::enState_Attack_Tail);
+		}
 	}
 	//falseなら遠距離パターンに
 	else {
-		//9以上なら空ブレス
-		if (m_attack_Rand >= 8) {
-			ChangeState(Enemy_Boss::enState_Takeoff, Enemy_Boss::enState_Attack_FlyShoot);
-		}
+		////9以上なら空ブレス
+		//if (m_attack_Rand >= 10) {
+		//	ChangeState(Enemy_Boss::enState_Takeoff, Enemy_Boss::enState_Attack_FlyShoot);
+		//}
 		//6以上なら滑空突進
-		else 
-		if (m_attack_Rand >= 6) {
+		if (m_attack_Rand >= 3) {
 			ChangeState(Enemy_Boss::enState_Takeoff, Enemy_Boss::enState_Attack_Fly);
 		}
 		//2以上ならブレス
