@@ -146,6 +146,7 @@
     <ClCompile Include="PlayerState_Flying_Back.cpp" />
     <ClCompile Include="Butten_UI.cpp" />
     <ClCompile Include="Boss_HP_UI.cpp" />
+    <ClCompile Include="Bullet.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -278,5 +279,6 @@
     <ClInclude Include="PlayerState_Flying_Back.h" />
     <ClInclude Include="Butten_UI.h" />
     <ClInclude Include="Boss_HP_UI.h" />
+    <ClInclude Include="Bullet.h" />
   </ItemGroup>
 </Project>
