@@ -98,8 +98,6 @@ namespace nsK2EngineLow {
 
         m_bloom.Execution(mainRenderTarget);
 
-        Render2D(rc);
-
         renderContext.WaitUntilFinishDrawingToRenderTarget(mainRenderTarget);
 
         renderContext.SetRenderTarget(
@@ -109,6 +107,8 @@ namespace nsK2EngineLow {
         renderContext.SetViewportAndScissor(g_graphicsEngine->GetFrameBufferViewport());
 
         m_result.Draw(rc);
+
+        Render2D(rc);
 
         //shadowSP.Draw(renderContext);
 
