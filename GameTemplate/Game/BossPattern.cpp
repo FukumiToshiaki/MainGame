@@ -52,16 +52,16 @@ void BossPattern::Update()
 	if (!m_isUnderPattern) {
 		return;
 	}
-	Scream(40, 3);
+	//Scream(40, 3);
 	//他の行動をさせないため
 	if (m_state == enState_Attack_Scream) {
 		return;
 	}
 	//必殺技のための移動
 	//その時は必殺技優先
-	if (m_testHP <= FINAL_PHASE && !m_isScream) {
-		return;
-	}
+	//if (m_testHP <= FINAL_PHASE && !m_isScream) {
+	//	return;
+	//}
 	//必殺技カウントの増加
 	m_screamCount++;
 	//プレイヤーのHPが一定数以下の時
@@ -159,9 +159,9 @@ void BossPattern::CoolTime()
 
 void BossPattern::DistancePattern()
 {
-	if (m_testHP <= FINAL_PHASE && !m_isScream) {
-		return;
-	}
+	//if (m_testHP <= FINAL_PHASE && !m_isScream) {
+	//	return;
+	//}
 	//プレイヤーの追跡の変数
 	m_distance = m_player->Get_PlayerPos() - m_pos;
 	m_distance.y = 0.0f;
@@ -233,7 +233,7 @@ void BossPattern::DefenseModeLast()
 		//	ChangeState(Enemy_Boss::enState_Attack_Scream);
 		//}
 		//11以上なら距離をとる
-		if (m_attack_Rand >= 2) {
+		if (m_attack_Rand >= 6) {
 			ChangeState(Enemy_Boss::enState_Takeoff, Enemy_Boss::enState_Fly);
 		}
 		////8以上なら嚙みつき
@@ -244,10 +244,10 @@ void BossPattern::DefenseModeLast()
 		//else if (m_attack_Rand >= 6) {
 		//	ChangeState(Enemy_Boss::enState_Attack_Shoot);
 		//}
-		////2以上ならガード
-		//else if (m_attack_Rand >= 3) {
-		//	ChangeState(Enemy_Boss::enState_Defence);
-		//}
+		//2以上ならガード
+		else if (m_attack_Rand >= 3) {
+			ChangeState(Enemy_Boss::enState_Defence);
+		}
 		//2未満なら尻尾攻撃
 		else {
 			ChangeState(Enemy_Boss::enState_Attack_Tail);
@@ -260,11 +260,11 @@ void BossPattern::DefenseModeLast()
 		//	ChangeState(Enemy_Boss::enState_Takeoff, Enemy_Boss::enState_Attack_FlyShoot);
 		//}
 		//6以上なら滑空突進
-		if (m_attack_Rand >= 3) {
-			ChangeState(Enemy_Boss::enState_Takeoff, Enemy_Boss::enState_Attack_Fly);
-		}
+		//if (m_attack_Rand >= 3) {
+		//	ChangeState(Enemy_Boss::enState_Takeoff, Enemy_Boss::enState_Attack_Fly);
+		//}
 		//2以上ならブレス
-		else if (m_attack_Rand >= 2) {
+		 if (m_attack_Rand >= 2) {
 			ChangeState(Enemy_Boss::enState_Attack_Shoot);
 		}
 		//2未満なら近づく
@@ -276,9 +276,9 @@ void BossPattern::DefenseModeLast()
 
 void BossPattern::BossPatternMode()
 {
-	if (m_testHP <= FINAL_PHASE && !m_isScream) {
-		return;
-	}
+	//if (m_testHP <= FINAL_PHASE && !m_isScream) {
+	//	return;
+	//}
 	if (m_isUnderPattern) {
 		ChangeState(Enemy_Boss::enState_Move);
 		//距離内なら近距離型のtrueに
