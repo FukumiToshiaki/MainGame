@@ -13,7 +13,9 @@
 #include "GameOver.h"
 #include "BossPattern.h"
 #include "Time_Limit_UI.h"
-
+#include "Player_HP_UI.h"
+#include "Butten_UI.h"
+#include "Boss_HP_UI.h"
 Game::~Game()
 {
 	DeleteGO(m_map);
@@ -25,23 +27,28 @@ Game::~Game()
 	DeleteGO(m_enemy_Shield);
 	DeleteGO(m_enemy_Sky);
 	DeleteGO(m_time_Limit_UI);
+	DeleteGO(m_player_HP_UI);
+	DeleteGO(m_butten_UI);
+
 }
 bool Game::Start()
 {
-	m_map = NewGO<Map>(0,"map");
-	//m_LightTest = NewGO<Light_Test>(0);
+	m_player_HP_UI = NewGO<Player_HP_UI>(0, "player_hp_ui");
+	m_boss_HP_UI = NewGO<Boss_HP_UI>(0, "boss_hp_ui");
+	//m_map = NewGO<Map>(0,"map");
+	m_butten_UI = NewGO<Butten_UI>(0,"butten_ui");
 	m_playerCamera = NewGO<PlayerCamera>(0);
+	m_player = NewGO<Player>(0, "player");
 	//m_enemy_Shield = NewGO<Enemy_Shield>(0, "enemy_shield");
 	//m_enemy_melee = NewGO<Enemy_Melee>(0, "enemy_melee");
 	//m_enemy_Sky = NewGO<Enemy_Sky>(0, "enemy_sky");
 	//m_enemy_Long = NewGO<Enemy_Long>(0, "enemy_long");
 	//m_enemy_Boss = NewGO<Enemy_Boss>(0, "enemy_boss");
 	m_enemy_Boss = NewGO<BossPattern>(0, "enemy_boss");
-	m_player = NewGO<Player>(0, "player");
 	m_time_Limit_UI = NewGO<Time_Limit_UI>(0, "time_limit");
 	m_bossFlyPoint.Update({ 0.0f,0.0f,0.0f });
 
-	//PhysicsWorld::GetInstance()->EnableDrawDebugWireFrame();
+	PhysicsWorld::GetInstance()->EnableDrawDebugWireFrame();
 	return true;
 }
 
