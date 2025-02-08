@@ -255,11 +255,11 @@ private:
 	Model m_model;			// モデル
 	Animation m_animation;	// アニメーション
 	AnimationClip m_animationClipArray[enAnimClip_Num];	// アニメーションクリップ
-	Quaternion m_rotation;	// 回転
+	Quaternion m_rotation= Quaternion::Identity;;	// 回転
 	Sprite m_sprite;	// スプライト
 	Skeleton m_skeleton;	// スケルトン
 	ModelRender m_modelRender;
 	CharacterController m_charaCon;	//キャラクターコントローラー
-	PlayerStatus m_playerStatus;
+	PlayerStatus *m_playerStatus = nullptr;
 	EffectEmitter* effectEmitter = nullptr;
 };

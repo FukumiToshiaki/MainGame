@@ -44,8 +44,8 @@ private:
 	BossFlyPoint m_bossFlyPoint;
 
 	Model m_model;			// モデル
-	Vector3 m_pos;		// 座標
-	Quaternion m_rotation;	// 回転
+	Vector3 m_pos=Vector3::Zero;		// 座標
+	Quaternion m_rotation= Quaternion::Identity;	// 回転
 	Sprite m_sprite;	// スプライト
 	Skeleton m_skeleton;	// スケルトン
 	ModelRender m_modelRender;
