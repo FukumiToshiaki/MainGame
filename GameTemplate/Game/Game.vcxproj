@@ -241,6 +241,10 @@
     <ClCompile Include="BossState_Takeoff.cpp" />
     <ClCompile Include="BossState_Walk.cpp" />
     <ClCompile Include="BossStatus.cpp" />
+    <ClCompile Include="Boss_HP_UI.cpp" />
+    <ClCompile Include="Boss_Shoot.cpp" />
+    <ClCompile Include="Butten_UI.cpp" />
+    <ClCompile Include="Button_UI.cpp" />
     <ClCompile Include="EnemyBase.cpp" />
     <ClCompile Include="Enemy_Melee.cpp" />
     <ClCompile Include="Enemy_Boss.cpp" />
@@ -264,12 +268,14 @@
     <ClCompile Include="PlayerState_Damage.cpp" />
     <ClCompile Include="PlayerState_Defense.cpp" />
     <ClCompile Include="PlayerState_Die.cpp" />
+    <ClCompile Include="PlayerState_Flying_Back.cpp" />
     <ClCompile Include="PlayerState_GuardBreak.cpp" />
     <ClCompile Include="PlayerState_Idle.cpp" />
     <ClCompile Include="PlayerState_Run.cpp" />
     <ClCompile Include="PlayerState_Walk.cpp" />
     <ClCompile Include="PlayerState_WalkAttack.cpp" />
     <ClCompile Include="PlayerStatus.cpp" />
+    <ClCompile Include="Player_HP_UI.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
@@ -298,6 +304,10 @@
     <ClInclude Include="BossState_Takeoff.h" />
     <ClInclude Include="BossState_Walk.h" />
     <ClInclude Include="BossStatus.h" />
+    <ClInclude Include="Boss_HP_UI.h" />
+    <ClInclude Include="Boss_Shoot.h" />
+    <ClInclude Include="Butten_UI.h" />
+    <ClInclude Include="Button_UI.h" />
     <ClInclude Include="EnemyBase.h" />
     <ClInclude Include="Enemy_Melee.h" />
     <ClInclude Include="Enemy_Boss.h" />
@@ -320,12 +330,14 @@
     <ClInclude Include="PlayerState_Damage.h" />
     <ClInclude Include="PlayerState_Defense.h" />
     <ClInclude Include="PlayerState_Die.h" />
+    <ClInclude Include="PlayerState_Flying_Back.h" />
     <ClInclude Include="PlayerState_GuardBreak.h" />
     <ClInclude Include="PlayerState_Idle.h" />
     <ClInclude Include="PlayerState_Run.h" />
     <ClInclude Include="PlayerState_Walk.h" />
     <ClInclude Include="PlayerState_WalkAttack.h" />
     <ClInclude Include="PlayerStatus.h" />
+    <ClInclude Include="Player_HP_UI.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="system\system.h" />
     <ClInclude Include="Time_Limit_UI.h" />

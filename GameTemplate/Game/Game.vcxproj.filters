@@ -140,6 +140,12 @@
       <Filter>Player</Filter>
     </ClCompile>
     <ClCompile Include="BossFlyPoint.cpp" />
+    <ClCompile Include="Button_UI.cpp" />
+    <ClCompile Include="Player_HP_UI.cpp" />
+    <ClCompile Include="Boss_Shoot.cpp" />
+    <ClCompile Include="PlayerState_Flying_Back.cpp" />
+    <ClCompile Include="Butten_UI.cpp" />
+    <ClCompile Include="Boss_HP_UI.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -266,5 +272,11 @@
       <Filter>Player</Filter>
     </ClInclude>
     <ClInclude Include="BossFlyPoint.h" />
+    <ClInclude Include="Button_UI.h" />
+    <ClInclude Include="Player_HP_UI.h" />
+    <ClInclude Include="Boss_Shoot.h" />
+    <ClInclude Include="PlayerState_Flying_Back.h" />
+    <ClInclude Include="Butten_UI.h" />
+    <ClInclude Include="Boss_HP_UI.h" />
   </ItemGroup>
 </Project>
