@@ -89,7 +89,7 @@ namespace nsK2EngineLow {
 		{
 			return m_ghostObject;
 		}
-	private:
+	//private:
 		/// <summary>
 		/// ゴースト作成処理の共通処理。
 		/// </summary>
