@@ -10,7 +10,7 @@ class Enemy_Shield;
 class Enemy_Sky;
 class Enemy_Melee;
 class Enemy_Long;
-
+class Player_HP_UI;
 class Player : public IGameObject
 {
 public:
@@ -42,7 +42,7 @@ public:
 	//ガードブレイク関数
 	void GuardBreak();
 	//ヒット関数
-	void Hit(float screamhitcooltime);
+	void Hit(float screamhitcooltime, float tail_knockback, float flyattack_knockback, float landing_knockback);
 	//エイム
 	void TakeAim(int maximum, int smallest);
 	//エネミーのリスト
@@ -82,6 +82,7 @@ public:
 		enAnimClip_Damage,
 		enAnimClip_Die,
 		enAnimClip_Arching,
+		enAnimClip_Landing_Back,
 		enAnimClip_Num,		// 3 :アニメーションクリップの数。アニメーションを追加するならこの上に作る
 
 	};
@@ -98,6 +99,7 @@ public:
 		enState_LongAttack,
 		enState_Arching,
 		enState_Die,
+		enState_Flying_Back,
 	};
 	EnState m_state = enState_Idle;
 	//ステートの管理
@@ -204,6 +206,7 @@ private:
 	IPlayer_State* m_Iplayer_State = nullptr;
 	CollisionObject* m_collision = nullptr;
 	SpriteRender		m_spriteRender;
+	Player_HP_UI* m_player_HP_UI = nullptr;
 	/// <summary>
 /// 変数
 /// </summary>
@@ -243,9 +246,12 @@ private:
 	bool m_isTakeAim = false;
 	bool m_isLockOn = false;
 	bool m_isLockOnCamera = false;
-	bool m_isEffect = false;
+	bool m_isEffect = false;		//エフェクトが出ているならtrue
 	bool m_isOver = false;
-	bool m_istest = false;
+	bool m_isUnderFlying_Back = false;//吹っ飛ばされ中ならtrue
+	bool m_isFlying_Back_Tail = false;		//尻尾攻撃の攻撃ヒット時true
+	bool m_isFlying_Back_FlyAttack = false;		//滑空突進の攻撃ヒット時true
+	bool m_isFlying_Back_Landing = false;
 	Model m_model;			// モデル
 	Animation m_animation;	// アニメーション
 	AnimationClip m_animationClipArray[enAnimClip_Num];	// アニメーションクリップ

@@ -19,6 +19,8 @@
 #include "PlayerState_Die.h"
 #include "PlayerState_Run.h"
 #include "PlayerState_Arching.h"
+#include "PlayerState_Flying_Back.h"
+#include "Player_HP_UI.h"
 
 #define START_POS_X 0.0f
 #define START_POS_Y 0.0f
@@ -35,6 +37,7 @@
 #define MELEEATTACKDAMAGE 4
 #define FLYATTACKDAMAGE 6
 #define SCREAMATTACKDAMAGE 8
+#define LANDINGDAMAGE 3
 void Player::InitSkeleton()
 {
 	//m_skeleton.Init("Assets/modelData/unityChan.tks");
@@ -77,6 +80,8 @@ bool Player::Start()
 	m_animationClipArray[enAnimClip_Die].SetLoopFlag(false);
 	m_animationClipArray[enAnimClip_Arching].Load("Assets/animData/Pico_Anime/Player_Test_Arching.tka");
 	m_animationClipArray[enAnimClip_Arching].SetLoopFlag(false);
+	m_animationClipArray[enAnimClip_Landing_Back].Load("Assets/animData/Pico_Anime/Player_Test_Flying_Back.tka");
+	m_animationClipArray[enAnimClip_Landing_Back].SetLoopFlag(false);
 
 
 	
@@ -86,7 +91,7 @@ bool Player::Start()
 
 	m_modelRender.Init("Assets/modelData/Player_Test/Player_Test.tkm", m_animationClipArray, enAnimClip_Num);
 	//m_modelRender.Init("Assets/modelData/PlayerData/PicoChan.tkm", m_animationClipArray, enAnimClip_Num);
-	m_spriteRender.Init("Assets/sprite/lock.DDS", 400, 400);
+	//m_spriteRender.Init("Assets/sprite/lock.DDS", 400, 400);
 	//スケール
 	m_pos = { START_POS_X, START_POS_Y, START_POS_Z };
 	m_modelRender.SetPosition(m_pos);
@@ -100,6 +105,7 @@ bool Player::Start()
 	m_enemy_Long = FindGO<Enemy_Long>("enemy_long");
 	m_enemy_Shield = FindGO<Enemy_Shield>("enemy_shield");
 	m_enemy_Sky = FindGO<Enemy_Sky>("enemy_sky");
+	m_player_HP_UI = FindGO<Player_HP_UI>("player_hp_ui");
 
 	ChangeState(enState_Idle);
 	////当たり判定の作成。
@@ -187,6 +193,22 @@ void Player::OnAnimationEvent(const wchar_t* clipName, const wchar_t* eventName)
 		m_isUnderDefense = true;
 	}
 
+	//キーの名前がFlying_Back_startの場合
+	if (wcscmp(eventName, L"Flying_Back_start") == 0)
+	{
+		//吹っ飛ばされ中にする
+		m_isUnderFlying_Back = true;
+	}
+	//キーの名前がFlying_Back_endの場合
+	else if (wcscmp(eventName, L"Flying_Back_end") == 0) {
+		//吹っ飛ばされるのを終わる
+		m_isUnderFlying_Back = false;
+		m_isFlying_Back_FlyAttack = false;
+		m_isFlying_Back_Tail = false;
+		m_isFlying_Back_Landing = false;
+	}
+
+
 }
 
 void Player::BitingAttackCollision()
@@ -273,6 +295,9 @@ void Player::ChangeState(EnState changeState)
 	case Player::enState_Arching:
 		m_Iplayer_State = new PlayerState_Arching(this);
 		break;
+	case Player::enState_Flying_Back:
+		m_Iplayer_State = new PlayerState_Flying_Back(this);
+		break;
 	}
 	m_state = changeState;
 }
@@ -282,7 +307,7 @@ void Player::Update()
 	m_Iplayer_State->Animation();
 	m_Iplayer_State->Update();
 	//InitAnimation();
-	m_spriteRender.Update();
+	//m_spriteRender.Update();
 	m_skeleton.Update(m_model.GetWorldMatrix());
 	m_pos = m_charaCon.Execute(m_moveSpeed, g_gameTime->GetFrameDeltaTime());
 	m_charaCon.SetPosition(m_pos);
@@ -304,7 +329,7 @@ void Player::Update()
 	Attack_Biting();
 	Defense();
 	GuardBreak();
-	Hit(0.1f);
+	Hit(0.1f,700.0f,400.0f,300.0f);
 	TakeAim(4000.0f,100.0f);
 	LockOn();
 	LongAttack(137,200,30.0f);
@@ -321,7 +346,7 @@ void Player::Update()
 void Player::Move(int walk_speed, int run_speed, int walkattack_speed)
 {
 	//死んでいたりダメージやよろけ中かreturn
-	if (m_state == enState_Die || m_state == enState_Damage ||  m_state == enState_Arching) {
+	if (m_state == enState_Die || m_state == enState_Damage || m_state == enState_Arching || m_state == enState_Flying_Back) {
 		return;
 	}
 	//攻撃中ならreturn
@@ -502,6 +527,8 @@ void Player::DefenseCollision(int melee_knockback,int melee_magnification,int ta
 			m_isKnockBack = true;
 			//タイマーのリセット
 			m_knockBackTime = KNOCKBACKTIME;
+			//HP_UIを減らす表示
+			m_player_HP_UI->DecreaseHP(MELEEATTACKDAMAGE / melee_magnification);
 			//ノックバック距離
 			if (m_isKnockBack) {
 				m_moveSpeed = m_KnockBack * melee_knockback;
@@ -518,6 +545,9 @@ void Player::DefenseCollision(int melee_knockback,int melee_magnification,int ta
 			m_isKnockBack = true;
 			//タイマーのリセット
 			m_knockBackTime = KNOCKBACKTIME;
+			//HP_UIを減らす表示
+			m_player_HP_UI->DecreaseHP(TAILATTACKDAMAGE / tail_magnification);
+
 			//ノックバック距離
 			if (m_isKnockBack) {
 				m_moveSpeed = m_KnockBack * tail_knockback;
@@ -534,6 +564,8 @@ void Player::DefenseCollision(int melee_knockback,int melee_magnification,int ta
 			m_isKnockBack = true;
 			//タイマーのリセット
 			m_knockBackTime = KNOCKBACKTIME;
+			//HP_UIを減らす表示
+			m_player_HP_UI->DecreaseHP(FLYATTACKDAMAGE / flyattack_magnification);
 			//ノックバック距離
 			if (m_isKnockBack) {
 				m_moveSpeed = m_KnockBack * flyattack_knockback;
@@ -550,6 +582,8 @@ void Player::DefenseCollision(int melee_knockback,int melee_magnification,int ta
 			m_isKnockBack = true;
 			//タイマーのリセット
 			m_knockBackTime = scream_hittime;
+			//HP_UIを減らす表示
+			m_player_HP_UI->DecreaseHP(SCREAMATTACKDAMAGE / scream_magnification);
 			//ノックバック距離
 			if (m_isKnockBack) {
 				m_moveSpeed = m_KnockBack * scream_knockback;
@@ -574,8 +608,20 @@ void Player::GuardBreak()
 		GuradBreakCollision();
 	}
 }
-void Player::Hit(float screamhitcooltime)
+void Player::Hit(float screamhitcooltime,float tail_knockback,float flyattack_knockback,float landing_knockback)
 {
+	//吹っ飛ばされる
+	if (m_isUnderFlying_Back&& m_isFlying_Back_FlyAttack) {
+		m_moveSpeed = m_KnockBack * flyattack_knockback;
+	}
+	else if (m_isUnderFlying_Back && m_isFlying_Back_Tail) {
+		m_moveSpeed = m_KnockBack * tail_knockback;
+	}
+	else if (m_isUnderFlying_Back && m_isFlying_Back_Landing) {
+		m_moveSpeed = m_KnockBack * landing_knockback;
+	}
+
+
 	//ヒット中ならreturn
 	if (m_state == enState_Damage||m_isUnderDefense) {
 		return;
@@ -596,6 +642,8 @@ void Player::Hit(float screamhitcooltime)
 			m_hitCoolTime = HITCOOLTIME;
 			//ダメージ中に動かないように
 			m_moveSpeed = Vector3::Zero;
+			//HP_UIを減らす表示
+			m_player_HP_UI->DecreaseHP(MELEEATTACKDAMAGE);
 			return;
 		}
 	}
@@ -604,12 +652,14 @@ void Player::Hit(float screamhitcooltime)
 	for (auto& collision : collisionList_TailAttack) {
 		if (collision->IsHit(m_collision)) {
 			//ダメージ
-			ChangeState(Player::enState_Damage);
+			ChangeState(Player::enState_Flying_Back);
 			m_testHP-=TAILATTACKDAMAGE;
 			//クールタイム
 			m_hitCoolTime = HITCOOLTIME;
-			//ダメージ中に動かないように
-			m_moveSpeed = Vector3::Zero;
+			//吹っ飛ばされる攻撃を受けたためtrue
+			m_isFlying_Back_Tail = true;
+			//HP_UIを減らす表示
+			m_player_HP_UI->DecreaseHP(TAILATTACKDAMAGE);
 			return;
 		}
 	}
@@ -618,19 +668,21 @@ void Player::Hit(float screamhitcooltime)
 	for (auto& collision : collisionList_FlyAttack) {
 		if (collision->IsHit(m_collision)) {
 			//ダメージ
-			ChangeState(Player::enState_Damage);
+			ChangeState(Player::enState_Flying_Back);
 			m_testHP-=FLYATTACKDAMAGE;
 			//クールタイム
 			m_hitCoolTime = HITCOOLTIME;
-			//ダメージ中に動かないように
-			m_moveSpeed = Vector3::Zero;
+			//吹っ飛ばされる攻撃を受けたためtrue
+			m_isFlying_Back_FlyAttack = true;
+			//HP_UIを減らす表示
+			m_player_HP_UI->DecreaseHP(FLYATTACKDAMAGE);
 			return;
 		}
 	}
 	//咆哮
 	const auto& collisionList_ScreamAttack = g_collisionObjectManager->FindCollisionObjects("boss_attack_scream");
 	for (auto& collision : collisionList_ScreamAttack) {
-		if (collision->IsHit(m_collision)&&m_isUnderDefense) {
+		if (collision->IsHit(m_collision)) {
 			//ダメージ
 			ChangeState(Player::enState_Damage);
 			m_testHP -= SCREAMATTACKDAMAGE;
@@ -638,6 +690,24 @@ void Player::Hit(float screamhitcooltime)
 			m_hitCoolTime = screamhitcooltime;
 			//ダメージ中に動かないように
 			m_moveSpeed = Vector3::Zero;
+			//HP_UIを減らす表示
+			m_player_HP_UI->DecreaseHP(SCREAMATTACKDAMAGE);
+			return;
+		}
+	}
+	//着地時に押しつぶされる
+	const auto& collisionList_Landing = g_collisionObjectManager->FindCollisionObjects("boss_attack_landing");
+	for (auto& collision : collisionList_Landing) {
+		if (collision->IsHit(m_collision)) {
+			//ダメージ
+			ChangeState(Player::enState_Flying_Back);
+			m_testHP -= LANDINGDAMAGE;
+			//クールタイム
+			m_hitCoolTime = HITCOOLTIME;
+			//HP_UIを減らす表示
+			m_player_HP_UI->DecreaseHP(LANDINGDAMAGE);
+			//吹っ飛ばされる攻撃を受けたためtrue
+			m_isFlying_Back_Landing = true;
 			return;
 		}
 	}
@@ -691,7 +761,7 @@ void Player::TakeAim(int maximum,int smallest)
 
 	Vector2 screenPosition;
 	g_camera3D->CalcScreenPositionFromWorldPosition(screenPosition, NearenemyPosition);
-	m_spriteRender.SetPosition(Vector3(screenPosition.x, screenPosition.y, 0.0f));
+	//m_spriteRender.SetPosition(Vector3(screenPosition.x, screenPosition.y, 0.0f));
 	m_targetPosition = NearenemyPosition;
 
 }
@@ -740,6 +810,17 @@ void Player::LockOn()
 }
 void Player::LongAttack(int hitstartframe,int hitendframe,int effect_speed)
 {
+	//エフェクトのポインターが残ってて
+	//エフェクトが消えていたら
+	//nullptrにする
+	if (effectEmitter != nullptr)
+	{
+		if (effectEmitter->IsDead())
+		{
+			effectEmitter = nullptr;
+		}
+	}
+
 	///
 	Quaternion qRot;
 	Vector3 diff = m_enemy_Boss->GetPos() - m_pos;
@@ -809,5 +890,5 @@ void Player::Render(RenderContext& rc)
 	{
 		return;
 	}
-	m_spriteRender.Draw(rc);
+	//m_spriteRender.Draw(rc);
 }
