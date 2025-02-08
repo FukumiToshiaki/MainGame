@@ -31,7 +31,8 @@
 #define BOSS_FORWARD 600.0f
 #define COLLISION 600.0f
 #define GUARDBREAK_DAMAGE 4.5f
-#define BITATTACKDAMAGE 1.5f
+#define BITATTACKDAMAGE 2.5f
+#define LONGATTACKDAMAGE 1.5f
 #define WALKATTACKDAMAGE 3
 #define HITCOOLTIME 1.5f
 //#define FLYATTACK_SPEED 5.0f
@@ -262,7 +263,7 @@ void Enemy_Boss::Hit(int damagemagnification)
 				//ダメージ
 				ChangeState(enState_Damage);
 				m_hitCoolTime = HITCOOLTIME;
-				m_testHP -= GUARDBREAK_DAMAGE* damagemagnification;
+				m_testHP -= GUARDBREAK_DAMAGE * damagemagnification;
 				//HP_UIを減らす表示
 				m_boss_HP_UI->DecreaseHP(GUARDBREAK_DAMAGE * damagemagnification);
 				return;
@@ -276,7 +277,7 @@ void Enemy_Boss::Hit(int damagemagnification)
 				//ダメージ
 				ChangeState(enState_Damage);
 				m_hitCoolTime = HITCOOLTIME;
-				m_testHP -= WALKATTACKDAMAGE* damagemagnification;
+				m_testHP -= WALKATTACKDAMAGE * damagemagnification;
 				//HP_UIを減らす表示
 				m_boss_HP_UI->DecreaseHP(WALKATTACKDAMAGE * damagemagnification);
 				return;
@@ -296,8 +297,21 @@ void Enemy_Boss::Hit(int damagemagnification)
 				return;
 			}
 		}
-	}
+		//遠距離攻撃が当たった時
+		const auto& collisionList_LongAttack = g_collisionObjectManager->FindCollisionObjects(/*"player_guardbreak"*/ /*"player_walk_attack"*/ "player_long_attack");
 
+		for (auto& collisionLongAttack : collisionList_LongAttack) {
+			if (collisionLongAttack->IsHit(m_collision)) {
+				//ダメージ
+				ChangeState(enState_Damage);
+				m_hitCoolTime = HITCOOLTIME;
+				m_testHP -= LONGATTACKDAMAGE * damagemagnification;
+				//HP_UIを減らす表示
+				m_boss_HP_UI->DecreaseHP(LONGATTACKDAMAGE * damagemagnification);
+				return;
+			}
+		}
+	}
 	//通常時
 	//ガードブレイクが当たった時
 	const auto& collisionList_GuardBreak = g_collisionObjectManager->FindCollisionObjects("player_guardbreak" /*"player_walk_attack" "player_biting_attack"*/);
@@ -341,6 +355,20 @@ void Enemy_Boss::Hit(int damagemagnification)
 			return;
 		}
 	}
+	//遠距離攻撃が当たった時
+	const auto& collisionList_LongAttack = g_collisionObjectManager->FindCollisionObjects(/*"player_guardbreak"*/ /*"player_walk_attack"*/ "player_long_attack");
+
+	for (auto& collisionLongAttack : collisionList_LongAttack) {
+		if (collisionLongAttack->IsHit(m_collision)) {
+			//ダメージ
+			m_hitCoolTime = HITCOOLTIME;
+			m_testHP -= LONGATTACKDAMAGE;
+			//HP_UIを減らす表示
+			m_boss_HP_UI->DecreaseHP(LONGATTACKDAMAGE);
+			return;
+		}
+	}
+
 }
 void Enemy_Boss::MeleeAttack()
 {
@@ -479,6 +507,17 @@ void Enemy_Boss::DefenceCollision(int break_magnification,int collision_defense)
 		}
 	}
 
+	const auto& collisionList_LongAttack = g_collisionObjectManager->FindCollisionObjects(/*"player_guardbreak"*/ /*"player_walk_attack"*/ "player_long_attack");
+
+	for (auto& collisionLongAttack : collisionList_LongAttack) {
+		if (collisionLongAttack->IsHit(collisionObject)) {
+			//ダメージは０でカウンター
+			ChangeState(enState_Attack_Shoot);
+			m_hitCoolTime = HITCOOLTIME;
+			return;
+		}
+	}
+
 
 }
 void Enemy_Boss::OnAnimationEvent(const wchar_t* clipName, const wchar_t* eventName)
@@ -604,7 +643,9 @@ void Enemy_Boss::Landing()
 	if (m_state != enState_Landing) {
 		return;
 	}
-	LandingDamage(300);
+	if (m_isUnderLanding) {
+		LandingDamage(500);
+	}
 }
 void Enemy_Boss::LandingDamage(int collision_landing)
 {
@@ -702,7 +743,7 @@ void Enemy_Boss::Update()
 	Scream();
 	Landing();
 	BGM();
-	//Shoot();
+	Shoot();
 	m_modelRender.SetRotation(m_rotation);
 	m_skeleton.Update(m_model.GetWorldMatrix());
 

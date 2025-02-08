@@ -194,7 +194,7 @@ protected:
 	int m_attack_Rand = 0;
 	int m_attack_Count = -1;
 	//HP
-	float m_testHP = 20.0f;
+	float m_testHP = 19.0f;
 	//飛んだ時のボーン取得のため
 	int m_flyBoneId = 0;
 	//必殺技を撃つためのカウント
@@ -236,14 +236,14 @@ protected:
 	Animation m_animation;	// アニメーション
 	Skeleton m_skeleton;	// スケルトン
 	Model m_model;			// モデル
-	Quaternion	m_rotation;							//回転
-	Quaternion m_wait;
+	Quaternion	m_rotation=Quaternion::Identity;							//回転
+	Quaternion m_wait=Quaternion::Identity;
 	AnimationClip m_animationClipArray[enAnimClip_Num];	// アニメーションクリップ
 	CharacterController m_charaCon;	//キャラクターコントローラー
 	BossFlyPoint::FlyPoint* m_flyPoint = nullptr;
 	SoundSource* m_bossLastButtle = nullptr;
 	SoundSource* m_bossButtle = nullptr;
-
+	
 	//EffectEmitter* Boss_Shoot_Start = nullptr;
 };
 
