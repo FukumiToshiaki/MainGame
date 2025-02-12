@@ -59,7 +59,8 @@ public:
 	void LandingDamage(int collision_landing);
 	//HPが30%以下になった時のBGM関数
 	void BGM();
-	
+	//空ブレスの時
+	void FlyShoot();
 	// アニメーションクリップの番号を表す列挙型。
 	enum EnAnimationClip {
 		enState_Idle_Animation,
@@ -169,6 +170,17 @@ public:
 	void SetEffectCount(int effectcount) {
 		m_effectCount = effectcount;
 	}
+
+	void SetisScream_Normal(bool Scream) {
+		m_isScream_Normal = Scream;
+	}
+	bool GetisScream_Normal()	{
+		return m_isScream_Normal;
+	}
+	bool GetisScream_Set() {
+		return m_isScream_Set;
+	}
+
 protected:
 	/// <summary>
 	/// ベクター
@@ -219,10 +231,13 @@ protected:
 	bool m_isUnderDefence = false;		//防御中ならtrue
 	bool m_isUnderScream = false;		//必殺技中ならtrue
 	bool m_isUnderLanding = false;		//着地中ならtrue
+	bool m_isUnderFly = false;			//空を飛んでいるならtrue
+	bool m_isUnderTakeoff= false;		//空に飛ぼうとしているならtrue
 	bool m_isScream = false;		//
-	//bool m_isShoot = false;				//ブレスを撃ったからtrue
+	bool m_isScream_Normal = false;				//咆哮が通常行動で選ばれたらtrue
 	bool m_isEffect = false;		//エフェクトが出ているならtrue
 	bool m_isFlyKeepDistance = false;	//空を飛んで距離をとっているならtrue
+	bool m_isScream_Set = false;
 
 	ModelRender m_modelRender;
 	Player* m_player = nullptr;

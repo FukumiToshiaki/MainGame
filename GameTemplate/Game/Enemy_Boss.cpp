@@ -594,10 +594,30 @@ void Enemy_Boss::OnAnimationEvent(const wchar_t* clipName, const wchar_t* eventN
 		m_isUnderLanding = false;
 	}
 
+	//キーの名前がBoss_Fly_startの場合
+	if (wcscmp(eventName, L"Boss_Fly_start") == 0)
+	{
+		//飛行中にする
+		m_isUnderFly = true;
+	}
+	//キーの名前がBoss_Fly_endの場合
+	else if (wcscmp(eventName, L"Boss_Fly_end") == 0)
+	{
+		//飛行を終わる
+		m_isUnderFly = false;
+	}
+
+	//キーの名前がBoss_Fly_startの場合
+	if (wcscmp(eventName, L"Boss_Takeoff_end") == 0)
+	{
+		//飛行中にする
+		m_isUnderTakeoff = true;
+	}
+
 }
 void Enemy_Boss::FlyPos(float movespeed)
 {
-	if (m_state != enState_Fly) {
+	if (m_state != enState_Fly||m_isScream_Set) {
 		return;
 	}
 	if (!m_isFlyKeepDistance){
@@ -674,6 +694,14 @@ void Enemy_Boss::BGM()
 
 	}
 }
+void Enemy_Boss::FlyShoot()
+{
+	if (m_isUnderTakeoff) {
+		m_moveSpeed = Vector3::Zero;
+		m_moveSpeed = m_diff;
+		m_isUnderTakeoff = false;
+	}
+}
 void Enemy_Boss::ChangeState(EnState changeState, int integerArgument0)
 {
 	m_Iboss_State = nullptr;
@@ -734,12 +762,12 @@ void Enemy_Boss::Update()
 	m_Iboss_State->Update();
 	Rotation(0.001f);
 	Hit(2.5f);
-	//FlyAttackMove();
+	FlyShoot();
 	MeleeAttack();
 	TailAttack();
 	Defence(); 
 	FlyPos(500.0f);
-	FlyAttack(400.0f);
+	FlyAttack(800.0f);
 	Scream();
 	Landing();
 	BGM();
