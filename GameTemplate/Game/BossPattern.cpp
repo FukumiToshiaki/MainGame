@@ -8,9 +8,9 @@
 #include <numeric>
 
 #define DISTANCE_POS 12000.0f
-#define FIRST_PHASE 80
-#define SECOND_PHASE 65
-#define FINAL_PHASE 50
+#define FIRST_PHASE 80.0f
+#define SECOND_PHASE 65.0f
+#define FINAL_PHASE 50.0f
 #define MELEE_ATTACK 0
 #define TAIL_ATTACK 13
 #define FLY 20
@@ -53,12 +53,12 @@ void BossPattern::Update()
 		return;
 	}
 	//Scream(40, 3);
-	//他の行動をさせないため
-	if (m_state == enState_Attack_Scream) {
-		return;
-	}
-	//必殺技のための移動
-	//その時は必殺技優先
+	////他の行動をさせないため
+	//if (m_state == enState_Attack_Scream) {
+	//	return;
+	//}
+	////必殺技のための移動
+	////その時は必殺技優先
 	//if (m_testHP <= FINAL_PHASE && !m_isScream) {
 	//	return;
 	//}
@@ -228,22 +228,22 @@ void BossPattern::DefenseModeLast()
 {
 		//trueなら近距離用のパターン
 	if (m_isBifurcation) {
-		////14以上なら必殺技の咆哮
-		//if (m_attack_Rand >= 14) {
-		//	ChangeState(Enemy_Boss::enState_Attack_Scream);
-		//}
+		//14以上なら必殺技の咆哮
+		if (m_attack_Rand >= 14) {
+			ChangeState(Enemy_Boss::enState_Attack_Scream);
+		}
 		//11以上なら距離をとる
-		if (m_attack_Rand >= 6) {
+		else if (m_attack_Rand >= 11) {
 			ChangeState(Enemy_Boss::enState_Takeoff, Enemy_Boss::enState_Fly);
 		}
-		////8以上なら嚙みつき
-		//else if (m_attack_Rand >= 8) {
-		//	ChangeState(Enemy_Boss::enState_Attack_Biting);
-		//}
-		////6以上ならブレス
-		//else if (m_attack_Rand >= 6) {
-		//	ChangeState(Enemy_Boss::enState_Attack_Shoot);
-		//}
+		//8以上なら嚙みつき
+		else if (m_attack_Rand >= 8) {
+			ChangeState(Enemy_Boss::enState_Attack_Biting);
+		}
+		//6以上ならブレス
+		else if (m_attack_Rand >= 6) {
+			ChangeState(Enemy_Boss::enState_Attack_Shoot);
+		}
 		//2以上ならガード
 		else if (m_attack_Rand >= 3) {
 			ChangeState(Enemy_Boss::enState_Defence);
@@ -255,16 +255,16 @@ void BossPattern::DefenseModeLast()
 	}
 	//falseなら遠距離パターンに
 	else {
-		////9以上なら空ブレス
-		//if (m_attack_Rand >= 10) {
-		//	ChangeState(Enemy_Boss::enState_Takeoff, Enemy_Boss::enState_Attack_FlyShoot);
-		//}
+		//9以上なら空ブレス
+		if (m_attack_Rand >=9) {
+			ChangeState(Enemy_Boss::enState_Takeoff, Enemy_Boss::enState_Attack_FlyShoot);
+		}
 		//6以上なら滑空突進
-		//if (m_attack_Rand >= 3) {
-		//	ChangeState(Enemy_Boss::enState_Takeoff, Enemy_Boss::enState_Attack_Fly);
-		//}
+		else if (m_attack_Rand >= 6) {
+			ChangeState(Enemy_Boss::enState_Takeoff, Enemy_Boss::enState_Attack_Fly);
+		}
 		//2以上ならブレス
-		 if (m_attack_Rand >= 2) {
+		else if (m_attack_Rand >= 3) {
 			ChangeState(Enemy_Boss::enState_Attack_Shoot);
 		}
 		//2未満なら近づく
@@ -329,44 +329,61 @@ void BossPattern::BossPatternMode()
 void BossPattern::Scream(int screamcount,int cooltime)
 {	
 	Vector3 diff;
-	diff = m_screamPos - m_pos;
+	diff = m_screamPos- m_pos;
+	Vector3 scream_Arrangement;
+	scream_Arrangement = diff;
 	diff.Normalize();
 	
 	//必殺技
 	if (m_testHP <= FINAL_PHASE && !m_isScream) {
+		m_isScream_Set = true;
 		//中央付近にいるなら
-		if (m_pos.Length() <= 10) {
+		if (scream_Arrangement.Length() <= 5.0f) {
+			//m_isScream_Normal = true;
 			//HPが半分の時に一回
-			ChangeState(enState_Attack_Scream);
+			ChangeState(Enemy_Boss::enState_Landing);
 		}
 		else {
-			ChangeState(Enemy_Boss::enState_Move);
-			m_moveSpeed = diff * CHASE_SPEED;
+			ChangeState(Enemy_Boss::enState_Takeoff);
+			if (m_isUnderFly) {
+				m_moveSpeed = diff * CHASE_SPEED;
+			}
 		}
-
-		//一定数行動したら
 	}
+	//一定数行動したら
 	else if (m_screamCount >= screamcount) {
+		m_isScream_Set = true;
 		//中央にいるなら
 		if (m_pos.Length() <= 5) {
-			ChangeState(enState_Attack_Scream);
+			//m_isScream_Normal = true;
+			ChangeState(enState_Landing);
 		}
 		else {
-			ChangeState(Enemy_Boss::enState_Move);
-			m_moveSpeed = diff * CHASE_SPEED;
+			ChangeState(Enemy_Boss::enState_Takeoff);
+			if (m_isUnderFly) {
+				m_moveSpeed = diff * CHASE_SPEED;
+			}
 		}
 	}
 	//ランダムの行動数値がマックスなら
 	else if (m_attack_Rand >= 14) {
+		m_isScream_Set = true;
 		if (m_pos.Length() <= 5) {
-			ChangeState(enState_Attack_Scream);
+			//m_isScream_Normal = true;
+			ChangeState(enState_Landing);
 		}
 		else {
-			ChangeState(Enemy_Boss::enState_Move);
-			m_moveSpeed = diff * CHASE_SPEED;
+			ChangeState(Enemy_Boss::enState_Takeoff,Enemy_Boss::enState_Fly);
+			if (m_isUnderFly) {
+				m_moveSpeed = diff * CHASE_SPEED;
+			}
 		}
 	}
-
+	if (m_isScream_Normal) {
+		ChangeState(Enemy_Boss::enState_Attack_Scream);
+		m_isScream_Normal = false;
+		m_isScream_Set = false;
+	}
 	if (m_state != enState_Attack_Scream) {
 		return;
 	}
