@@ -9,10 +9,14 @@ void BossState_Landing::Animation()
 	);
 	if (!m_enemy_Boss->GetIsPlayingAnimation())
 	{
+		//™ôšK—p
+		m_enemy_Boss->SetisScream_Normal(true);
+		//Idleó‘Ô‚É‚·‚é
 		m_enemy_Boss->ChangeState(Enemy_Boss::enState_Idle);
 	}
 }
 
 void BossState_Landing::Update()
 {
+
 }

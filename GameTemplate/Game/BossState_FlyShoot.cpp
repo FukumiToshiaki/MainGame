@@ -15,6 +15,6 @@ void BossState_FlyShoot::Animation()
 
 void BossState_FlyShoot::Update()
 {
-	m_enemy_Boss->SetMoveSpeed(Vector3::Zero);
-	m_enemy_Boss->SetMoveSpeed(m_enemy_Boss->GetDiff());
+	//m_enemy_Boss->SetMoveSpeed(Vector3::Zero);
+	//m_enemy_Boss->SetMoveSpeed(m_enemy_Boss->GetDiff());
 }

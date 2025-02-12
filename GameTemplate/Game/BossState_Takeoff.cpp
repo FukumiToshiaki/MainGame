@@ -15,4 +15,7 @@ void BossState_Takeoff::Animation()
 
 void BossState_Takeoff::Update()
 {
+	if (m_enemy_Boss->GetisScream_Set()) {
+		m_enemy_Boss->ChangeState(Enemy_Boss::enState_Fly);
+	}
 }
