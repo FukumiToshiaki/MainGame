@@ -21,6 +21,7 @@
 #include "PlayerState_Arching.h"
 #include "PlayerState_Flying_Back.h"
 #include "Player_HP_UI.h"
+#include "Bullet.h"
 
 #define START_POS_X 0.0f
 #define START_POS_Y 0.0f
@@ -31,10 +32,11 @@
 #define PLAYER_FORWARD 150.0f
 #define LONGATTACKCOOLTIME 5.0f
 #define KNOCKBACKTIME 0.5f
-#define HITCOOLTIME 1.0f
+#define HITCOOLTIME 2.0f
 #define KNOCKBACKTIME_SCREAM 0.2f
 #define TAILATTACKDAMAGE 2
 #define MELEEATTACKDAMAGE 4
+#define SHOOTATTACKDAMAGE 5
 #define FLYATTACKDAMAGE 6
 #define SCREAMATTACKDAMAGE 8
 #define LANDINGDAMAGE 3
@@ -438,6 +440,11 @@ void Player::Rotation(int rotation)
 }
 void Player::Attack_Biting()
 {
+	//ダメージステート中ならreturn
+	if (m_state == enState_Damage || m_state == enState_Arching) {
+		return;
+	}
+
 	//ボタンが押されたときに攻撃中じゃなく
 	// ダッシュアタックでなければ
 	if (g_pad[0]->IsTrigger(enButtonRB2) && m_state != enState_WalkAttack && !m_isNowAttack) {
@@ -455,6 +462,11 @@ void Player::Attack_Biting()
 }
 void Player::WalkAttack()
 {
+	//ダメージステート中ならreturn
+	if (m_state == enState_Damage || m_state == enState_Arching) {
+		return;
+	}
+
 	//走っているとき
 	if (m_state == enState_Run)
 	{
@@ -484,14 +496,15 @@ void Player::Defense()
 		m_isUnderDefense = false;
 	}
 	if (m_isUnderDefense) {
-		DefenseCollision(500.0f, 2, 1300.0f, 4, 1200.0f, 6, 800.0f, 8, 0.2);
+		DefenseCollision(500.0f, 2, 1300.0f, 4, 1200.0f, 6, 800.0f, 8, 0.2,500.0f,5);
 	}
 	//ノックバックに使うVector
 	m_KnockBack = m_pos - m_enemy_Boss->GetPos();
 	m_KnockBack.Normalize();
 }
 void Player::DefenseCollision(int melee_knockback,int melee_magnification,int tail_knockback,int tail_magnification,
-	int flyattack_knockback,int flyattack_magnification, int scream_knockback,int scream_magnification,float scream_hittime)
+	int flyattack_knockback,int flyattack_magnification, int scream_knockback,int scream_magnification,float scream_hittime,
+	int shoot_knockback,int shoot_magnification)
 {
 
 	//コリジョンオブジェクトを作成する
@@ -592,9 +605,40 @@ void Player::DefenseCollision(int melee_knockback,int melee_magnification,int ta
 		}
 	}
 
+	//ブレス
+	const auto& collisionList_ShootAttack = g_collisionObjectManager->FindCollisionObjects("boss_shoot_collision");
+	for (auto& collision : collisionList_ShootAttack) {
+		if (collision->IsHit(collisionObject)) {
+			//ダメージ
+			m_testHP -= SHOOTATTACKDAMAGE / shoot_magnification;
+			m_isKnockBack = true;
+			//タイマーのリセット
+			m_knockBackTime = KNOCKBACKTIME;
+			//HP_UIを減らす表示
+			m_player_HP_UI->DecreaseHP(SHOOTATTACKDAMAGE / shoot_magnification);
+			//ノックバック距離
+			if (m_isKnockBack) {
+				m_moveSpeed = m_KnockBack * shoot_knockback;
+			}
+			//コリジョンを消すとエフェクトを消す
+			QueryGOs<Bullet>("bullet", [&](Bullet* Shoot) {
+				Shoot->Dead();
+				Shoot->OnDeadEffect();
+				return true;
+				});
+			return;
+		}
+	}
+
+
 }
 void Player::GuardBreak()
 {
+	//ダメージステート中ならreturn
+	if (m_state == enState_Damage || m_state == enState_Arching) {
+		return;
+	}
+
 	//ボタンが押されたときに攻撃中ではないなら攻撃
 	if (g_pad[0]->IsTrigger(enButtonY) && !m_isNowAttack) {
 		ChangeState(Player::enState_GuradBreak);
@@ -712,6 +756,25 @@ void Player::Hit(float screamhitcooltime,float tail_knockback,float flyattack_kn
 		}
 	}
 
+	//ブレス
+	const auto& collisionList_ShootAttack = g_collisionObjectManager->FindCollisionObjects("boss_shoot_collision");
+	for (auto& collision : collisionList_ShootAttack) {
+		if (collision->IsHit(m_collision)) {
+			//ダメージ
+			ChangeState(Player::enState_Damage);
+			m_testHP -= SHOOTATTACKDAMAGE;
+			//クールタイム
+			m_hitCoolTime = HITCOOLTIME;
+			//ダメージ中に動かないように
+			m_moveSpeed = Vector3::Zero;
+			//ブレスの判定を消す
+			
+			//HP_UIを減らす表示
+			m_player_HP_UI->DecreaseHP(SHOOTATTACKDAMAGE);
+			return;
+		}
+	}
+
 }
 void Player::TakeAim(int maximum,int smallest)
 {
@@ -810,6 +873,11 @@ void Player::LockOn()
 }
 void Player::LongAttack(int hitstartframe,int hitendframe,int effect_speed)
 {
+	//ダメージステート中ならreturn
+	if (m_state == enState_Damage || m_state == enState_Arching) {
+		return;
+	}
+
 	//エフェクトのポインターが残ってて
 	//エフェクトが消えていたら
 	//nullptrにする

@@ -38,7 +38,8 @@ public:
 	void Defense();
 	//防御コリジョンの関数
 	void DefenseCollision(int melee_knockback, int melee_magnification, int tail_knockback, int tail_magnification,
-		int flyattack_knockback, int flyattack_magnification, int scream_knockback, int scream_magnification,float scream_hittime);
+		int flyattack_knockback, int flyattack_magnification, int scream_knockback, int scream_magnification,float scream_hittime,
+		int shoot_knockback, int shoot_magnification);
 	//ガードブレイク関数
 	void GuardBreak();
 	//ヒット関数
@@ -219,7 +220,7 @@ private:
 	//エフェクトカウンター
 	int m_effectCount = 0;
 	//HP
-	float m_testHP = 50.0f;
+	float m_testHP = 10.0f;
 	//ヒット時のクールタイム
 	float m_hitCoolTime = 1.5f;
 	//遠距離攻撃のクールタイム
