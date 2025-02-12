@@ -29,13 +29,14 @@ Game::~Game()
 	DeleteGO(m_time_Limit_UI);
 	DeleteGO(m_player_HP_UI);
 	DeleteGO(m_butten_UI);
+	DeleteGO(m_boss_HP_UI);
 
 }
 bool Game::Start()
 {
 	m_player_HP_UI = NewGO<Player_HP_UI>(0, "player_hp_ui");
 	m_boss_HP_UI = NewGO<Boss_HP_UI>(0, "boss_hp_ui");
-	//m_map = NewGO<Map>(0,"map");
+	m_map = NewGO<Map>(0,"map");
 	m_butten_UI = NewGO<Butten_UI>(0,"butten_ui");
 	m_playerCamera = NewGO<PlayerCamera>(0);
 	m_player = NewGO<Player>(0, "player");
@@ -48,7 +49,7 @@ bool Game::Start()
 	m_time_Limit_UI = NewGO<Time_Limit_UI>(0, "time_limit");
 	m_bossFlyPoint.Update({ 0.0f,0.0f,0.0f });
 
-	PhysicsWorld::GetInstance()->EnableDrawDebugWireFrame();
+	//PhysicsWorld::GetInstance()->EnableDrawDebugWireFrame();
 	return true;
 }
 
