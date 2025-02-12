@@ -18,7 +18,7 @@ public:
 	void Move();
 
 	void Delete();
-
+	void OnDeadEffect();
 private:
 	Enemy_Boss* m_boss = nullptr;
 	Boss_Shoot* m_boss_Shoot = nullptr;
@@ -38,5 +38,8 @@ private:
 	Quaternion qRot = Quaternion::Identity;
 
 	float m_deleteTime = 7.0f;
+	float m_delete = 1.0f;
+
+	std::function<void()> m_onDeadEventFunction;
 };
 

@@ -5,6 +5,8 @@ class Bullet;
 class Boss_Shoot :public IGameObject
 {
 public:
+	Boss_Shoot() {};
+	~Boss_Shoot();
 
 	bool Start();
 
@@ -12,8 +14,9 @@ public:
 
 	void Update();
 
-	 void Shoot(int movespeed, int hitstartframe, int hitendframe);
+	 void Shoot();
 
+	 void FlyShoot();
 	 void SetisShoot(bool bossshoot) {
 		 m_isShoot = bossshoot;
 	 }
