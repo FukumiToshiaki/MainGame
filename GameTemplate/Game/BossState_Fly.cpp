@@ -9,7 +9,7 @@ void BossState_Fly::Animation()
 	);
 	if (m_flyTime<=0) {
 		// 次のステートに遷移する
-		m_enemy_Boss->ChangeState(m_enemy_Boss->enState_Landing);
+		m_enemy_Boss->ChangeState(Enemy_Boss::enState_Landing);
 		m_flyTime = rand() % 4;
 	}
 }
@@ -17,7 +17,4 @@ void BossState_Fly::Animation()
 void BossState_Fly::Update()
 {
 	m_flyTime -= g_gameTime->GetFrameDeltaTime();
-	if (m_enemy_Boss->GetPos().Length() <= 10.0f) {
-		m_enemy_Boss->ChangeState(m_enemy_Boss->enState_Landing);
-	}
 }
