@@ -22,7 +22,7 @@ public:
 	// アニメーションを初期化。
 	void InitAnimation();
 	//回転の初期化
-	void Rotation(int rotation);
+	void Rotation(float rotation);
 	//近距離攻撃の噛みつき
 	void MeleeAttack();
 	//遠距離攻撃の地上からのブレス
@@ -30,21 +30,21 @@ public:
 	//大技後の休憩モーション
 	void Rest();
 	//コリジョンの当たり判定
-	void Hit(int damagemagnification);
+	void Hit(float damagemagnification);
 	//噛みつき攻撃のコリジョン
-	void MeleeAttackCollision(int collision_melee);
+	void MeleeAttackCollision(float collision_melee);
 	//尻尾の薙ぎ払い
 	void TailAttack();
 	//尻尾の薙ぎ払いのコリジョン
-	void TailAttackCollision(int collision_tail);
+	void TailAttackCollision(float collision_tail);
 	//空中突進
 	void FlyAttack(float movespeed);
 	//空中突進の当たり判定
-	void FlyAttackCollision(int collision_flyattack);
+	void FlyAttackCollision(float collision_flyattack);
 	//ガードの判定
 	void Defence();
 	//ガードのコリジョン
-	void DefenceCollision(int break_magnification,int collision_defense);
+	void DefenceCollision(float break_magnification, float collision_defense);
 	// アニメーションイベント用の関数。
 	void OnAnimationEvent(const wchar_t* clipName, const wchar_t* eventName);
 	//距離をとる関数
@@ -52,11 +52,11 @@ public:
 	//必殺技の咆哮
 	void Scream();
 	//必殺技のコリジョン
-	void ScreamCollision(int collision_scream);
+	void ScreamCollision(float collision_scream);
 	//着地時のダメージ
 	void Landing();
 	//着地時のコリジョン
-	void LandingDamage(int collision_landing);
+	void LandingDamage(float collision_landing);
 	//HPが30%以下になった時のBGM関数
 	void BGM();
 	//空ブレスの時
@@ -178,7 +178,7 @@ public:
 		return m_isScream_Normal;
 	}
 	bool GetisScream_Set() {
-		return m_isScream_Set;
+		return m_isFly_Set;
 	}
 
 protected:
@@ -192,7 +192,7 @@ protected:
 	Vector3	m_forward = Vector3::AxisZ;					//エネミーの正面ベクトル。
 	Vector3 m_collisionPos = Vector3::Zero;
 	Vector3 m_flyPos = Vector3::Zero;
-	//Vector3 m_moveSpeed_Shoot = Vector3::Zero;
+	Vector3 m_tailEffectPos = Vector3::Zero;
 	//Vector3 m_shootPos = Vector3::Zero;
 	//Vector3 m_shot = Vector3::Zero;
 	Vector3 diff = Vector3::Zero;
@@ -206,7 +206,7 @@ protected:
 	int m_attack_Rand = 0;
 	int m_attack_Count = -1;
 	//HP
-	float m_testHP = 19.0f;
+	float m_testHP = 100.0f;
 	//飛んだ時のボーン取得のため
 	int m_flyBoneId = 0;
 	//必殺技を撃つためのカウント
@@ -237,7 +237,7 @@ protected:
 	bool m_isScream_Normal = false;				//咆哮が通常行動で選ばれたらtrue
 	bool m_isEffect = false;		//エフェクトが出ているならtrue
 	bool m_isFlyKeepDistance = false;	//空を飛んで距離をとっているならtrue
-	bool m_isScream_Set = false;
+	bool m_isFly_Set = false;
 
 	ModelRender m_modelRender;
 	Player* m_player = nullptr;
@@ -252,13 +252,15 @@ protected:
 	Skeleton m_skeleton;	// スケルトン
 	Model m_model;			// モデル
 	Quaternion	m_rotation=Quaternion::Identity;							//回転
-	Quaternion m_wait=Quaternion::Identity;
+	Quaternion m_tailEffect = Quaternion::Identity;
 	AnimationClip m_animationClipArray[enAnimClip_Num];	// アニメーションクリップ
 	CharacterController m_charaCon;	//キャラクターコントローラー
 	BossFlyPoint::FlyPoint* m_flyPoint = nullptr;
 	SoundSource* m_bossLastButtle = nullptr;
 	SoundSource* m_bossButtle = nullptr;
 	
-	//EffectEmitter* Boss_Shoot_Start = nullptr;
+	EffectEmitter* m_boss_Tail = nullptr;
+	std::function<void()> m_onDeadEventFunction;
+
 };
 

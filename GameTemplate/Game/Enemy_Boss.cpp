@@ -33,8 +33,10 @@
 #define GUARDBREAK_DAMAGE 4.5f
 #define BITATTACKDAMAGE 2.5f
 #define LONGATTACKDAMAGE 1.5f
-#define WALKATTACKDAMAGE 3
+#define WALKATTACKDAMAGE 3.0f
 #define HITCOOLTIME 1.5f
+#define FINAL_PHASE 50.0f
+
 //#define FLYATTACK_SPEED 5.0f
 //#define DISTANCE_POS 1400.0f
 //#define BITING_DISTANCE 1000.0f
@@ -121,6 +123,9 @@ bool Enemy_Boss::Start()
 	//ボスのHPが30%以下の時BGMの読み込み
 	g_soundEngine->ResistWaveFileBank(2, "Assets/sound/Boss_LastBattle.wav");
 
+	//尻尾攻撃のエフェクト
+	EffectEngine::GetInstance()->ResistEffect(3, u"Assets/Effect/Boss_Tail.efk");
+
 	//InitAnimation();
 	m_player = FindGO<Player>("player");
 	m_player->AddEnemy_List(this);
@@ -155,7 +160,7 @@ void Enemy_Boss::InitAnimation()
 	//アニメーションを進める。
 	m_animation.Progress(g_gameTime->GetFrameDeltaTime());
 }
-void Enemy_Boss::Rotation(int rotation)
+void Enemy_Boss::Rotation(float rotation)
 {
 	if (fabsf(m_moveSpeed.x) < rotation
 		&& fabsf(m_moveSpeed.z) < rotation) {
@@ -233,18 +238,19 @@ void Enemy_Boss::Rest()
 {
 	
 }
-void Enemy_Boss::Hit(int damagemagnification)
+void Enemy_Boss::Hit(float damagemagnification)
 {
 	//ヒット時のクールタイム
 	m_hitCoolTime -= g_gameTime->GetFrameDeltaTime();
 
-	//攻撃を受けているとき
-	if (m_state == enState_Attack_Scream)
-	{
+	//必殺技のための移動
+	//その時は必殺技優先
+	if (m_testHP <= FINAL_PHASE && !m_isScream) {
 		return;
 	}
-	//必殺技中はreturn
-	if (m_state == enState_Damage || m_state == enState_Defence) {
+	//必殺技中
+	//攻撃を受けているときはreturn
+	if (m_state == enState_Attack_Scream||m_state == enState_Damage || m_state == enState_Defence) {
 		return;
 	}
 	//ヒット時ならreturn
@@ -382,7 +388,7 @@ void Enemy_Boss::Shoot()
 	m_boss_Shoot->Init(this);
 	m_boss_Shoot->Update();
 }
-void Enemy_Boss::MeleeAttackCollision(int collision_melee)
+void Enemy_Boss::MeleeAttackCollision(float collision_melee)
 {
 	//コリジョンオブジェクトを作成する
 	auto collisionObject = NewGO<CollisionObject>(0);
@@ -400,10 +406,27 @@ void Enemy_Boss::MeleeAttackCollision(int collision_melee)
 void Enemy_Boss::TailAttack()
 {
 	if (m_isUnderTail) {
+		//m_tailEffectPos = m_forward;
 		TailAttackCollision(400.0f);
+		//m_tailEffect = { 90.0f,0.0f,0.0f,0.0f };
+		//m_tailEffect.AddRotationY(1.0f);
+		//m_tailEffect.Apply(m_tailEffectPos);
+		//エフェクト
+		m_boss_Tail = NewGO<EffectEmitter>(3, "boss_tail");
+		m_boss_Tail->Init(3);
+		m_boss_Tail->SetScale(Vector3::One * 10.0f);
+		m_boss_Tail->SetPosition(m_forward *BOSS_FORWARD);
+		m_boss_Tail->Play();
+		//m_boss_Tail->SetRotation(m_tailEffect);
+		// エフェクト死亡時のイベント処理
+		m_onDeadEventFunction = [&] { m_boss_Tail = nullptr; };
+		// イベントを登録
+		m_boss_Tail->AddDeadEventFunction(m_onDeadEventFunction);
+
 	}
+
 }
-void Enemy_Boss::TailAttackCollision(int collision_tail)
+void Enemy_Boss::TailAttackCollision(float collision_tail)
 {
 	//コリジョンオブジェクトを作成する
 	auto collisionObject = NewGO<CollisionObject>(0);
@@ -431,7 +454,7 @@ void Enemy_Boss::FlyAttack(float movespeed)
 
 
 }
-void Enemy_Boss::FlyAttackCollision(int collision_flyattack)
+void Enemy_Boss::FlyAttackCollision(float collision_flyattack)
 {
 	//コリジョンオブジェクトを作成する
 	auto collisionObject = NewGO<CollisionObject>(0);
@@ -453,7 +476,7 @@ void Enemy_Boss::Defence()
 	DefenceCollision(1.5f,550.0f);
 
 }
-void Enemy_Boss::DefenceCollision(int break_magnification,int collision_defense)
+void Enemy_Boss::DefenceCollision(float break_magnification, float collision_defense)
 {
 	//コリジョンオブジェクトを作成する
 	auto collisionObject = NewGO<CollisionObject>(0);
@@ -607,7 +630,7 @@ void Enemy_Boss::OnAnimationEvent(const wchar_t* clipName, const wchar_t* eventN
 		m_isUnderFly = false;
 	}
 
-	//キーの名前がBoss_Fly_startの場合
+	//キーの名前がBoss_Takeoff_endの場合
 	if (wcscmp(eventName, L"Boss_Takeoff_end") == 0)
 	{
 		//飛行中にする
@@ -617,7 +640,7 @@ void Enemy_Boss::OnAnimationEvent(const wchar_t* clipName, const wchar_t* eventN
 }
 void Enemy_Boss::FlyPos(float movespeed)
 {
-	if (m_state != enState_Fly||m_isScream_Set) {
+	if (m_state != enState_Fly||m_isFly_Set) {
 		return;
 	}
 	if (!m_isFlyKeepDistance){
@@ -645,7 +668,7 @@ void Enemy_Boss::Scream()
 	m_moveSpeed.z = 0.0f;
 	m_isScream = true;
 }
-void Enemy_Boss::ScreamCollision(int collision_scream)
+void Enemy_Boss::ScreamCollision(float collision_scream)
 {
 	//コリジョンオブジェクトを作成する
 	auto collisionObject = NewGO<CollisionObject>(0);
@@ -667,7 +690,7 @@ void Enemy_Boss::Landing()
 		LandingDamage(500);
 	}
 }
-void Enemy_Boss::LandingDamage(int collision_landing)
+void Enemy_Boss::LandingDamage(float collision_landing)
 {
 	//コリジョンオブジェクトを作成する
 	auto collisionObject = NewGO<CollisionObject>(0);
@@ -766,7 +789,7 @@ void Enemy_Boss::Update()
 	MeleeAttack();
 	TailAttack();
 	Defence(); 
-	FlyPos(500.0f);
+	FlyPos(300.0f);
 	FlyAttack(800.0f);
 	Scream();
 	Landing();
