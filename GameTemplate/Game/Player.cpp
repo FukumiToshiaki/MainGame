@@ -306,6 +306,8 @@ void Player::ChangeState(EnState changeState)
 
 void Player::Update()
 {
+	m_hitCoolTime -= g_gameTime->GetFrameDeltaTime();
+
 	m_Iplayer_State->Animation();
 	m_Iplayer_State->Update();
 	//InitAnimation();
@@ -323,17 +325,19 @@ void Player::Update()
 		m_moveSpeed.z = 0.0f;
 		return;
 	}
-	m_hitCoolTime -= g_gameTime->GetFrameDeltaTime();
-
 	Move(500.0f,1000.0f,5.0f);
 	Rotation(0.001f);
+	Hit(0.1f, 700.0f, 500.0f, 400.0f);
+	TakeAim(4000.0f, 100.0f);
+	LockOn();
+	//ダメージステート中ならreturn
+	if (m_state == enState_Damage || m_state == enState_Arching || m_state == enState_Flying_Back) {
+		return;
+	}
 	WalkAttack();
 	Attack_Biting();
 	Defense();
 	GuardBreak();
-	Hit(0.1f,700.0f,500.0f,400.0f);
-	TakeAim(4000.0f,100.0f);
-	LockOn();
 	LongAttack(137,200,30.0f);
 	//// 回転
 	////ボーンの座標を受け取るプログラムテスト
@@ -345,9 +349,9 @@ void Player::Update()
 
 }
 
-void Player::Move(int walk_speed, int run_speed, int walkattack_speed)
+void Player::Move(float walk_speed, float run_speed, float walkattack_speed)
 {
-	//死んでいたりダメージやよろけ中かreturn
+	//死んでいたりダメージやよろけ中return
 	if (m_state == enState_Die || m_state == enState_Damage || m_state == enState_Arching || m_state == enState_Flying_Back) {
 		return;
 	}
@@ -407,7 +411,7 @@ void Player::Move(int walk_speed, int run_speed, int walkattack_speed)
 	////移動速度にスティックの入力量を加算する。
 	m_moveSpeed += right + forward;
 }
-void Player::Rotation(int rotation)
+void Player::Rotation(float rotation)
 {
 	//if (fabsf(m_moveSpeed.x) < 0.001f
 	//	&& fabsf(m_moveSpeed.z) < 0.001f) {
@@ -440,11 +444,6 @@ void Player::Rotation(int rotation)
 }
 void Player::Attack_Biting()
 {
-	//ダメージステート中ならreturn
-	if (m_state == enState_Damage || m_state == enState_Arching) {
-		return;
-	}
-
 	//ボタンが押されたときに攻撃中じゃなく
 	// ダッシュアタックでなければ
 	if (g_pad[0]->IsTrigger(enButtonRB2) && m_state != enState_WalkAttack && !m_isNowAttack) {
@@ -462,11 +461,6 @@ void Player::Attack_Biting()
 }
 void Player::WalkAttack()
 {
-	//ダメージステート中ならreturn
-	if (m_state == enState_Damage || m_state == enState_Arching) {
-		return;
-	}
-
 	//走っているとき
 	if (m_state == enState_Run)
 	{
@@ -481,10 +475,6 @@ void Player::WalkAttack()
 }
 void Player::Defense()
 {
-	//ダメージステート中ならreturn
-	if (m_state == enState_Damage) {
-		return;
-	}
 	//ボタンが押されたときに攻撃中でなければDefense
 	if (g_pad[0]->IsPress(enButtonRB1) && !m_isNowAttack) {
 		ChangeState(Player::enState_Defense);
@@ -496,22 +486,21 @@ void Player::Defense()
 		m_isUnderDefense = false;
 	}
 	if (m_isUnderDefense) {
-		DefenseCollision(500.0f, 2, 1300.0f, 4, 1200.0f, 6, 800.0f, 8, 0.2,500.0f,5);
+		DefenseCollision(500.0f, 2.0f, 1300.0f, 4.0f, 1200.0f, 6.0f, 800.0f, 8.0f, 0.2, 500.0f, 5.0f);
 	}
 	//ノックバックに使うVector
 	m_KnockBack = m_pos - m_enemy_Boss->GetPos();
 	m_KnockBack.Normalize();
 }
-void Player::DefenseCollision(int melee_knockback,int melee_magnification,int tail_knockback,int tail_magnification,
-	int flyattack_knockback,int flyattack_magnification, int scream_knockback,int scream_magnification,float scream_hittime,
-	int shoot_knockback,int shoot_magnification)
+void Player::DefenseCollision(float melee_knockback, float melee_magnification, float tail_knockback, float tail_magnification,
+	float flyattack_knockback, float flyattack_magnification, float scream_knockback, float scream_magnification,float scream_hittime,
+	float shoot_knockback, float shoot_magnification)
 {
-
 	//コリジョンオブジェクトを作成する
 	auto collisionObject = NewGO<CollisionObject>(0);
 	Vector3 collisionPosition = m_pos;
 	//座標をプレイヤーの少し前に設定
-	collisionPosition += m_forward * 60.0f;
+	collisionPosition += m_forward * 80.0f;
 	//球状のコリジョンを作成
 	collisionObject->CreateSphere(collisionPosition,//座標
 		Quaternion::Identity,//回転
@@ -526,11 +515,8 @@ void Player::DefenseCollision(int melee_knockback,int melee_magnification,int ta
 	//攻撃を受けたらタイマースタート
 	if (m_isKnockBack) {
 		m_knockBackTime -= g_gameTime->GetFrameDeltaTime();
-	}
-	if (m_isKnockBack) {
 		return;
 	}
-
 	//嚙みつき
 	const auto& collisionList_MeleeAttack = g_collisionObjectManager->FindCollisionObjects("boss_attack_melee");
 	for (auto& collision : collisionList_MeleeAttack) {
@@ -549,7 +535,7 @@ void Player::DefenseCollision(int melee_knockback,int melee_magnification,int ta
 			return;
 		}
 	}
-	//商品攻撃
+	//尻尾攻撃
 	const auto& collisionList_TailAttack = g_collisionObjectManager->FindCollisionObjects("boss_attack_tail");
 	for (auto& collision : collisionList_TailAttack) {
 		if (collision->IsHit(collisionObject)) {
@@ -560,7 +546,6 @@ void Player::DefenseCollision(int melee_knockback,int melee_magnification,int ta
 			m_knockBackTime = KNOCKBACKTIME;
 			//HP_UIを減らす表示
 			m_player_HP_UI->DecreaseHP(TAILATTACKDAMAGE / tail_magnification);
-
 			//ノックバック距離
 			if (m_isKnockBack) {
 				m_moveSpeed = m_KnockBack * tail_knockback;
@@ -604,7 +589,6 @@ void Player::DefenseCollision(int melee_knockback,int melee_magnification,int ta
 			return;
 		}
 	}
-
 	//ブレス
 	const auto& collisionList_ShootAttack = g_collisionObjectManager->FindCollisionObjects("boss_shoot_collision");
 	for (auto& collision : collisionList_ShootAttack) {
@@ -634,11 +618,6 @@ void Player::DefenseCollision(int melee_knockback,int melee_magnification,int ta
 }
 void Player::GuardBreak()
 {
-	//ダメージステート中ならreturn
-	if (m_state == enState_Damage || m_state == enState_Arching) {
-		return;
-	}
-
 	//ボタンが押されたときに攻撃中ではないなら攻撃
 	if (g_pad[0]->IsTrigger(enButtonY) && !m_isNowAttack) {
 		ChangeState(Player::enState_GuradBreak);
@@ -648,6 +627,8 @@ void Player::GuardBreak()
 		m_moveSpeed.x = 0.0f;
 		m_moveSpeed.z = 0.0f;
 	}
+	//アニメーションのシーンが来たら
+	//コリジョンを作る
 	if (m_isUnderGuradBreak)	{
 		GuradBreakCollision();
 	}
@@ -739,7 +720,7 @@ void Player::Hit(float screamhitcooltime,float tail_knockback,float flyattack_kn
 			return;
 		}
 	}
-	//着地時に押しつぶされる
+	//着地時に近くにいたら吹き飛ばされる
 	const auto& collisionList_Landing = g_collisionObjectManager->FindCollisionObjects("boss_attack_landing");
 	for (auto& collision : collisionList_Landing) {
 		if (collision->IsHit(m_collision)) {
@@ -755,7 +736,6 @@ void Player::Hit(float screamhitcooltime,float tail_knockback,float flyattack_kn
 			return;
 		}
 	}
-
 	//ブレス
 	const auto& collisionList_ShootAttack = g_collisionObjectManager->FindCollisionObjects("boss_shoot_collision");
 	for (auto& collision : collisionList_ShootAttack) {
@@ -768,15 +748,19 @@ void Player::Hit(float screamhitcooltime,float tail_knockback,float flyattack_kn
 			//ダメージ中に動かないように
 			m_moveSpeed = Vector3::Zero;
 			//ブレスの判定を消す
-			
+			//コリジョンを消す+エフェクトを消す
+			QueryGOs<Bullet>("bullet", [&](Bullet* Shoot) {
+				Shoot->Dead();
+				Shoot->OnDeadEffect();
+				return true;
+				});
 			//HP_UIを減らす表示
 			m_player_HP_UI->DecreaseHP(SHOOTATTACKDAMAGE);
 			return;
 		}
 	}
-
 }
-void Player::TakeAim(int maximum,int smallest)
+void Player::TakeAim(float maximum, float smallest)
 {
 	Vector3 NearenemyPosition;
 	if (m_count == 0) {
@@ -799,7 +783,7 @@ void Player::TakeAim(int maximum,int smallest)
 	}
 	NearenemyPosition = m_enemyList[m_targetCount]->GetPos();
 
-		Vector3 diff = m_pos-NearenemyPosition;
+	Vector3 diff = m_pos - NearenemyPosition;
 	//プレイヤーとエネミーが一定以上離れていたら
 	//ターゲッティングしない
 	//近すぎてもターゲッティングしない
@@ -871,7 +855,7 @@ void Player::LockOn()
 	}
 
 }
-void Player::LongAttack(int hitstartframe,int hitendframe,int effect_speed)
+void Player::LongAttack(float hitstartframe, float hitendframe, float effect_speed)
 {
 	//ダメージステート中ならreturn
 	if (m_state == enState_Damage || m_state == enState_Arching) {
@@ -889,17 +873,17 @@ void Player::LongAttack(int hitstartframe,int hitendframe,int effect_speed)
 		}
 	}
 
-	///
+	//エフェクトの軌道の計算
 	Quaternion qRot;
 	Vector3 diff = m_enemy_Boss->GetPos() - m_pos;
 	diff.Normalize();
 	Vector3 PosZ = Vector3::AxisZ;
 	qRot.SetRotation(PosZ, diff);
-	///
+	//クールタイム
 	m_longAttackCoolTime -= g_gameTime->GetFrameDeltaTime();
 	//クールタイムがあけているならtrue
 	if (m_longAttackCoolTime <= 0) {
-		//攻撃中ではなくLB1
+		//攻撃中ではなくLB1を押されたら
 		if (g_pad[0]->IsTrigger(enButtonLB1)&&!m_isNowAttack) {
 			ChangeState(Player::enState_LongAttack);
 			effectEmitter = NewGO<EffectEmitter>(0, "long_attack");
@@ -929,6 +913,7 @@ void Player::LongAttack(int hitstartframe,int hitendframe,int effect_speed)
 		if (m_effectCount == hitstartframe) {
 			m_longAttackPos = m_pos;
 		}
+		//プレイヤーとボスの間の距離を求める
 		Vector3 diff = m_enemy_Boss->GetPos() - m_pos;
 		diff.Normalize();
 		m_longAttackPos += diff * effect_speed;

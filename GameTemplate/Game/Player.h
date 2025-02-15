@@ -27,9 +27,9 @@ public:
 	//モデルレンダー
 	void Render(RenderContext& rc) override;
 	//移動の関数
-	void Move(int walk_speed, int run_speed, int walkattack_speed);
+	void Move(float walk_speed, float run_speed, float walkattack_speed);
 	//回転関数
-	void Rotation(int rotation);
+	void Rotation(float rotation);
 	//近距離攻撃の関数
 	void Attack_Biting();
 	//ダッシュアタックの関数
@@ -37,15 +37,15 @@ public:
 	//防御関数
 	void Defense();
 	//防御コリジョンの関数
-	void DefenseCollision(int melee_knockback, int melee_magnification, int tail_knockback, int tail_magnification,
-		int flyattack_knockback, int flyattack_magnification, int scream_knockback, int scream_magnification,float scream_hittime,
-		int shoot_knockback, int shoot_magnification);
+	void DefenseCollision(float melee_knockback, float melee_magnification, float tail_knockback, float tail_magnification,
+		float flyattack_knockback, float flyattack_magnification, float scream_knockback, float scream_magnification,float scream_hittime,
+		float shoot_knockback, float shoot_magnification);
 	//ガードブレイク関数
 	void GuardBreak();
 	//ヒット関数
 	void Hit(float screamhitcooltime, float tail_knockback, float flyattack_knockback, float landing_knockback);
 	//エイム
-	void TakeAim(int maximum, int smallest);
+	void TakeAim(float maximum, float smallest);
 	//エネミーのリスト
 	void AddEnemy_List(EnemyBase* enemybase);
 	void RemoveEnemy_List(EnemyBase* enemybase);
@@ -53,7 +53,7 @@ public:
 	//ロックオン
 	void LockOn();
 	//遠距離攻撃
-	void LongAttack(int hitstartframe,int hitendframe,int effect_speed);
+	void LongAttack(float hitstartframe, float hitendframe, float effect_speed);
 	// スケルトンを初期化
 	void InitSkeleton();
 	// モデルを初期化。
@@ -220,7 +220,7 @@ private:
 	//エフェクトカウンター
 	int m_effectCount = 0;
 	//HP
-	float m_testHP = 10.0f;
+	float m_testHP = 120.0f;
 	//ヒット時のクールタイム
 	float m_hitCoolTime = 1.5f;
 	//遠距離攻撃のクールタイム
