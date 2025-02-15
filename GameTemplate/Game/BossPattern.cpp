@@ -11,15 +11,15 @@
 #define FIRST_PHASE 80.0f
 #define SECOND_PHASE 65.0f
 #define FINAL_PHASE 50.0f
-#define MELEE_ATTACK 0
-#define TAIL_ATTACK 13
-#define FLY 20
-#define MELEE_SHOOT_ATTACK 17
-#define MELEE_POINT 25
+//#define MELEE_ATTACK 0
+//#define TAIL_ATTACK 13
+//#define FLY 20
+#define MELEE_SHOOT_ATTACK 17.0f
+#define MELEE_POINT 25.0f
 #define ATTACK_COOLTIME 5.0f
 #define LASTATTACK_COOLTIME 4.0f
 #define MELEE_DISTANCE 1500.0f
-#define CHASE_SPEED 500.0f
+#define CHASE_SPEED 480.0f
 #define PLAYERLASTHP 20.0f
 #define BOSSLASTHP 20.0f
 #define LASTCOOLTIME 2
@@ -52,16 +52,25 @@ void BossPattern::Update()
 	if (!m_isUnderPattern) {
 		return;
 	}
-	//Scream(40, 3);
-	////他の行動をさせないため
-	//if (m_state == enState_Attack_Scream) {
-	//	return;
-	//}
-	////必殺技のための移動
-	////その時は必殺技優先
-	//if (m_testHP <= FINAL_PHASE && !m_isScream) {
-	//	return;
-	//}
+	Scream(40,400.0f);
+	//他の行動をさせないため
+	if (m_state == enState_Attack_Scream) {
+		//行動数値を0に戻す
+		m_attack_Rand = 0;
+		//フラグをfalseに
+		m_isUnderPattern = false;
+		//クールタイムをランダムに
+		m_coolTime = 3.0f;
+		//必殺技カウンターを0に戻す
+		m_screamCount = 0;
+
+		return;
+	}
+	//必殺技のための移動
+	//その時は必殺技優先
+	if (m_testHP <= FINAL_PHASE && !m_isScream) {
+		return;
+	}
 	//必殺技カウントの増加
 	m_screamCount++;
 	//プレイヤーのHPが一定数以下の時
@@ -156,12 +165,11 @@ void BossPattern::CoolTime()
 		m_iscoolTimeStart = false;
 	}
 }
-
 void BossPattern::DistancePattern()
 {
-	//if (m_testHP <= FINAL_PHASE && !m_isScream) {
-	//	return;
-	//}
+	if (m_testHP <= FINAL_PHASE && !m_isScream) {
+		return;
+	}
 	//プレイヤーの追跡の変数
 	m_distance = m_player->Get_PlayerPos() - m_pos;
 	m_distance.y = 0.0f;
@@ -171,6 +179,56 @@ void BossPattern::DistancePattern()
 	//Move状態なら追いかける
 	if (m_distance.Length() <= DISTANCE_POS && m_state == enState_Move) {
 		m_moveSpeed = m_diff * CHASE_SPEED;
+	}
+}
+void BossPattern::BossPatternMode()
+{
+	if (m_testHP <= FINAL_PHASE && !m_isScream) {
+		return;
+	}
+	if (m_isUnderPattern) {
+		//距離内なら近距離型のtrueに
+		if (m_distance.Length() <= MELEE_DISTANCE) {
+			m_isBifurcation = true;
+		}
+		//違うなら遠距離型のfalseに
+		else {
+			m_isBifurcation = false;
+		}
+		//自分のHPが低いほど
+		//足す数字を大きくする
+		//第1段階
+		if (m_testHP > FIRST_PHASE) {
+			m_attack_Rand += rand() % 3;
+		}
+		//第2段階
+		else if (m_testHP > SECOND_PHASE) {
+			m_attack_Rand += rand() % 4;
+		}
+		//第3段階
+		else if (m_testHP > FINAL_PHASE) {
+			m_attack_Rand += rand() % 5;
+		}
+		//第4段階
+		else {
+			m_attack_Rand += rand() % 6;
+		}
+
+		//PlayerのHPが多かったら足す数字を少なく、
+		//少なかったら足す数字を大きく
+		if (m_player->GetHP() > FIRST_PHASE) {
+			m_attack_Rand += rand() % 2;
+		}
+		else if (m_player->GetHP() > SECOND_PHASE) {
+			m_attack_Rand += rand() % 3;
+		}
+		else if (m_player->GetHP() > FINAL_PHASE) {
+			m_attack_Rand += rand() % 5;
+		}
+		else {
+			m_attack_Rand += rand() % 6;
+		}
+		m_attack_Rand += rand() % 5;
 	}
 }
 
@@ -274,77 +332,36 @@ void BossPattern::DefenseModeLast()
 	}
 }
 
-void BossPattern::BossPatternMode()
-{
-	//if (m_testHP <= FINAL_PHASE && !m_isScream) {
-	//	return;
-	//}
-	if (m_isUnderPattern) {
-		ChangeState(Enemy_Boss::enState_Move);
-		//距離内なら近距離型のtrueに
-		if (m_distance.Length() <= MELEE_DISTANCE) {
-			m_isBifurcation = true;
-		}
-		//違うなら遠距離型のfalseに
-		else {
-			m_isBifurcation = false;
-		}
-		//自分のHPが低いほど
-		//足す数字を大きくする
-		//第1段階
-		if (m_testHP > FIRST_PHASE) {
-			m_attack_Rand += rand() % 3;
-		}
-		//第2段階
-		else if (m_testHP > SECOND_PHASE) {
-			m_attack_Rand += rand() % 4;
-		}
-		//第3段階
-		else if (m_testHP > FINAL_PHASE) {
-			m_attack_Rand += rand() % 5;
-		}
-		//第4段階
-		else {
-			m_attack_Rand += rand() % 6;
-		}
 
-		//PlayerのHPが多かったら足す数字を少なく、
-		//少なかったら足す数字を大きく
-		if (m_player->GetHP() > FIRST_PHASE) {
-			m_attack_Rand += rand() % 2;
-		}
-		else if (m_player->GetHP() > SECOND_PHASE) {
-			m_attack_Rand += rand() % 3;
-		}
-		else if (m_player->GetHP() > FINAL_PHASE) {
-			m_attack_Rand += rand() % 5;
-		}
-		else {
-			m_attack_Rand += rand() % 6;
-		}
-		m_attack_Rand += rand() % 5;
-	}
-}
-
-void BossPattern::Scream(int screamcount,int cooltime)
+void BossPattern::Scream(int screamcount,float screamdistance)
 {	
 	Vector3 diff;
 	diff = m_screamPos- m_pos;
 	Vector3 scream_Arrangement;
 	scream_Arrangement = diff;
 	diff.Normalize();
-	
+
+
 	//必殺技
 	if (m_testHP <= FINAL_PHASE && !m_isScream) {
-		m_isScream_Set = true;
 		//中央付近にいるなら
-		if (scream_Arrangement.Length() <= 5.0f) {
-			//m_isScream_Normal = true;
-			//HPが半分の時に一回
-			ChangeState(Enemy_Boss::enState_Landing);
+		if (scream_Arrangement.Length() <= screamdistance) {
+			if (m_isFly_Set) {
+				//HPが半分の時に一回
+				ChangeState(Enemy_Boss::enState_Landing);
+			}
+			else {
+				m_isScream_Normal = true;
+			}
 		}
 		else {
-			ChangeState(Enemy_Boss::enState_Takeoff);
+			if(!m_isFly_Set){
+				ChangeState(Enemy_Boss::enState_Takeoff);
+				m_isFly_Set = true;
+			}
+			else {
+				ChangeState(Enemy_Boss::enState_Fly);
+			}
 			if (m_isUnderFly) {
 				m_moveSpeed = diff * CHASE_SPEED;
 			}
@@ -352,14 +369,19 @@ void BossPattern::Scream(int screamcount,int cooltime)
 	}
 	//一定数行動したら
 	else if (m_screamCount >= screamcount) {
-		m_isScream_Set = true;
-		//中央にいるなら
-		if (m_pos.Length() <= 5) {
-			//m_isScream_Normal = true;
-			ChangeState(enState_Landing);
+		//中央付近にいるなら
+		if (scream_Arrangement.Length() <= screamdistance) {
+			//HPが半分の時に一回
+			ChangeState(Enemy_Boss::enState_Landing);
 		}
 		else {
-			ChangeState(Enemy_Boss::enState_Takeoff);
+			if (!m_isFly_Set) {
+				ChangeState(Enemy_Boss::enState_Takeoff);
+				m_isFly_Set = true;
+			}
+			else {
+				ChangeState(Enemy_Boss::enState_Fly);
+			}
 			if (m_isUnderFly) {
 				m_moveSpeed = diff * CHASE_SPEED;
 			}
@@ -367,34 +389,31 @@ void BossPattern::Scream(int screamcount,int cooltime)
 	}
 	//ランダムの行動数値がマックスなら
 	else if (m_attack_Rand >= 14) {
-		m_isScream_Set = true;
-		if (m_pos.Length() <= 5) {
-			//m_isScream_Normal = true;
-			ChangeState(enState_Landing);
+		//中央付近にいるなら
+		if (scream_Arrangement.Length() <= screamdistance) {
+			//HPが半分の時に一回
+			ChangeState(Enemy_Boss::enState_Landing);
 		}
 		else {
-			ChangeState(Enemy_Boss::enState_Takeoff,Enemy_Boss::enState_Fly);
+			if (!m_isFly_Set) {
+				ChangeState(Enemy_Boss::enState_Takeoff);
+				m_isFly_Set = true;
+			}
+			else {
+				ChangeState(Enemy_Boss::enState_Fly);
+			}
 			if (m_isUnderFly) {
 				m_moveSpeed = diff * CHASE_SPEED;
 			}
 		}
 	}
+	//咆哮準備が整ったら咆哮
 	if (m_isScream_Normal) {
 		ChangeState(Enemy_Boss::enState_Attack_Scream);
+		//リセット
 		m_isScream_Normal = false;
-		m_isScream_Set = false;
+		m_isFly_Set = false;
 	}
-	if (m_state != enState_Attack_Scream) {
-		return;
-	}
-	//行動数値を0に戻す
-	m_attack_Rand = 0;
-	//フラグをfalseに
-	m_isUnderPattern = false;
-	//クールタイムをランダムに
-	m_coolTime = cooltime;
-	//必殺技カウンターを0に戻す
-	m_screamCount = 0;
 }
 
 void BossPattern::SuperDefenseMode()

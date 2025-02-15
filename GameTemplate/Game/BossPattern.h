@@ -26,7 +26,7 @@ public:
 	//パターン決めの関数
 	void BossPatternMode();
 	//必殺技
-	void Scream(int screamcount,int cooltime);
+	void Scream(int screamcount, float screamdistance);
 	//ボスのモード関数
 	void SuperDefenseMode();
 	void DefenseMode();
