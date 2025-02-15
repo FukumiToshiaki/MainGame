@@ -101,7 +101,7 @@ void Boss_HP_UI::AdjustmentTransparent()
 		if (DecreaseTransition4)
 		{
 			//ÇﬂÇøÇ·Ç≠ÇøÇ·ç◊Ç©Ç≠å∏ÇÁÇ∑
-			m_nowScale.x -= 0.009;
+			m_nowScale.x -= 0.009f;
 			//0à»â∫ÇæÇ¡ÇΩÇÁ0Ç…ñﬂÇ∑
 			if (m_nowScale.x < 0)
 			{

@@ -73,15 +73,15 @@ private:
 	Enemy_Boss* m_enemy_boss = nullptr;
 	/////////////////////////////////////////変数
 	//最大HP
-	float m_fullhp = 20.0f;
+	float m_fullhp = 100.0f;
 	//現在HP　
 	float m_nowhp = m_fullhp;
 	//過去HP
 	float m_oldhp = m_fullhp;
 	//現在hpバースケール(動かすのはm_hpUI_B、zは固定)
-	Vector3 m_scale_B = { 0.8,0.8,1.0 };
+	Vector3 m_scale_B = { 0.8f,0.8f,1.0f };
 	//現在透過hpバースケール(動かすのはm_hpUI_C、zは固定)
-	Vector3 m_scale_C = { 0.8,0.8,1.0 };
+	Vector3 m_scale_C = { 0.8f,0.8f,1.0f };
 	//減少遅延タイマー
 	float m_delaytimer = 0.0f;
 	//透過減少割合
