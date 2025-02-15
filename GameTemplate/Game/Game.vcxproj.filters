@@ -139,14 +139,22 @@
     <ClCompile Include="PlayerState_Run.cpp">
       <Filter>Player</Filter>
     </ClCompile>
-    <ClCompile Include="BossFlyPoint.cpp" />
-    <ClCompile Include="Button_UI.cpp" />
     <ClCompile Include="Player_HP_UI.cpp" />
-    <ClCompile Include="Boss_Shoot.cpp" />
     <ClCompile Include="PlayerState_Flying_Back.cpp" />
     <ClCompile Include="Butten_UI.cpp" />
-    <ClCompile Include="Boss_HP_UI.cpp" />
-    <ClCompile Include="Bullet.cpp" />
+    <ClCompile Include="Boss_HP_UI.cpp">
+      <Filter>Boss</Filter>
+    </ClCompile>
+    <ClCompile Include="Boss_Shoot.cpp">
+      <Filter>Boss</Filter>
+    </ClCompile>
+    <ClCompile Include="BossFlyPoint.cpp">
+      <Filter>Boss</Filter>
+    </ClCompile>
+    <ClCompile Include="Bullet.cpp">
+      <Filter>Boss</Filter>
+    </ClCompile>
+    <ClCompile Include="Countdown.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -272,13 +280,21 @@
     <ClInclude Include="PlayerState_Run.h">
       <Filter>Player</Filter>
     </ClInclude>
-    <ClInclude Include="BossFlyPoint.h" />
-    <ClInclude Include="Button_UI.h" />
     <ClInclude Include="Player_HP_UI.h" />
-    <ClInclude Include="Boss_Shoot.h" />
     <ClInclude Include="PlayerState_Flying_Back.h" />
     <ClInclude Include="Butten_UI.h" />
-    <ClInclude Include="Boss_HP_UI.h" />
-    <ClInclude Include="Bullet.h" />
+    <ClInclude Include="Bullet.h">
+      <Filter>Boss</Filter>
+    </ClInclude>
+    <ClInclude Include="Boss_HP_UI.h">
+      <Filter>Boss</Filter>
+    </ClInclude>
+    <ClInclude Include="Boss_Shoot.h">
+      <Filter>Boss</Filter>
+    </ClInclude>
+    <ClInclude Include="BossFlyPoint.h">
+      <Filter>Boss</Filter>
+    </ClInclude>
+    <ClInclude Include="Countdown.h" />
   </ItemGroup>
 </Project>
