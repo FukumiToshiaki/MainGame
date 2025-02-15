@@ -16,6 +16,7 @@
 #include "Player_HP_UI.h"
 #include "Butten_UI.h"
 #include "Boss_HP_UI.h"
+#include "Countdown.h"
 Game::~Game()
 {
 	DeleteGO(m_map);
@@ -26,7 +27,7 @@ Game::~Game()
 	DeleteGO(m_enemy_melee);
 	DeleteGO(m_enemy_Shield);
 	DeleteGO(m_enemy_Sky);
-	DeleteGO(m_time_Limit_UI);
+	//DeleteGO(m_time_Limit_UI);
 	DeleteGO(m_player_HP_UI);
 	DeleteGO(m_butten_UI);
 	DeleteGO(m_boss_HP_UI);
@@ -34,6 +35,7 @@ Game::~Game()
 }
 bool Game::Start()
 {
+	//m_countdown = NewGO<Countdown>(0, "countdown");
 	m_player_HP_UI = NewGO<Player_HP_UI>(0, "player_hp_ui");
 	m_boss_HP_UI = NewGO<Boss_HP_UI>(0, "boss_hp_ui");
 	m_map = NewGO<Map>(0,"map");
@@ -46,7 +48,7 @@ bool Game::Start()
 	//m_enemy_Long = NewGO<Enemy_Long>(0, "enemy_long");
 	//m_enemy_Boss = NewGO<Enemy_Boss>(0, "enemy_boss");
 	m_enemy_Boss = NewGO<BossPattern>(0, "enemy_boss");
-	m_time_Limit_UI = NewGO<Time_Limit_UI>(0, "time_limit");
+	//m_time_Limit_UI = NewGO<Time_Limit_UI>(0, "time_limit");
 	m_bossFlyPoint.Update({ 0.0f,0.0f,0.0f });
 
 	//PhysicsWorld::GetInstance()->EnableDrawDebugWireFrame();
@@ -62,9 +64,9 @@ void Game::Update()
 	if (m_player->GetHP() <= 0.0f) {
 		m_gameState = enGameOver;
 	}
-	if (m_time_Limit_UI->GetTime_Limit() < 0) {
-		m_gameState = enTimeOver;
-	}
+	//if (m_time_Limit_UI->GetTime_Limit() < 0) {
+	//	m_gameState = enTimeOver;
+	//}
 	switch (m_gameState)
 	{
 	case Game::enTimeOver:

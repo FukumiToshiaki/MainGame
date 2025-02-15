@@ -16,6 +16,7 @@ class Time_Limit_UI;
 class Player_HP_UI;
 class Boss_HP_UI;
 class Butten_UI;
+//class Countdown;
 class Game : public IGameObject
 {
 public:
@@ -62,6 +63,7 @@ private:
 	Player_HP_UI* m_player_HP_UI = nullptr;
 	Boss_HP_UI* m_boss_HP_UI = nullptr;
 	Butten_UI* m_butten_UI = nullptr;
+	//Countdown* m_countdown = nullptr;
 	//BossPattern* m_bossPattren = nullptr;
 	Vector3						m_forward = Vector3::AxisZ;
 	std::vector<SPointLight*>	m_pointLightList;			//ポイントライト。
