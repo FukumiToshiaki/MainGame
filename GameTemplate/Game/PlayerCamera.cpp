@@ -24,8 +24,7 @@ bool PlayerCamera::Start()
 	//プレイヤーのインスタンスを探す。
 	m_player = FindGO<Player>("player");
 	//カメラのニアクリップとファークリップを設定。
-	/*g_camera3D->SetNear(1.0f);
-	g_camera3D->SetFar(30000.0f);*/
+	g_camera3D->SetFar(30000.0f);
 
 	return true;
 }
