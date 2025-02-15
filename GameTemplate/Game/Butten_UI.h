@@ -1,6 +1,5 @@
 #pragma once
 #include <SpriteRender.h>
-const float PI = 3.14159f;
 
 class Game;
 class Butten_UI :public IGameObject
@@ -51,7 +50,7 @@ private:
 	/// <summary>
 	/// Yボタンの表示スプライト
 	/// </summary>
-	SpriteRender m_buttenY_UI;
+	SpriteRender m_buttenY_UI;;
 	/// <summary>
 	/// Xボタンの表示スプライト
 	/// </summary>

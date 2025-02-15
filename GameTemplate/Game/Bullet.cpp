@@ -85,7 +85,7 @@ void Bullet::Update()
 
 void Bullet::Move()
 {
-	m_pos += m_shootPos * 60.0f;
+	m_pos += m_shootPos * 100.0f;
 	//if (m_shootCollision != nullptr) {
 	//}
 	if (m_boss_shoot != nullptr) {
