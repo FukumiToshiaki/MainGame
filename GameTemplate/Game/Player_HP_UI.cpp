@@ -40,8 +40,8 @@ void Player_HP_UI::Update()
 	Adjustment();
 	//透過減算計算処理
 	AdjustmentTransparent();
-	//1Pの表示
-	Model1P();
+	////1Pの表示
+	//Model1P();
 	//描画処理
 	m_hpUI_A.Update();
 	m_hpUI_B.Update();
@@ -143,16 +143,16 @@ void Player_HP_UI::AdjustmentTransparent()
 	DecreaseTransitionIN2;
 }
 
-void Player_HP_UI::Model1P()
-{
-	Vector3 position = m_player->Get_PlayerPos();
-	//オブジェクトの上の方に画像を表示したいので。
-	//y座標を少し大きくする。
-	//ワールド座標からスクリーン座標を計算。
-	//計算結果がm_spritePositionに代入される。
-	g_camera3D->CalcScreenPositionFromWorldPosition(m_spritePos, position);
-	//m_spriteRender.SetPosition(Vector3(m_player->Get_PlayerPos().x, m_player->Get_PlayerPos().y, m_player->Get_PlayerPos().z));
-}
+//void Player_HP_UI::Model1P()
+//{
+//	Vector3 position = m_player->Get_PlayerPos();
+//	//オブジェクトの上の方に画像を表示したいので。
+//	//y座標を少し大きくする。
+//	//ワールド座標からスクリーン座標を計算。
+//	//計算結果がm_spritePositionに代入される。
+//	g_camera3D->CalcScreenPositionFromWorldPosition(m_spritePos, position);
+//	//m_spriteRender.SetPosition(Vector3(m_player->Get_PlayerPos().x, m_player->Get_PlayerPos().y, m_player->Get_PlayerPos().z));
+//}
 
 void Player_HP_UI::Render(RenderContext& rc)
 {
@@ -161,6 +161,4 @@ void Player_HP_UI::Render(RenderContext& rc)
 	m_hpUI_A.Draw(rc);
 	//バーの描画処理を後に
 	m_hpUI_B.Draw(rc);
-	//1Pの画像貼り付け
-	//m_spriteRender.Draw(rc);
 }

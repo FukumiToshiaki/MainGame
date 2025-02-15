@@ -42,8 +42,8 @@ public:
 	void AdjustmentTransparent();
 	//モデル
 	void Render(RenderContext& renderContext);
-	//キャラの表示
-	void Model1P();
+	////キャラの表示
+	//void Model1P();
 	//HP減少処理
 	void DecreaseHP(float decrease)
 	{
@@ -73,7 +73,7 @@ private:
 	Player* m_player = nullptr;
 	/////////////////////////////////////////変数
 	//最大HP
-	float m_fullhp = 50;
+	float m_fullhp = 120.0f;
 	//現在HP　
 	float m_nowhp = m_fullhp;
 	//過去HP
