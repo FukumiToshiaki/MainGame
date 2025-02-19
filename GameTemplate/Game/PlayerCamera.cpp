@@ -143,7 +143,7 @@ void PlayerCamera::LockOnCamera()
 	Vector3 target = m_player->GetTargetPosition();
 	Vector3 toPos = target - m_player->Get_PlayerPos();
 	float r = toPos.Length() + 200.0f;
-	toPos.y = 0.0f;
+	//toPos.y = 0.0f;
 	toPos.Normalize();
 	Vector3 position = target - toPos * r;
 	position.y = m_player->Get_PlayerPos().y + 200.0f;
