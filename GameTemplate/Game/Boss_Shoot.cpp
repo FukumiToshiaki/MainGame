@@ -9,8 +9,6 @@ Boss_Shoot::~Boss_Shoot()
 }
 bool Boss_Shoot::Start()
 {
-	//EffectEngine::GetInstance()->ResistEffect(2, u"Assets/Effect/Boss_Shoot.efk");
-
 	return true;
 }
 void Boss_Shoot::Init(Enemy_Boss* boss)
