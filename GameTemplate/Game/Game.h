@@ -43,7 +43,7 @@ public:
 private:
 	EnGameState m_gameState = enNormal;	//ゲームのステート
 	BossFlyPoint m_bossFlyPoint;
-
+	float m_gameTime = 3.0f;
 	Model m_model;			// モデル
 	Vector3 m_pos=Vector3::Zero;		// 座標
 	Quaternion m_rotation= Quaternion::Identity;	// 回転

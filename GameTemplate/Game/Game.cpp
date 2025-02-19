@@ -29,7 +29,7 @@ Game::~Game()
 	DeleteGO(m_enemy_Sky);
 	//DeleteGO(m_time_Limit_UI);
 	DeleteGO(m_player_HP_UI);
-	DeleteGO(m_butten_UI);
+	//DeleteGO(m_butten_UI);
 	DeleteGO(m_boss_HP_UI);
 
 }
@@ -39,7 +39,7 @@ bool Game::Start()
 	m_player_HP_UI = NewGO<Player_HP_UI>(0, "player_hp_ui");
 	m_boss_HP_UI = NewGO<Boss_HP_UI>(0, "boss_hp_ui");
 	m_map = NewGO<Map>(0,"map");
-	m_butten_UI = NewGO<Butten_UI>(0,"butten_ui");
+	//m_butten_UI = NewGO<Butten_UI>(0,"butten_ui");
 	m_playerCamera = NewGO<PlayerCamera>(0);
 	m_player = NewGO<Player>(0, "player");
 	//m_enemy_Shield = NewGO<Enemy_Shield>(0, "enemy_shield");
@@ -84,7 +84,8 @@ void Game::Update()
 void Game::GameOverState()
 {
 	if (m_player->GetisOver()) {
-		if (g_pad[0]->IsTrigger(enButtonA)) {
+		m_gameTime -= g_gameTime->GetFrameDeltaTime();
+		if (m_gameTime<=0) {
 			GameOver* gameOver = NewGO<GameOver>(0, "gameover");
 			DeleteGO(this);
 		}
@@ -95,7 +96,8 @@ void Game::GameClearState()
 {
 	m_enemy_Boss->ChangeState(Enemy_Boss::enState_Die);
 	if (m_enemy_Boss->GetisClear()) {
-		if (g_pad[0]->IsTrigger(enButtonA)) {
+		m_gameTime -= g_gameTime->GetFrameDeltaTime();
+		if (m_gameTime <= 0) {
 			GameClear* gameClear = NewGO<GameClear>(0, "gameclear");
 			DeleteGO(this);
 		}
