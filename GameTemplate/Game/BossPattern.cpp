@@ -14,12 +14,13 @@
 //#define MELEE_ATTACK 0
 //#define TAIL_ATTACK 13
 //#define FLY 20
-#define MELEE_SHOOT_ATTACK 17.0f
-#define MELEE_POINT 25.0f
-#define ATTACK_COOLTIME 5.0f
-#define LASTATTACK_COOLTIME 4.0f
+//#define MELEE_SHOOT_ATTACK 17.0f
+//#define MELEE_POINT 25.0f
+//#define ATTACK_COOLTIME 5.0f
+//#define LASTATTACK_COOLTIME 4.0f
 #define MELEE_DISTANCE 1500.0f
-#define CHASE_SPEED 480.0f
+#define CHASE_SPEED 700.0f
+#define FLY_SPEED 200.0f
 #define PLAYERLASTHP 20.0f
 #define BOSSLASTHP 20.0f
 #define LASTCOOLTIME 2
@@ -48,6 +49,7 @@ void BossPattern::Update()
 	//基底クラスのUpdateを呼ぶ
 	Enemy_Boss::Update();
 
+	//return;
 	//フラグが立っていないなら計算する必要がないので、早期リターン
 	if (!m_isUnderPattern) {
 		return;
@@ -335,6 +337,7 @@ void BossPattern::DefenseModeLast()
 
 void BossPattern::Scream(int screamcount,float screamdistance)
 {	
+	//ボスと原点の距離を求める
 	Vector3 diff;
 	diff = m_screamPos- m_pos;
 	Vector3 scream_Arrangement;
@@ -363,7 +366,7 @@ void BossPattern::Scream(int screamcount,float screamdistance)
 				ChangeState(Enemy_Boss::enState_Fly);
 			}
 			if (m_isUnderFly) {
-				m_moveSpeed = diff * CHASE_SPEED;
+				m_moveSpeed = diff * FLY_SPEED;
 			}
 		}
 	}
@@ -383,7 +386,7 @@ void BossPattern::Scream(int screamcount,float screamdistance)
 				ChangeState(Enemy_Boss::enState_Fly);
 			}
 			if (m_isUnderFly) {
-				m_moveSpeed = diff * CHASE_SPEED;
+				m_moveSpeed = diff * FLY_SPEED;
 			}
 		}
 	}
@@ -403,7 +406,7 @@ void BossPattern::Scream(int screamcount,float screamdistance)
 				ChangeState(Enemy_Boss::enState_Fly);
 			}
 			if (m_isUnderFly) {
-				m_moveSpeed = diff * CHASE_SPEED;
+				m_moveSpeed = diff * FLY_SPEED;
 			}
 		}
 	}
@@ -447,8 +450,8 @@ void BossPattern::SuperDefenseMode()
 		if (m_attack_Rand >= 11) {
 			ChangeState(Enemy_Boss::enState_Takeoff, Enemy_Boss::enState_Attack_FlyShoot);
 		}
-		//8以上なら滑空突進
-		else if (m_attack_Rand >= 8) {
+		//7以上なら滑空突進
+		else if (m_attack_Rand >= 7) {
 			ChangeState(Enemy_Boss::enState_Takeoff, Enemy_Boss::enState_Attack_Fly);
 		}
 		//2以上ならブレス
@@ -478,8 +481,8 @@ void BossPattern::DefenseMode()
 			m_pattern--;
 			ChangeState(Enemy_Boss::enState_Takeoff, Enemy_Boss::enState_Fly);
 		}
-		//6以上ならブレス
-		else if (m_attack_Rand >= 6) {
+		//7以上ならブレス
+		else if (m_attack_Rand >= 7) {
 			ChangeState(Enemy_Boss::enState_Attack_Shoot);
 		}
 		//5以上なら尻尾攻撃
@@ -497,8 +500,8 @@ void BossPattern::DefenseMode()
 		if (m_attack_Rand >= 12) {
 			ChangeState(Enemy_Boss::enState_Takeoff, Enemy_Boss::enState_Attack_FlyShoot);
 		}
-		//10以上なら滑空突進
-		else if (m_attack_Rand >= 10) {
+		//9以上なら滑空突進
+		else if (m_attack_Rand >= 9) {
 			ChangeState(Enemy_Boss::enState_Takeoff, Enemy_Boss::enState_Attack_Fly);
 		}
 		//4以上ならブレス
@@ -570,20 +573,20 @@ void BossPattern::AttackMode()
 	if (m_isBifurcation) {
 		//12以上なら距離をとる
 		//パターン段階を1下げる
-		if (m_attack_Rand >= 11) {
+		if (m_attack_Rand >= 12) {
 			m_pattern--;
 			ChangeState(Enemy_Boss::enState_Takeoff, Enemy_Boss::enState_Fly);
 		}
 		//9以上ならガード
-		else if (m_attack_Rand >= 8) {
+		else if (m_attack_Rand >= 9) {
 			ChangeState(Enemy_Boss::enState_Defence);
 		}
 		//6以上なら噛みつき
-		else if (m_attack_Rand >= 5) {
+		else if (m_attack_Rand >= 6) {
 			ChangeState(Enemy_Boss::enState_Attack_Biting);
 		}
 		//4以上ならブレス
-		else if (m_attack_Rand >= 3) {
+		else if (m_attack_Rand >= 4) {
 			ChangeState(Enemy_Boss::enState_Attack_Shoot);
 		}
 		//4未満なら尻尾攻撃
@@ -601,12 +604,12 @@ void BossPattern::AttackMode()
 		else if (m_attack_Rand >= 9) {
 			ChangeState(Enemy_Boss::enState_Takeoff, Enemy_Boss::enState_Attack_Fly);
 		}
-		//5以上ならブレス
-		else if (m_attack_Rand >= 5) {
+		//4以上ならブレス
+		else if (m_attack_Rand >= 4) {
 			ChangeState(Enemy_Boss::enState_Attack_Shoot);
 
 		}
-		//5未満なら近づく
+		//4未満なら近づく
 		//パターン段階を1上げる
 		else {
 			m_pattern++;
@@ -652,11 +655,11 @@ void BossPattern::SuperAttackMode()
 		else if (m_attack_Rand >= 7) {
 			ChangeState(Enemy_Boss::enState_Takeoff, Enemy_Boss::enState_Attack_Fly);
 		}
-		//5以上ならブレス
-		else if (m_attack_Rand >= 5) {
+		//4以上ならブレス
+		else if (m_attack_Rand >= 4) {
 			ChangeState(Enemy_Boss::enState_Attack_Shoot);
 		}
-		//5未満なら近づく
+		//4未満なら近づく
 		else {
 			ChangeState(Enemy_Boss::enState_Move);
 		}
