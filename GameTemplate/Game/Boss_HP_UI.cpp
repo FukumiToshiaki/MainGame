@@ -5,9 +5,9 @@
 
 namespace {
 	//HPの位置
-	const Vector3 n_position_HP{ 120.0f,410.0f,0.0f };
+	const Vector3 n_position_HP{ 110.0f,410.0f,0.0f };
 	//HPの位置
-	const Vector3 n_position_Damage{ 120.0f,410.0f,0.0f };
+	const Vector3 n_position_Damage{ 110.0f,410.0f,0.0f };
 	//BとCの基点
 	const Vector2 n_pivot_HP_Damage{ 0,0.5 };
 	//スケール
@@ -27,14 +27,10 @@ bool Boss_HP_UI::Start()
 	//位置設定
 	m_hpUI_A.SetPosition(n_position_HP);
 	//位置設定
-	m_hpUI_B.SetPosition(n_position_HP);
+	m_hpUI_B.SetPosition(n_position_Damage);
 	//基点設定
 	m_hpUI_A.SetPivot(n_pivot_HP_Damage);
 	m_hpUI_B.SetPivot(n_pivot_HP_Damage);
-	
-	m_hpUI_A.SetRotation(m_quaternion);
-	m_hpUI_B.SetRotation(m_quaternion);
-
 	//スケール
 	m_hpUI_A.SetScale(n_scale);
 	m_hpUI_B.SetScale(n_scale);
@@ -48,8 +44,6 @@ void Boss_HP_UI::Update()
 	Adjustment();
 	//透過減算計算処理
 	AdjustmentTransparent();
-	//1Pの表示
-	Model1P();
 	//描画処理
 	m_hpUI_A.Update();
 	m_hpUI_B.Update();
@@ -150,17 +144,6 @@ void Boss_HP_UI::AdjustmentTransparent()
 	DecreaseTransitionIN2;
 }
 
-void Boss_HP_UI::Model1P()
-{
-	Vector3 position = m_enemy_boss->GetPos();
-	//オブジェクトの上の方に画像を表示したいので。
-	//y座標を少し大きくする。
-	//ワールド座標からスクリーン座標を計算。
-	//計算結果がm_spritePositionに代入される。
-	g_camera3D->CalcScreenPositionFromWorldPosition(m_spritePos, position);
-	//m_spriteRender.SetPosition(Vector3(m_player->Get_PlayerPos().x, m_player->Get_PlayerPos().y, m_player->Get_PlayerPos().z));
-}
-
 void Boss_HP_UI::Render(RenderContext& rc)
 {
 	m_game = FindGO<Game>("game");
@@ -168,6 +151,4 @@ void Boss_HP_UI::Render(RenderContext& rc)
 	m_hpUI_A.Draw(rc);
 	//バーの描画処理を後に
 	m_hpUI_B.Draw(rc);
-	//1Pの画像貼り付け
-	//m_spriteRender.Draw(rc);
 }
