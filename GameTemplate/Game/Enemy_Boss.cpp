@@ -32,7 +32,7 @@
 #define COLLISION 600.0f
 #define GUARDBREAK_DAMAGE 4.0f
 #define BITATTACKDAMAGE 2.5f
-#define LONGATTACKDAMAGE 1.5f
+#define LONGATTACKDAMAGE 3.5f
 #define WALKATTACKDAMAGE 3.0f
 #define HITCOOLTIME 1.5f
 #define FINAL_PHASE 50.0f
@@ -809,7 +809,7 @@ void Enemy_Boss::Update()
 	m_charaCon.SetPosition({ m_charaCon.GetPosition().x, boneYPos-350.0f, m_charaCon.GetPosition().z });
 	m_moveSpeed.y = 0.0f;
 	m_pos = m_charaCon.Execute(m_moveSpeed, g_gameTime->GetFrameDeltaTime());
-	//m_pos.y = 0.0f;
+	m_pos.y = 0.0f;
 	//m_charaCon.SetPosition(m_pos);
 	//ƒRƒŠƒWƒ‡ƒ“‚Ì“–‚½‚è”»’è
 	//m_collision->SetPosition(m_collisionPos);
