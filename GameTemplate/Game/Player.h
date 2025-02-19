@@ -220,7 +220,7 @@ private:
 	//エフェクトカウンター
 	int m_effectCount = 0;
 	//HP
-	float m_testHP = 120.0f;
+	float m_testHP = 70.0f;
 	//ヒット時のクールタイム
 	float m_hitCoolTime = 1.5f;
 	//遠距離攻撃のクールタイム

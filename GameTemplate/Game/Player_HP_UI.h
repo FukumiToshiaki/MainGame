@@ -73,7 +73,7 @@ private:
 	Player* m_player = nullptr;
 	/////////////////////////////////////////•Ï”
 	//Å‘åHP
-	float m_fullhp = 120.0f;
+	float m_fullhp = 70.0f;
 	//Œ»İHP@
 	float m_nowhp = m_fullhp;
 	//‰ß‹HP
