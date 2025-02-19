@@ -486,7 +486,7 @@ void Player::Defense()
 		m_isUnderDefense = false;
 	}
 	if (m_isUnderDefense) {
-		DefenseCollision(500.0f, 2.0f, 1300.0f, 4.0f, 1200.0f, 6.0f, 800.0f, 8.0f, 0.2, 500.0f, 5.0f);
+		DefenseCollision(500.0f, 2.0f, 1500.0f, 4.0f, 1200.0f, 6.0f, 800.0f, 8.0f, 0.2, 500.0f, 5.0f);
 	}
 	//ノックバックに使うVector
 	m_KnockBack = m_pos - m_enemy_Boss->GetPos();
