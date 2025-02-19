@@ -30,7 +30,7 @@
 #define SCALE 4.5f
 #define BOSS_FORWARD 600.0f
 #define COLLISION 600.0f
-#define GUARDBREAK_DAMAGE 4.5f
+#define GUARDBREAK_DAMAGE 4.0f
 #define BITATTACKDAMAGE 2.5f
 #define LONGATTACKDAMAGE 1.5f
 #define WALKATTACKDAMAGE 3.0f
@@ -122,6 +122,9 @@ bool Enemy_Boss::Start()
 	m_bossButtle->Play(true);
 	//ボスのHPが30%以下の時BGMの読み込み
 	g_soundEngine->ResistWaveFileBank(2, "Assets/sound/Boss_LastBattle.wav");
+	m_bossButtle = NewGO<SoundSource>(2);
+	m_bossButtle->Init(2);
+	m_bossButtle->Play(true);
 
 	//尻尾攻撃のエフェクト
 	EffectEngine::GetInstance()->ResistEffect(3, u"Assets/Effect/Boss_Tail.efk");
@@ -412,16 +415,16 @@ void Enemy_Boss::TailAttack()
 		//m_tailEffect.AddRotationY(1.0f);
 		//m_tailEffect.Apply(m_tailEffectPos);
 		//エフェクト
-		m_boss_Tail = NewGO<EffectEmitter>(3, "boss_tail");
-		m_boss_Tail->Init(3);
-		m_boss_Tail->SetScale(Vector3::One * 10.0f);
-		m_boss_Tail->SetPosition(m_forward *BOSS_FORWARD);
-		m_boss_Tail->Play();
-		//m_boss_Tail->SetRotation(m_tailEffect);
-		// エフェクト死亡時のイベント処理
-		m_onDeadEventFunction = [&] { m_boss_Tail = nullptr; };
-		// イベントを登録
-		m_boss_Tail->AddDeadEventFunction(m_onDeadEventFunction);
+		//m_boss_Tail = NewGO<EffectEmitter>(3, "boss_tail");
+		//m_boss_Tail->Init(3);
+		//m_boss_Tail->SetScale(Vector3::One * 10.0f);
+		//m_boss_Tail->SetPosition(m_forward *BOSS_FORWARD);
+		//m_boss_Tail->Play();
+		////m_boss_Tail->SetRotation(m_tailEffect);
+		//// エフェクト死亡時のイベント処理
+		//m_onDeadEventFunction = [&] { m_boss_Tail = nullptr; };
+		//// イベントを登録
+		//m_boss_Tail->AddDeadEventFunction(m_onDeadEventFunction);
 
 	}
 
@@ -503,6 +506,8 @@ void Enemy_Boss::DefenceCollision(float break_magnification, float collision_def
 			//ダメージ
 			ChangeState(enState_Damage);
 			m_testHP -= GUARDBREAK_DAMAGE * break_magnification;
+			//HP_UIを減らす表示
+			m_boss_HP_UI->DecreaseHP(GUARDBREAK_DAMAGE * break_magnification);
 			m_hitCoolTime = HITCOOLTIME;
 			return;
 		}
@@ -704,8 +709,8 @@ void Enemy_Boss::LandingDamage(float collision_landing)
 }
 void Enemy_Boss::BGM()
 {
-	if (m_testHP <= 19) {
-		m_bossButtle->Stop();
+	if (m_testHP >= 0) {
+		//m_bossButtle->Stop();
 		//ボスのHPが30%以下の時BGMの再生
 		m_bossLastButtle = NewGO<SoundSource>(2);
 		if (m_bossLastButtle->IsPlaying()) {
@@ -804,7 +809,7 @@ void Enemy_Boss::Update()
 	m_charaCon.SetPosition({ m_charaCon.GetPosition().x, boneYPos-350.0f, m_charaCon.GetPosition().z });
 	m_moveSpeed.y = 0.0f;
 	m_pos = m_charaCon.Execute(m_moveSpeed, g_gameTime->GetFrameDeltaTime());
-	m_pos.y = 0.0f;
+	//m_pos.y = 0.0f;
 	//m_charaCon.SetPosition(m_pos);
 	//コリジョンの当たり判定
 	//m_collision->SetPosition(m_collisionPos);
