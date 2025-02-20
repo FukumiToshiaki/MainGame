@@ -46,5 +46,6 @@ private:
 	Bullet* m_bullet = nullptr;
 	Vector3 m_pos = Vector3::Zero;
 	EffectEmitter* m_boss_shoot = nullptr;
+	//SoundSource* m_shoot = nullptr;		//No7
 };
 

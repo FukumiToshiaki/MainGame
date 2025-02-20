@@ -256,9 +256,14 @@ protected:
 	AnimationClip m_animationClipArray[enAnimClip_Num];	// アニメーションクリップ
 	CharacterController m_charaCon;	//キャラクターコントローラー
 	BossFlyPoint::FlyPoint* m_flyPoint = nullptr;
-	SoundSource* m_bossLastButtle = nullptr;
-	SoundSource* m_bossButtle = nullptr;
-	
+	SoundSource* m_bossLastButtle = nullptr;//No2
+	//SoundSource* m_bossButtle = nullptr;
+	SoundSource* m_fly = nullptr;			//No3
+	SoundSource* m_flyAttack = nullptr;		//No4
+	SoundSource* m_landing = nullptr;		//No5
+	SoundSource* m_scream = nullptr;		//No6
+	SoundSource* m_tail = nullptr;			//No8
+
 	EffectEmitter* m_boss_Tail = nullptr;
 	std::function<void()> m_onDeadEventFunction;
 

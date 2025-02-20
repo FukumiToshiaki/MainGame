@@ -3,12 +3,17 @@
 #include "Player.h"
 #include "Enemy_Boss.h"
 #include "Bullet.h"
+#include <SoundManager.h>
+
 Boss_Shoot::~Boss_Shoot()
 {
 	DeleteGO(this);
 }
 bool Boss_Shoot::Start()
 {
+	////ボスのブレスの読み込み
+	//g_soundEngine->ResistWaveFileBank(7, "Assets/sound/Shoot.wav");
+	//m_shoot = NewGO<SoundSource>(7);
 	return true;
 }
 void Boss_Shoot::Init(Enemy_Boss* boss)
@@ -45,7 +50,11 @@ void Boss_Shoot::Shoot()
 	}
 	if (!m_isShoot) {
 		m_isShoot = true;
-
+		//音再生
+		g_soundManager->InitAndPlaySoundSource(
+			enSoundShoot,
+			g_soundManager->GetSEVolume()
+		);
 		m_bullet = NewGO<Bullet>(0, "bullet");
 	}
 }
@@ -56,7 +65,11 @@ void Boss_Shoot::FlyShoot()
 	}
 	if (!m_isShoot) {
 		m_isShoot = true;
-
+		//音再生
+		g_soundManager->InitAndPlaySoundSource(
+			enSoundShoot,
+			g_soundManager->GetSEVolume()
+		);
 		m_bullet = NewGO<Bullet>(0, "bullet");
 	}
 
