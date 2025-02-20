@@ -159,6 +159,7 @@
     <ClCompile Include="PlayerState_Flying_Back.cpp">
       <Filter>Player</Filter>
     </ClCompile>
+    <ClCompile Include="SoundFile.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -304,5 +305,6 @@
     <ClInclude Include="PlayerState_Flying_Back.h">
       <Filter>Player</Filter>
     </ClInclude>
+    <ClInclude Include="SoundFile.h" />
   </ItemGroup>
 </Project>
