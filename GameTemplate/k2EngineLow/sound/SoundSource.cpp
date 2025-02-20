@@ -4,6 +4,7 @@
 #include "k2EngineLowPreCompile.h"
 #include "SoundEngine.h"
 #include "SoundSource.h"
+#include "SoundManager.h"
 
 namespace nsK2EngineLow {
 
@@ -14,6 +15,8 @@ namespace nsK2EngineLow {
 	}
 	SoundSource::~SoundSource()
 	{
+		//ƒŠƒXƒg‚©‚çíœ
+		g_soundManager->EraseSoundSourceList(this);
 		Release();
 	}
 	void SoundSource::InitCommon()
@@ -32,7 +35,7 @@ namespace nsK2EngineLow {
 		m_dspSettings.ListenerVelocityComponent = 0.0f;
 	}
 
-	void SoundSource::Init(const int number, bool is3DSound)
+	void SoundSource::Init(const int number, bool is3DSound, bool bgmFlag)
 	{
 		m_isAvailable = false;
 		m_waveFile = g_soundEngine->GetWaveFileBank().FindWaveFile(number);
@@ -50,6 +53,7 @@ namespace nsK2EngineLow {
 
 		m_is3DSound = is3DSound;
 		m_isAvailable = true;
+		m_bgmFlag = bgmFlag;
 	}
 
 	void SoundSource::Play(bool isLoop)

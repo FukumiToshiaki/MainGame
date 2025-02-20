@@ -236,6 +236,7 @@
     <ClCompile Include="CollisionObject.cpp" />
     <ClCompile Include="PreSpriteRender.cpp" />
     <ClCompile Include="Bloom.cpp" />
+    <ClCompile Include="SoundManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="k2EngineLowPreCompile.h" />
@@ -522,6 +523,7 @@
     <ClInclude Include="CollisionObject.h" />
     <ClInclude Include="PreSpriteRender.h" />
     <ClInclude Include="Bloom.h" />
+    <ClInclude Include="SoundManager.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="graphics">

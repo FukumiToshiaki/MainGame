@@ -1,6 +1,7 @@
 #include "k2EngineLowPreCompile.h"
 #include "k2EngineLow.h"
 #include "graphics/Texture.h"
+#include <SoundManager.h>
 
 namespace nsK2EngineLow {
 	//追加コード
@@ -26,6 +27,7 @@ namespace nsK2EngineLow {
 		PhysicsWorld::DeleteInstance();
 		EffectEngine::DeleteInstance();
 
+		delete g_soundManager;
 		delete g_soundEngine;
 	}
 	void K2EngineLow::Init(HWND hwnd, UINT frameBufferWidth, UINT frameBufferHeight)
@@ -48,6 +50,9 @@ namespace nsK2EngineLow {
 			//エフェクトエンジンの初期化。
 			EffectEngine::CreateInstance();
 		}
+		//サウンドマネージャーの作成
+		g_soundManager = new SoundManager();
+
 #ifdef K2_DEBUG
 		if (m_graphicsEngine) {
 			m_fpsFont = std::make_unique<Font>();
