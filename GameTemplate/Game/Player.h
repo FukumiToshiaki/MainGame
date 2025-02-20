@@ -253,6 +253,8 @@ private:
 	bool m_isFlying_Back_Tail = false;		//尻尾攻撃の攻撃ヒット時true
 	bool m_isFlying_Back_FlyAttack = false;		//滑空突進の攻撃ヒット時true
 	bool m_isFlying_Back_Landing = false;
+	bool m_isSound = false;					//効果音
+
 	Model m_model;			// モデル
 	Animation m_animation;	// アニメーション
 	AnimationClip m_animationClipArray[enAnimClip_Num];	// アニメーションクリップ
@@ -263,4 +265,11 @@ private:
 	CharacterController m_charaCon;	//キャラクターコントローラー
 	PlayerStatus *m_playerStatus = nullptr;
 	EffectEmitter* effectEmitter = nullptr;
+	SoundSource* m_bitAttack = nullptr;			//No9
+	SoundSource* m_defense = nullptr;			//No10
+	SoundSource* m_guardBreak = nullptr;		//No11
+	SoundSource* m_run = nullptr;				//No12
+	SoundSource* m_walk = nullptr;				//No13
+	SoundSource* m_walkAttack = nullptr;		//No14
+
 };

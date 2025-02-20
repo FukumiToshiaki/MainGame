@@ -22,6 +22,7 @@
 #include "PlayerState_Flying_Back.h"
 #include "Player_HP_UI.h"
 #include "Bullet.h"
+#include <SoundManager.h>
 
 #define START_POS_X 0.0f
 #define START_POS_Y 0.0f
@@ -115,6 +116,24 @@ bool Player::Start()
 	m_collision->CreateSphere(m_pos, Quaternion::Identity, 100.0f);
 	m_collision->SetName("player_collsion");
 	m_collision->SetIsEnableAutoDelete(false);
+	////近接攻撃
+	////g_soundEngine->ResistWaveFileBank(9, "Assets/sound/BitAttack.wav");
+	//m_bitAttack = NewGO<SoundSource>(9);
+	//////ガードのノックバック
+	////g_soundEngine->ResistWaveFileBank(10, "Assets/sound/Defense.wav");
+	//m_defense = NewGO<SoundSource>(10);
+	//////ガードブレイク
+	////g_soundEngine->ResistWaveFileBank(11, "Assets/sound/GuardBreak.wav");
+	//m_guardBreak = NewGO<SoundSource>(11);
+	//////走る
+	////g_soundEngine->ResistWaveFileBank(12, "Assets/sound/Run.wav");
+	//m_run = NewGO<SoundSource>(12);
+	//////歩く
+	////g_soundEngine->ResistWaveFileBank(13, "Assets/sound/Walk.wav");
+	//m_walk = NewGO<SoundSource>(13);
+	//////ダッシュ攻撃
+	////g_soundEngine->ResistWaveFileBank(14, "Assets/sound/WalkAttack.wav");
+	//m_walkAttack = NewGO<SoundSource>(14);
 
 	////手首のボーンを受け取る
 	//m_TestBoneId = m_modelRender.FindBoneID(L"mixamorig:RightHand");
@@ -356,7 +375,7 @@ void Player::Move(float walk_speed, float run_speed, float walkattack_speed)
 		return;
 	}
 	//攻撃中ならreturn
-	if (m_state == enState_Attack_Biting || m_state == enState_GuradBreak ||m_state == enState_LongAttack) {
+	if (m_state == enState_Attack_Biting || m_state == enState_GuradBreak || m_state == enState_LongAttack) {
 		m_isNowAttack = true;
 		return;
 	}
@@ -373,7 +392,7 @@ void Player::Move(float walk_speed, float run_speed, float walkattack_speed)
 	m_moveSpeed.x = 0.0f;
 	m_moveSpeed.z = 0.0f;
 	m_moveSpeed.y = 0.0f;
-	
+
 	//左スティックの入力量を取得。
 	m_stickL.x = g_pad[0]->GetLStickXF();
 	m_stickL.z = g_pad[0]->GetLStickYF();
@@ -391,22 +410,39 @@ void Player::Move(float walk_speed, float run_speed, float walkattack_speed)
 	m_pos += m_moveSpeed * g_gameTime->GetFrameDeltaTime();
 	m_modelRender.SetPosition(m_pos);
 	//Xボタンを押されながら移動したら走る
-	if (g_pad[0]->IsPress(enButtonX)&& m_stickL.x != 0.0f || g_pad[0]->IsPress(enButtonX) && m_stickL.z != 0.0f) {
+	if (g_pad[0]->IsPress(enButtonX) && m_stickL.x != 0.0f || g_pad[0]->IsPress(enButtonX) && m_stickL.z != 0.0f) {
 		right *= m_stickL.x * run_speed;
 		forward *= m_stickL.z * run_speed;
 		ChangeState(Player::enState_Run);
+		//音再生
+		g_soundManager->InitAndPlaySoundSource(
+			enSoundRun,
+			g_soundManager->GetSEVolume()
+		);
 	}
 	//何も押されず移動なら歩く
 	else if (m_stickL.x != 0.0f || m_stickL.z != 0.0f) {
 		right *= m_stickL.x * walk_speed;
 		forward *= m_stickL.z * walk_speed;
 		ChangeState(Player::enState_Walk);
+		//音再生
+		g_soundManager->InitAndPlaySoundSource(
+			enSoundWalk,
+			g_soundManager->GetSEVolume()
+		);
+
 	}
 	else {
 		//移動しないならIdle状態
 		right *= m_stickL.x * 0.0f;;
 		forward *= m_stickL.z * 0.0f;
 		ChangeState(Player::enState_Idle);
+		//if (m_walk != nullptr) {
+		//	m_walk->Stop();
+		//}
+		//else if (m_run != nullptr) {
+		//	m_run->Stop();
+		//}
 	}
 	////移動速度にスティックの入力量を加算する。
 	m_moveSpeed += right + forward;
@@ -448,13 +484,20 @@ void Player::Attack_Biting()
 	// ダッシュアタックでなければ
 	if (g_pad[0]->IsTrigger(enButtonRB2) && m_state != enState_WalkAttack && !m_isNowAttack) {
 		ChangeState(Player::enState_Attack_Biting);
+		m_isSound = true;
 	}
 	//攻撃判定中なら
 	if (m_isUnderAttack) {
 		//攻撃用のコリジョンを作成する
 		BitingAttackCollision();
+		//音再生
+		g_soundManager->InitAndPlaySoundSource(
+			enSoundBitAttack,
+			g_soundManager->GetSEVolume()
+		);
+
 	}
-		if (m_state == enState_Attack_Biting) {
+	if (m_state == enState_Attack_Biting) {
 			m_moveSpeed.x = 0.0f;
 			m_moveSpeed.z = 0.0f;
 		}
@@ -471,6 +514,11 @@ void Player::WalkAttack()
 	}
 	if (m_isUnderWalkAttack) {
 		WalkAttackCollision();
+		//音再生
+		g_soundManager->InitAndPlaySoundSource(
+			enSoundWalkAttack,
+			g_soundManager->GetSEVolume()
+		);
 	}
 }
 void Player::Defense()
@@ -514,6 +562,11 @@ void Player::DefenseCollision(float melee_knockback, float melee_magnification, 
 	}
 	//攻撃を受けたらタイマースタート
 	if (m_isKnockBack) {
+		//音再生
+		g_soundManager->InitAndPlaySoundSource(
+			enSoundDefense,
+			g_soundManager->GetSEVolume()
+		);
 		m_knockBackTime -= g_gameTime->GetFrameDeltaTime();
 		return;
 	}
@@ -621,6 +674,11 @@ void Player::GuardBreak()
 	//ボタンが押されたときに攻撃中ではないなら攻撃
 	if (g_pad[0]->IsTrigger(enButtonY) && !m_isNowAttack) {
 		ChangeState(Player::enState_GuradBreak);
+		//音再生
+		g_soundManager->InitAndPlaySoundSource(
+			enSoundGuardBreak,
+			g_soundManager->GetSEVolume()
+		);
 	}
 	if (m_state == enState_GuradBreak) {
 		//その場に止まらせる
@@ -648,7 +706,7 @@ void Player::Hit(float screamhitcooltime,float tail_knockback,float flyattack_kn
 
 
 	//ヒット中ならreturn
-	if (m_state == enState_Damage||m_isUnderDefense) {
+	if (m_state == enState_Damage || m_isUnderDefense || m_state == enState_Arching) {
 		return;
 	}
 	//ヒットクールタイムが終わってないならreturn
