@@ -280,11 +280,11 @@ void BossPattern::AttackModeLast()
 		else if (m_attack_Rand >= 9) {
 			ChangeState(Enemy_Boss::enState_Takeoff, Enemy_Boss::enState_Attack_Fly);
 		}
-		//5以上ならブレス
-		else if (m_attack_Rand >= 5) {
+		//4以上ならブレス
+		else if (m_attack_Rand >= 4) {
 			ChangeState(Enemy_Boss::enState_Attack_Shoot);
 		}
-		//5未満なら近づく
+		//4未満なら近づく
 		else {
 			ChangeState(Enemy_Boss::enState_Move);
 		}
