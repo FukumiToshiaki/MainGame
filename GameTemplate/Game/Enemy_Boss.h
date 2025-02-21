@@ -58,7 +58,7 @@ public:
 	//着地時のコリジョン
 	void LandingDamage(float collision_landing);
 	//HPが30%以下になった時のBGM関数
-	void BGM();
+	//void BGM();
 	//空ブレスの時
 	void FlyShoot();
 	// アニメーションクリップの番号を表す列挙型。
@@ -238,6 +238,7 @@ protected:
 	bool m_isEffect = false;		//エフェクトが出ているならtrue
 	bool m_isFlyKeepDistance = false;	//空を飛んで距離をとっているならtrue
 	bool m_isFly_Set = false;
+	bool m_isSound = false;		//効果音
 
 	ModelRender m_modelRender;
 	Player* m_player = nullptr;
@@ -256,13 +257,13 @@ protected:
 	AnimationClip m_animationClipArray[enAnimClip_Num];	// アニメーションクリップ
 	CharacterController m_charaCon;	//キャラクターコントローラー
 	BossFlyPoint::FlyPoint* m_flyPoint = nullptr;
-	SoundSource* m_bossLastButtle = nullptr;//No2
-	//SoundSource* m_bossButtle = nullptr;
-	SoundSource* m_fly = nullptr;			//No3
-	SoundSource* m_flyAttack = nullptr;		//No4
-	SoundSource* m_landing = nullptr;		//No5
-	SoundSource* m_scream = nullptr;		//No6
-	SoundSource* m_tail = nullptr;			//No8
+	//SoundSource* m_bossLastButtle = nullptr;//No2
+	////SoundSource* m_bossButtle = nullptr;
+	//SoundSource* m_fly = nullptr;			//No3
+	//SoundSource* m_flyAttack = nullptr;		//No4
+	//SoundSource* m_landing = nullptr;		//No5
+	//SoundSource* m_scream = nullptr;		//No6
+	//SoundSource* m_tail = nullptr;			//No8
 
 	EffectEmitter* m_boss_Tail = nullptr;
 	std::function<void()> m_onDeadEventFunction;

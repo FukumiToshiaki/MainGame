@@ -23,7 +23,7 @@
 #include "Boss_Shoot.h"
 #include "Boss_HP_UI.h"
 #include "sound/SoundEngine.h"
-#include <SoundManager.h>
+#include "SoundManager.h"
 
 #define START_POS_X 0.0f
 #define START_POS_Y 0.0f
@@ -37,7 +37,7 @@
 #define WALKATTACKDAMAGE 3.0f
 #define HITCOOLTIME 1.5f
 #define FINAL_PHASE 50.0f
-
+#define DEFAULT_BATTLE_BGM 0.8f
 //#define FLYATTACK_SPEED 5.0f
 //#define DISTANCE_POS 1400.0f
 //#define BITING_DISTANCE 1000.0f
@@ -148,6 +148,8 @@ bool Enemy_Boss::Start()
 	//ボスの咆哮の読み込み
 	////尻尾攻撃のエフェクト
 	//EffectEngine::GetInstance()->ResistEffect(3, u"Assets/Effect/Boss_Tail.efk");
+			//BGMの再生
+	g_soundManager->InitAndPlaySoundSource(enSoundBoss, DEFAULT_BATTLE_BGM, false, true, true);
 
 	//InitAnimation();
 	m_player = FindGO<Player>("player");
@@ -434,11 +436,13 @@ void Enemy_Boss::TailAttack()
 	if (m_isUnderTail) {
 		//m_tailEffectPos = m_forward;
 		TailAttackCollision(400.0f);
-		//音再生
-		g_soundManager->InitAndPlaySoundSource(
-			enSoundTail,
-			g_soundManager->GetSEVolume()
-		);
+		if (m_isSound) {
+			//音再生
+			g_soundManager->InitAndPlaySoundSource(
+				enSoundTail,
+				g_soundManager->GetSEVolume()
+			);
+		}
 		//m_tailEffect = { 90.0f,0.0f,0.0f,0.0f };
 		//m_tailEffect.AddRotationY(1.0f);
 		//m_tailEffect.Apply(m_tailEffectPos);
@@ -477,11 +481,16 @@ void Enemy_Boss::FlyAttack(float movespeed)
 	}
 	if (m_isUnderFlyAttack) {
 		FlyAttackCollision(450.0f);
-		//音再生
-		g_soundManager->InitAndPlaySoundSource(
-			enSoundFlyAttack,
-			g_soundManager->GetSEVolume()
-		);
+		if (m_isSound) {
+			//音再生
+			g_soundManager->InitAndPlaySoundSource(
+				enSoundFlyAttack,
+				g_soundManager->GetSEVolume()
+			);
+			m_isSound=false;		}
+	}
+	else {
+		g_soundManager->StopSound(enSoundFlyAttack);
 	}
 	Vector3 diff = m_player->Get_PlayerPos() - m_pos;
 	diff.Normalize();
@@ -687,11 +696,14 @@ void Enemy_Boss::FlyPos(float movespeed)
 		diff.Normalize();
 		m_isFlyKeepDistance = true;
 	}
-	//音再生
-	g_soundManager->InitAndPlaySoundSource(
-		enSoundFly,
-		g_soundManager->GetSEVolume()
-	);
+	if (m_isSound) {
+		//音再生
+		g_soundManager->InitAndPlaySoundSource(
+			enSoundFly,
+			g_soundManager->GetSEVolume()
+		);
+		m_isSound = false;
+	}
 	//移動速度をいれる
 	m_moveSpeed = diff * movespeed;
 }
@@ -703,11 +715,14 @@ void Enemy_Boss::Scream()
 	}
 	if (m_isUnderScream) {
 		ScreamCollision(5500.0f);
-		//音再生
-		g_soundManager->InitAndPlaySoundSource(
-			enSoundScream,
-			g_soundManager->GetSEVolume()
-		);
+		if (m_isSound) {
+			//音再生
+			g_soundManager->InitAndPlaySoundSource(
+				enSoundScream,
+				g_soundManager->GetSEVolume()
+			);
+			m_isSound = false;
+		}
 	}
 	m_moveSpeed.x = 0.0f;
 	m_moveSpeed.z = 0.0f;
@@ -733,11 +748,14 @@ void Enemy_Boss::Landing()
 	}
 	if (m_isUnderLanding) {
 		LandingDamage(500);
-		//音再生
-		g_soundManager->InitAndPlaySoundSource(
-			enSoundLanding,
-			g_soundManager->GetSEVolume()
-		);
+		if (m_isSound) {
+			//音再生
+			g_soundManager->InitAndPlaySoundSource(
+				enSoundLanding,
+				g_soundManager->GetSEVolume()
+			);
+			m_isSound = false;
+		}
 	}
 }
 void Enemy_Boss::LandingDamage(float collision_landing)
@@ -751,18 +769,6 @@ void Enemy_Boss::LandingDamage(float collision_landing)
 		collision_landing//半径
 	);
 	collisionObject->SetName("boss_attack_landing");
-}
-void Enemy_Boss::BGM()
-{
-	if (m_testHP >= 0) {
-		//m_bossButtle->Stop();
-		//ボスのHPが30%以下の時BGMの再生
-		//音再生
-		g_soundManager->InitAndPlaySoundSource(
-			enSoundBoss,
-			g_soundManager->GetBGMVolume()
-		);
-	}
 }
 void Enemy_Boss::FlyShoot()
 {
@@ -840,7 +846,7 @@ void Enemy_Boss::Update()
 	FlyAttack(800.0f);
 	Scream();
 	Landing();
-	BGM();
+	//BGM();
 	Shoot();
 	m_modelRender.SetRotation(m_rotation);
 	m_skeleton.Update(m_model.GetWorldMatrix());

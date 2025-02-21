@@ -22,7 +22,7 @@
 #define CHASE_SPEED 700.0f
 #define FLY_SPEED 200.0f
 #define PLAYERLASTHP 20.0f
-#define BOSSLASTHP 20.0f
+#define BOSSLASTHP 25.0f
 #define LASTCOOLTIME 2
 
 BossPattern::~BossPattern()
@@ -54,6 +54,11 @@ void BossPattern::Update()
 	if (!m_isUnderPattern) {
 		return;
 	}
+	if (m_state != enState_Landing) {
+		//効果音のフラグをtrue
+		m_isSound = true;
+	}
+	//咆哮を放つため
 	Scream(40,400.0f);
 	//他の行動をさせないため
 	if (m_state == enState_Attack_Scream) {
@@ -65,6 +70,8 @@ void BossPattern::Update()
 		m_coolTime = 3.0f;
 		//必殺技カウンターを0に戻す
 		m_screamCount = 0;
+		//効果音のフラグをtrue
+		m_isSound = true;
 
 		return;
 	}
@@ -324,7 +331,7 @@ void BossPattern::DefenseModeLast()
 			ChangeState(Enemy_Boss::enState_Takeoff, Enemy_Boss::enState_Attack_Fly);
 		}
 		//2以上ならブレス
-		else if (m_attack_Rand >= 3) {
+		else if (m_attack_Rand >= 2) {
 			ChangeState(Enemy_Boss::enState_Attack_Shoot);
 		}
 		//2未満なら近づく
