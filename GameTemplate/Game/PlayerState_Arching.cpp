@@ -24,5 +24,5 @@ void PlayerState_Arching::Update()
 	m_player->SetisGuradBreak(false);
 	m_player->SetisWalkAttack(false);
 	m_player->SetisLongAttack(false);
-
+	m_player->SetisSound(false);
 }
