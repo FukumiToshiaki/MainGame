@@ -22,7 +22,8 @@
 #include "PlayerState_Flying_Back.h"
 #include "Player_HP_UI.h"
 #include "Bullet.h"
-#include <SoundManager.h>
+#include "SoundManager.h"
+#include "sound/SoundEngine.h"
 
 #define START_POS_X 0.0f
 #define START_POS_Y 0.0f
@@ -414,23 +415,24 @@ void Player::Move(float walk_speed, float run_speed, float walkattack_speed)
 		right *= m_stickL.x * run_speed;
 		forward *= m_stickL.z * run_speed;
 		ChangeState(Player::enState_Run);
-		//音再生
-		g_soundManager->InitAndPlaySoundSource(
-			enSoundRun,
-			g_soundManager->GetSEVolume()
-		);
+		m_isSound = false;
+		////音再生
+		//g_soundManager->InitAndPlaySoundSource(
+		//	enSoundRun,
+		//	g_soundManager->GetSEVolume()
+		//);
 	}
 	//何も押されず移動なら歩く
 	else if (m_stickL.x != 0.0f || m_stickL.z != 0.0f) {
 		right *= m_stickL.x * walk_speed;
 		forward *= m_stickL.z * walk_speed;
 		ChangeState(Player::enState_Walk);
-		//音再生
-		g_soundManager->InitAndPlaySoundSource(
-			enSoundWalk,
-			g_soundManager->GetSEVolume()
-		);
-
+		m_isSound = false;
+		////音再生
+		//g_soundManager->InitAndPlaySoundSource(
+		//	enSoundWalk,
+		//	g_soundManager->GetSEVolume()
+		//);
 	}
 	else {
 		//移動しないならIdle状態
@@ -490,12 +492,14 @@ void Player::Attack_Biting()
 	if (m_isUnderAttack) {
 		//攻撃用のコリジョンを作成する
 		BitingAttackCollision();
-		//音再生
-		g_soundManager->InitAndPlaySoundSource(
-			enSoundBitAttack,
-			g_soundManager->GetSEVolume()
-		);
-
+		if (m_isSound) {
+			//音再生
+			g_soundManager->InitAndPlaySoundSource(
+				enSoundBitAttack,
+				g_soundManager->GetSEVolume()
+			);
+			m_isSound = false;
+		}
 	}
 	if (m_state == enState_Attack_Biting) {
 			m_moveSpeed.x = 0.0f;
@@ -510,15 +514,19 @@ void Player::WalkAttack()
 		//ボタンが押されたときに攻撃中でなければダッシュアタック
 		if (g_pad[0]->IsTrigger(enButtonRB2) && !m_isNowAttack) {
 			ChangeState(Player::enState_WalkAttack);
+			m_isSound = true;
 		}
 	}
 	if (m_isUnderWalkAttack) {
 		WalkAttackCollision();
-		//音再生
-		g_soundManager->InitAndPlaySoundSource(
-			enSoundWalkAttack,
-			g_soundManager->GetSEVolume()
-		);
+		if (m_isSound) {
+			//音再生
+			g_soundManager->InitAndPlaySoundSource(
+				enSoundWalkAttack,
+				g_soundManager->GetSEVolume()
+			);
+			m_isSound = false;
+		}
 	}
 }
 void Player::Defense()
@@ -533,8 +541,19 @@ void Player::Defense()
 		//防御のコリジョンをリセット
 		m_isUnderDefense = false;
 	}
+	if (m_state != enState_Defense) {
+		return;
+	}
 	if (m_isUnderDefense) {
-		DefenseCollision(500.0f, 2.0f, 1500.0f, 4.0f, 1200.0f, 6.0f, 800.0f, 8.0f, 0.2, 500.0f, 5.0f);
+		DefenseCollision(500.0f, 2.0f, 1500.0f, 4.0f, 1200.0f, 6.0f, 800.0f, 8.0f, 0.2f, 500.0f, 5.0f, 4000.0f, 3.0f);
+		if (m_isSound) {
+			//音再生
+			g_soundManager->InitAndPlaySoundSource(
+				enSoundDefense,
+				g_soundManager->GetSEVolume()
+			);
+			m_isSound = false;
+		}
 	}
 	//ノックバックに使うVector
 	m_KnockBack = m_pos - m_enemy_Boss->GetPos();
@@ -542,13 +561,13 @@ void Player::Defense()
 }
 void Player::DefenseCollision(float melee_knockback, float melee_magnification, float tail_knockback, float tail_magnification,
 	float flyattack_knockback, float flyattack_magnification, float scream_knockback, float scream_magnification,float scream_hittime,
-	float shoot_knockback, float shoot_magnification)
+	float shoot_knockback, float shoot_magnification,float landing_knockback,float landing_magnification)
 {
 	//コリジョンオブジェクトを作成する
 	auto collisionObject = NewGO<CollisionObject>(0);
 	Vector3 collisionPosition = m_pos;
 	//座標をプレイヤーの少し前に設定
-	collisionPosition += m_forward * 80.0f;
+	collisionPosition += m_forward * 120.0f;
 	//球状のコリジョンを作成
 	collisionObject->CreateSphere(collisionPosition,//座標
 		Quaternion::Identity,//回転
@@ -562,11 +581,6 @@ void Player::DefenseCollision(float melee_knockback, float melee_magnification, 
 	}
 	//攻撃を受けたらタイマースタート
 	if (m_isKnockBack) {
-		//音再生
-		g_soundManager->InitAndPlaySoundSource(
-			enSoundDefense,
-			g_soundManager->GetSEVolume()
-		);
 		m_knockBackTime -= g_gameTime->GetFrameDeltaTime();
 		return;
 	}
@@ -577,6 +591,7 @@ void Player::DefenseCollision(float melee_knockback, float melee_magnification, 
 			//ダメージ
 			m_testHP -= MELEEATTACKDAMAGE / melee_magnification;
 			m_isKnockBack = true;
+			m_isSound = true;
 			//タイマーのリセット
 			m_knockBackTime = KNOCKBACKTIME;
 			//HP_UIを減らす表示
@@ -595,6 +610,7 @@ void Player::DefenseCollision(float melee_knockback, float melee_magnification, 
 			//ダメージ
 			m_testHP -= TAILATTACKDAMAGE / tail_magnification;			
 			m_isKnockBack = true;
+			m_isSound = true;
 			//タイマーのリセット
 			m_knockBackTime = KNOCKBACKTIME;
 			//HP_UIを減らす表示
@@ -613,6 +629,7 @@ void Player::DefenseCollision(float melee_knockback, float melee_magnification, 
 			//ダメージ
 			m_testHP -= FLYATTACKDAMAGE / flyattack_magnification;
 			m_isKnockBack = true;
+			m_isSound = true;
 			//タイマーのリセット
 			m_knockBackTime = KNOCKBACKTIME;
 			//HP_UIを減らす表示
@@ -631,6 +648,7 @@ void Player::DefenseCollision(float melee_knockback, float melee_magnification, 
 			//ダメージ
 			m_testHP -= SCREAMATTACKDAMAGE / scream_magnification;
 			m_isKnockBack = true;
+			m_isSound = true;
 			//タイマーのリセット
 			m_knockBackTime = scream_hittime;
 			//HP_UIを減らす表示
@@ -642,6 +660,25 @@ void Player::DefenseCollision(float melee_knockback, float melee_magnification, 
 			return;
 		}
 	}
+	//押しつぶし
+	const auto& collisionList_LandingAttack = g_collisionObjectManager->FindCollisionObjects("boss_attack_landing");
+	for (auto& collision : collisionList_LandingAttack) {
+		if (collision->IsHit(collisionObject)) {
+			//ダメージ
+			m_testHP -= LANDINGDAMAGE / landing_magnification;
+			m_isKnockBack = true;
+			m_isSound = true;
+			//タイマーのリセット
+			m_knockBackTime = HITCOOLTIME;
+			//HP_UIを減らす表示
+			m_player_HP_UI->DecreaseHP(LANDINGDAMAGE / landing_magnification);
+			//ノックバック距離
+			if (m_isKnockBack) {
+				m_moveSpeed = m_KnockBack * landing_knockback;
+			}
+			return;
+		}
+	}
 	//ブレス
 	const auto& collisionList_ShootAttack = g_collisionObjectManager->FindCollisionObjects("boss_shoot_collision");
 	for (auto& collision : collisionList_ShootAttack) {
@@ -649,6 +686,7 @@ void Player::DefenseCollision(float melee_knockback, float melee_magnification, 
 			//ダメージ
 			m_testHP -= SHOOTATTACKDAMAGE / shoot_magnification;
 			m_isKnockBack = true;
+			m_isSound = true;
 			//タイマーのリセット
 			m_knockBackTime = KNOCKBACKTIME;
 			//HP_UIを減らす表示
@@ -674,11 +712,7 @@ void Player::GuardBreak()
 	//ボタンが押されたときに攻撃中ではないなら攻撃
 	if (g_pad[0]->IsTrigger(enButtonY) && !m_isNowAttack) {
 		ChangeState(Player::enState_GuradBreak);
-		//音再生
-		g_soundManager->InitAndPlaySoundSource(
-			enSoundGuardBreak,
-			g_soundManager->GetSEVolume()
-		);
+		m_isSound = true;
 	}
 	if (m_state == enState_GuradBreak) {
 		//その場に止まらせる
@@ -689,6 +723,14 @@ void Player::GuardBreak()
 	//コリジョンを作る
 	if (m_isUnderGuradBreak)	{
 		GuradBreakCollision();
+		if (m_isSound) {
+			//音再生
+			g_soundManager->InitAndPlaySoundSource(
+				enSoundGuardBreak,
+				g_soundManager->GetSEVolume()
+			);
+			m_isSound = false;
+		}
 	}
 }
 void Player::Hit(float screamhitcooltime,float tail_knockback,float flyattack_knockback,float landing_knockback)
@@ -706,7 +748,7 @@ void Player::Hit(float screamhitcooltime,float tail_knockback,float flyattack_kn
 
 
 	//ヒット中ならreturn
-	if (m_state == enState_Damage || m_isUnderDefense || m_state == enState_Arching) {
+	if (m_state == enState_Damage || m_isUnderDefense) {
 		return;
 	}
 	//ヒットクールタイムが終わってないならreturn

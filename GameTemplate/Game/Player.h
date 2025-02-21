@@ -39,7 +39,7 @@ public:
 	//防御コリジョンの関数
 	void DefenseCollision(float melee_knockback, float melee_magnification, float tail_knockback, float tail_magnification,
 		float flyattack_knockback, float flyattack_magnification, float scream_knockback, float scream_magnification,float scream_hittime,
-		float shoot_knockback, float shoot_magnification);
+		float shoot_knockback, float shoot_magnification, float landing_knockback, float landing_magnification);
 	//ガードブレイク関数
 	void GuardBreak();
 	//ヒット関数
@@ -162,6 +162,10 @@ public:
 	float GetHP()
 	{
 		return m_testHP;
+	}
+
+	void SetisSound(bool Sound) {
+		m_isSound = Sound;
 	}
 	/// <summary>
 	/// ターゲットの座標を取得。
