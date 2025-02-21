@@ -17,6 +17,8 @@
 #include "Butten_UI.h"
 #include "Boss_HP_UI.h"
 #include "Countdown.h"
+#include "SoundManager.h"
+
 Game::~Game()
 {
 	DeleteGO(m_map);
@@ -81,11 +83,16 @@ void Game::Update()
 	}
 }
 
+//void Game::BGM()
+//{
+//}
+
 void Game::GameOverState()
 {
 	if (m_player->GetisOver()) {
 		m_gameTime -= g_gameTime->GetFrameDeltaTime();
 		if (m_gameTime<=0) {
+			g_soundManager->StopSound(enSoundBoss);
 			GameOver* gameOver = NewGO<GameOver>(0, "gameover");
 			DeleteGO(this);
 		}
@@ -98,6 +105,7 @@ void Game::GameClearState()
 	if (m_enemy_Boss->GetisClear()) {
 		m_gameTime -= g_gameTime->GetFrameDeltaTime();
 		if (m_gameTime <= 0) {
+			g_soundManager->StopSound(enSoundBoss);
 			GameClear* gameClear = NewGO<GameClear>(0, "gameclear");
 			DeleteGO(this);
 		}

@@ -24,6 +24,7 @@ public:
 	~Game();
 	bool Start() override;
 	void Update() override;
+	//void BGM();
 	void GameOverState();
 	void GameClearState();
 	void TimeOver();
@@ -41,11 +42,23 @@ public:
 		return &m_bossFlyPoint;
 	}
 private:
+	/// <summary>
+	/// bool
+	/// </summary>
+	bool m_isBGMFlag = false;
+	/// <summary>
+	/// float
+	/// </summary>
+	float m_gameTime = 3.0f;
+
+	/// <summary>
+	/// Vector
+	/// </summary>
+	Vector3 m_pos = Vector3::Zero;		// 座標
+
 	EnGameState m_gameState = enNormal;	//ゲームのステート
 	BossFlyPoint m_bossFlyPoint;
-	float m_gameTime = 3.0f;
 	Model m_model;			// モデル
-	Vector3 m_pos=Vector3::Zero;		// 座標
 	Quaternion m_rotation= Quaternion::Identity;	// 回転
 	Sprite m_sprite;	// スプライト
 	Skeleton m_skeleton;	// スケルトン
