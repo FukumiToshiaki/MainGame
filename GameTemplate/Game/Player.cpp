@@ -735,6 +735,10 @@ void Player::GuardBreak()
 }
 void Player::Hit(float screamhitcooltime,float tail_knockback,float flyattack_knockback,float landing_knockback)
 {
+	//ノックバックに使うVector
+	m_KnockBack = m_pos - m_enemy_Boss->GetPos();
+	m_KnockBack.Normalize();
+
 	//吹っ飛ばされる
 	if (m_isUnderFlying_Back&& m_isFlying_Back_FlyAttack) {
 		m_moveSpeed = m_KnockBack * flyattack_knockback;
