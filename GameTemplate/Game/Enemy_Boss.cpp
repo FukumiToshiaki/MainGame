@@ -562,7 +562,7 @@ void Enemy_Boss::DefenceCollision(float break_magnification, float collision_def
 			return;
 		}
 	}
-	const auto& collisionList_MeleeAttack = g_collisionObjectManager->FindCollisionObjects(/*"player_guardbreak"*/ /*"player_walk_attack"*/ "player_biting_attack");
+	const auto& collisionList_MeleeAttack = g_collisionObjectManager->FindCollisionObjects( "player_biting_attack");
 
 	for (auto& collision_MeleeAttack : collisionList_MeleeAttack) {
 		if (collision_MeleeAttack->IsHit(collisionObject)) {
