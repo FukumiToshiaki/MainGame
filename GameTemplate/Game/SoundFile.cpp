@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #include "SoundFile.h"
-#include <SoundManager.h>
-
+#include "SoundManager.h"
 SoundFile::SoundFile()
 {
 	ResistAllSoundFile();
