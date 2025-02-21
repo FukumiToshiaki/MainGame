@@ -2,6 +2,7 @@
 #include "system/system.h"
 #include "Game.h"
 #include "Title.h"
+#include "SoundFile.h"
 
 // K2EngineLowのグローバルアクセスポイント。
 K2EngineLow* g_k2EngineLow = nullptr;
@@ -25,6 +26,9 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 	RenderingEngine m_renderingEngine;
 	m_renderingEngine.Init();
 	g_renderingEngine = &m_renderingEngine;
+	//サウンドファイルの読み込み
+	SoundFile* soundFile = new SoundFile();
+	delete soundFile;
 
 
 	Light m_sceneLight;
