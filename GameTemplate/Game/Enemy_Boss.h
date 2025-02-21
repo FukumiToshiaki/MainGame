@@ -44,7 +44,7 @@ public:
 	//ガードの判定
 	void Defence();
 	//ガードのコリジョン
-	void DefenceCollision(float break_magnification, float collision_defense);
+	void DefenceCollision(float break_magnification, float collision_defense, float tailknockback, Vector3 knockback);
 	// アニメーションイベント用の関数。
 	void OnAnimationEvent(const wchar_t* clipName, const wchar_t* eventName);
 	//距離をとる関数

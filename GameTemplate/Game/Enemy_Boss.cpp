@@ -515,10 +515,10 @@ void Enemy_Boss::Defence()
 	if (m_state!=enState_Defence) {
 		return;
 	}
-	DefenceCollision(1.5f,550.0f);
+	DefenceCollision(1.5f,550.0f, 700.0f,Vector3::Zero);
 
 }
-void Enemy_Boss::DefenceCollision(float break_magnification, float collision_defense)
+void Enemy_Boss::DefenceCollision(float break_magnification, float collision_defense, float tailknockback,Vector3 knockback)
 {
 	//コリジョンオブジェクトを作成する
 	auto collisionObject = NewGO<CollisionObject>(0);
@@ -569,6 +569,7 @@ void Enemy_Boss::DefenceCollision(float break_magnification, float collision_def
 			//ダメージは０でカウンター
 			ChangeState(enState_Attack_Tail);
 			m_player->ChangeState(Player::enState_Arching);
+		//	m_player->SetMoveSpeed(knockback * tailknockback);
 			m_hitCoolTime = HITCOOLTIME;
 			return;
 		}
