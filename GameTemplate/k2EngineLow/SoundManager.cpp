@@ -30,7 +30,7 @@ namespace nsK2EngineLow
 			so->SetPosition(soundPosition);
 		}
 		so->SetNumber(num);
-		so->SetVolume(1.0f);
+		so->SetVolume(volume);
 		so->Play(roopFlag);
 		//ƒŠƒXƒg‚É’Ç‰Á
 		AddSoundSourceList(so);
