@@ -287,7 +287,7 @@ void Enemy_Boss::Hit(float damagemagnification)
 	//咆哮後の隙の時
 	if (m_state == enState_Rest) {
 		//ガードブレイクが当たった時
-		const auto& collisionList_GuardBreak = g_collisionObjectManager->FindCollisionObjects("player_guardbreak" /*"player_walk_attack" "player_biting_attack"*/);
+		const auto& collisionList_GuardBreak = g_collisionObjectManager->FindCollisionObjects("player_guardbreak");
 
 		for (auto& collision_GuardBreak : collisionList_GuardBreak) {
 			if (collision_GuardBreak->IsHit(m_collision)) {
@@ -301,7 +301,7 @@ void Enemy_Boss::Hit(float damagemagnification)
 			}
 		}
 		//ダッシュアタックが当たった時
-		const auto& collisionList_WalkAttack = g_collisionObjectManager->FindCollisionObjects/*("player_guardbreak"*/("player_walk_attack" /*"player_biting_attack"*/);
+		const auto& collisionList_WalkAttack = g_collisionObjectManager->FindCollisionObjects("player_walk_attack");
 
 		for (auto& collision_WalkAttack : collisionList_WalkAttack) {
 			if (collision_WalkAttack->IsHit(m_collision)) {
@@ -315,7 +315,7 @@ void Enemy_Boss::Hit(float damagemagnification)
 			}
 		}
 		//近接攻撃が当たった時
-		const auto& collisionList_MeleeAttack = g_collisionObjectManager->FindCollisionObjects(/*"player_guardbreak"*/ /*"player_walk_attack"*/ "player_biting_attack");
+		const auto& collisionList_MeleeAttack = g_collisionObjectManager->FindCollisionObjects("player_biting_attack");
 
 		for (auto& collision_MeleeAttack : collisionList_MeleeAttack) {
 			if (collision_MeleeAttack->IsHit(m_collision)) {
@@ -329,7 +329,7 @@ void Enemy_Boss::Hit(float damagemagnification)
 			}
 		}
 		//遠距離攻撃が当たった時
-		const auto& collisionList_LongAttack = g_collisionObjectManager->FindCollisionObjects(/*"player_guardbreak"*/ /*"player_walk_attack"*/ "player_long_attack");
+		const auto& collisionList_LongAttack = g_collisionObjectManager->FindCollisionObjects("player_long_attack");
 
 		for (auto& collisionLongAttack : collisionList_LongAttack) {
 			if (collisionLongAttack->IsHit(m_collision)) {
@@ -345,7 +345,7 @@ void Enemy_Boss::Hit(float damagemagnification)
 	}
 	//通常時
 	//ガードブレイクが当たった時
-	const auto& collisionList_GuardBreak = g_collisionObjectManager->FindCollisionObjects("player_guardbreak" /*"player_walk_attack" "player_biting_attack"*/);
+	const auto& collisionList_GuardBreak = g_collisionObjectManager->FindCollisionObjects("player_guardbreak");
 
 	for (auto& collision_GuardBreak : collisionList_GuardBreak) {
 		if (collision_GuardBreak->IsHit(m_collision)) {
@@ -359,7 +359,7 @@ void Enemy_Boss::Hit(float damagemagnification)
 		}
 	}
 	//ダッシュアタックが当たった時
-	const auto& collisionList_WalkAttack = g_collisionObjectManager->FindCollisionObjects/*("player_guardbreak"*/("player_walk_attack" /*"player_biting_attack"*/);
+	const auto& collisionList_WalkAttack = g_collisionObjectManager->FindCollisionObjects("player_walk_attack");
 
 	for (auto& collision_WalkAttack : collisionList_WalkAttack) {
 		if (collision_WalkAttack->IsHit(m_collision)) {
@@ -373,7 +373,7 @@ void Enemy_Boss::Hit(float damagemagnification)
 		}
 	}
 	//近接攻撃が当たった時
-	const auto& collisionList_MeleeAttack = g_collisionObjectManager->FindCollisionObjects(/*"player_guardbreak"*/ /*"player_walk_attack"*/ "player_biting_attack");
+	const auto& collisionList_MeleeAttack = g_collisionObjectManager->FindCollisionObjects("player_biting_attack");
 
 	for (auto& collision_MeleeAttack : collisionList_MeleeAttack) {
 		if (collision_MeleeAttack->IsHit(m_collision)) {
@@ -387,7 +387,7 @@ void Enemy_Boss::Hit(float damagemagnification)
 		}
 	}
 	//遠距離攻撃が当たった時
-	const auto& collisionList_LongAttack = g_collisionObjectManager->FindCollisionObjects(/*"player_guardbreak"*/ /*"player_walk_attack"*/ "player_long_attack");
+	const auto& collisionList_LongAttack = g_collisionObjectManager->FindCollisionObjects("player_long_attack");
 
 	for (auto& collisionLongAttack : collisionList_LongAttack) {
 		if (collisionLongAttack->IsHit(m_collision)) {
@@ -538,7 +538,7 @@ void Enemy_Boss::DefenceCollision(float break_magnification, float collision_def
 
 	// 攻撃コリジョンと衝突しているかを調べる
 	//ガードブレイク時はダメージが増える
-	const auto& collisionList_GuardBreak = g_collisionObjectManager->FindCollisionObjects("player_guardbreak" /*"player_walk_attack" "player_biting_attack"*/);
+	const auto& collisionList_GuardBreak = g_collisionObjectManager->FindCollisionObjects("player_guardbreak");
 
 	for (auto& collision_GuardBreak : collisionList_GuardBreak) {
 		if (collision_GuardBreak->IsHit(collisionObject)) {
@@ -551,7 +551,7 @@ void Enemy_Boss::DefenceCollision(float break_magnification, float collision_def
 			return;
 		}
 	}
-	const auto& collisionList_WalkAttack = g_collisionObjectManager->FindCollisionObjects/*("player_guardbreak"*/("player_walk_attack" /*"player_biting_attack"*/);
+	const auto& collisionList_WalkAttack = g_collisionObjectManager->FindCollisionObjects("player_walk_attack");
 
 	for (auto& collision_WalkAttack : collisionList_WalkAttack) {
 		if (collision_WalkAttack->IsHit(collisionObject)) {
@@ -575,7 +575,7 @@ void Enemy_Boss::DefenceCollision(float break_magnification, float collision_def
 		}
 	}
 
-	const auto& collisionList_LongAttack = g_collisionObjectManager->FindCollisionObjects(/*"player_guardbreak"*/ /*"player_walk_attack"*/ "player_long_attack");
+	const auto& collisionList_LongAttack = g_collisionObjectManager->FindCollisionObjects("player_long_attack");
 
 	for (auto& collisionLongAttack : collisionList_LongAttack) {
 		if (collisionLongAttack->IsHit(collisionObject)) {

@@ -25,7 +25,7 @@ BossFlyPoint::~BossFlyPoint()
 void BossFlyPoint::Update(Vector3 position)
 {
     //ポイントを設置する方向
-    Vector3 direction=Vector3::AxisZ;
+    Vector3 direction = Vector3::AxisZ;
 
     //ポイントを設置する方向を回転させるクオータニオン
     Quaternion directionRot;
