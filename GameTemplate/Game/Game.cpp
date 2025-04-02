@@ -51,7 +51,7 @@ bool Game::Start()
 	//m_enemy_Boss = NewGO<Enemy_Boss>(0, "enemy_boss");
 	m_enemy_Boss = NewGO<BossPattern>(0, "enemy_boss");
 	//m_time_Limit_UI = NewGO<Time_Limit_UI>(0, "time_limit");
-	m_bossFlyPoint.Update({ 0.0f,0.0f,0.0f });
+	//m_bossFlyPoint.Update({ 0.0f,0.0f,0.0f });
 
 	//PhysicsWorld::GetInstance()->EnableDrawDebugWireFrame();
 	return true;
@@ -81,6 +81,7 @@ void Game::Update()
 		GameOverState();
 		break;
 	}
+	m_bossFlyPoint.Update(m_player->Get_PlayerPos());
 }
 
 //void Game::BGM()
