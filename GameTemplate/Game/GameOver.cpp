@@ -8,7 +8,7 @@ GameOver::~GameOver()
 bool GameOver::Start()
 {
 	//ƒ^ƒCƒgƒ‹‚Ì‰æ‘œ
-	m_spriteRender.Init("Assets/modelData/test/Test_Over.dds", 1920.0f, 1080.0f);
+	m_spriteRender.Init("Assets/modelData/UI/gameover.dds", 1920.0f, 1080.0f);
 
 	return true;
 }

@@ -10,7 +10,7 @@ GameClear::~GameClear()
 bool GameClear::Start()
 {
 	//ƒ^ƒCƒgƒ‹‚Ì‰æ‘œ
-	m_spriteRender.Init("Assets/modelData/test/Test_Clear.dds", 1920.0f, 1080.0f);
+	m_spriteRender.Init("Assets/modelData/UI/GameClear.dds", 1920.0f, 1080.0f);
 
 	return true;
 }
