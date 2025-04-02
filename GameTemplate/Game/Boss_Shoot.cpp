@@ -28,14 +28,6 @@ void Boss_Shoot::Update()
 {
 	//エフェクトのポインターが残ってて
 	//エフェクトが消えていたら
-	////nullptrにする
-	//if (m_boss_shoot != nullptr) {
-	//	if (m_boss_shoot->IsDead())	{
-	//		m_boss_shoot = nullptr;
-	//		DeleteGO(m_shootCollision);
-	//		m_shot = m_boss->GetPos();
-	//	}
-	//}
 	if (m_boss != nullptr) {
 		Init(m_boss);
 		Shoot();
@@ -55,6 +47,7 @@ void Boss_Shoot::Shoot()
 			enSoundShoot,
 			g_soundManager->GetSEVolume()
 		);
+		//BulletクラスをNewGO
 		m_bullet = NewGO<Bullet>(0, "bullet");
 	}
 }
