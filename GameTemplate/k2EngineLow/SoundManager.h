@@ -149,7 +149,7 @@ namespace nsK2EngineLow {
 	private:
 		std::vector<SoundSource*> m_soundSourceList;
 
-		const float m_defaultSEVolume = 1.0f;
+		const float m_defaultSEVolume = 2.0f;
 		const float m_defaultBGMVolume = 4.0f;
 
 		float m_seVolume = m_defaultSEVolume;
