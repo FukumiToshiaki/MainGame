@@ -546,13 +546,13 @@ void Player::Defense()
 	}
 	if (m_isUnderDefense) {
 		DefenseCollision(500.0f, 2.0f, 1500.0f, 4.0f, 1200.0f, 6.0f, 800.0f, 8.0f, 0.2f, 500.0f, 5.0f, 4000.0f, 3.0f);
-		if (m_isSound) {
+		if (m_isDefenseSound) {
 			//音再生
 			g_soundManager->InitAndPlaySoundSource(
 				enSoundDefense,
 				g_soundManager->GetSEVolume()
 			);
-			m_isSound = false;
+			m_isDefenseSound = false;
 		}
 	}
 	//ノックバックに使うVector
@@ -591,7 +591,7 @@ void Player::DefenseCollision(float melee_knockback, float melee_magnification, 
 			//ダメージ
 			m_testHP -= MELEEATTACKDAMAGE / melee_magnification;
 			m_isKnockBack = true;
-			m_isSound = true;
+			m_isDefenseSound = true;
 			//タイマーのリセット
 			m_knockBackTime = KNOCKBACKTIME;
 			//HP_UIを減らす表示
@@ -610,7 +610,7 @@ void Player::DefenseCollision(float melee_knockback, float melee_magnification, 
 			//ダメージ
 			m_testHP -= TAILATTACKDAMAGE / tail_magnification;			
 			m_isKnockBack = true;
-			m_isSound = true;
+			m_isDefenseSound = true;
 			//タイマーのリセット
 			m_knockBackTime = KNOCKBACKTIME;
 			//HP_UIを減らす表示
@@ -629,7 +629,7 @@ void Player::DefenseCollision(float melee_knockback, float melee_magnification, 
 			//ダメージ
 			m_testHP -= FLYATTACKDAMAGE / flyattack_magnification;
 			m_isKnockBack = true;
-			m_isSound = true;
+			m_isDefenseSound = true;
 			//タイマーのリセット
 			m_knockBackTime = KNOCKBACKTIME;
 			//HP_UIを減らす表示
@@ -648,7 +648,7 @@ void Player::DefenseCollision(float melee_knockback, float melee_magnification, 
 			//ダメージ
 			m_testHP -= SCREAMATTACKDAMAGE / scream_magnification;
 			m_isKnockBack = true;
-			m_isSound = true;
+			m_isDefenseSound = true;
 			//タイマーのリセット
 			m_knockBackTime = scream_hittime;
 			//HP_UIを減らす表示
@@ -667,7 +667,7 @@ void Player::DefenseCollision(float melee_knockback, float melee_magnification, 
 			//ダメージ
 			m_testHP -= LANDINGDAMAGE / landing_magnification;
 			m_isKnockBack = true;
-			m_isSound = true;
+			m_isDefenseSound = true;
 			//タイマーのリセット
 			m_knockBackTime = HITCOOLTIME;
 			//HP_UIを減らす表示
@@ -686,7 +686,7 @@ void Player::DefenseCollision(float melee_knockback, float melee_magnification, 
 			//ダメージ
 			m_testHP -= SHOOTATTACKDAMAGE / shoot_magnification;
 			m_isKnockBack = true;
-			m_isSound = true;
+			m_isDefenseSound = true;
 			//タイマーのリセット
 			m_knockBackTime = KNOCKBACKTIME;
 			//HP_UIを減らす表示

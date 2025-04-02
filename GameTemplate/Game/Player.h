@@ -258,6 +258,7 @@ private:
 	bool m_isFlying_Back_FlyAttack = false;		//滑空突進の攻撃ヒット時true
 	bool m_isFlying_Back_Landing = false;
 	bool m_isSound = false;					//効果音
+	bool m_isDefenseSound = false;	//ガードの効果音
 
 	Model m_model;			// モデル
 	Animation m_animation;	// アニメーション
