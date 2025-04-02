@@ -688,15 +688,15 @@ void Enemy_Boss::FlyPos(float movespeed)
 	if (m_state != enState_Fly||m_isFly_Set) {
 		return;
 	}
-	if (!m_isFlyKeepDistance){
+	//if (!m_isFlyKeepDistance){
 		BossFlyPoint::FlyPoint* flypoint;
 		flypoint = m_game->GetBossFlyPoint()->GetFlyPoint(m_pos);
 		//ボスからフライポイントに向かうベクトルを求める
-		diff = flypoint->m_pos - m_pos;
+		diff = m_pos-flypoint->m_pos;
 		//ベクトルのNormalizeする
 		diff.Normalize();
-		m_isFlyKeepDistance = true;
-	}
+	//	m_isFlyKeepDistance = true;
+	//}
 	if (m_isSound) {
 		//音再生
 		g_soundManager->InitAndPlaySoundSource(
@@ -748,7 +748,7 @@ void Enemy_Boss::Landing()
 		return;
 	}
 	if (m_isUnderLanding) {
-		LandingDamage(500);
+		LandingColision(400);
 		if (m_isSound) {
 			//音再生
 			g_soundManager->InitAndPlaySoundSource(
@@ -759,7 +759,7 @@ void Enemy_Boss::Landing()
 		}
 	}
 }
-void Enemy_Boss::LandingDamage(float collision_landing)
+void Enemy_Boss::LandingColision(float collision_landing)
 {
 	//コリジョンオブジェクトを作成する
 	auto collisionObject = NewGO<CollisionObject>(0);
@@ -842,11 +842,11 @@ void Enemy_Boss::Update()
 	FlyShoot();
 	MeleeAttack();
 	TailAttack();
+	Landing();
 	Defence(); 
 	FlyPos(300.0f);
 	FlyAttack(800.0f);
 	Scream();
-	Landing();
 	//BGM();
 	Shoot();
 	m_modelRender.SetRotation(m_rotation);

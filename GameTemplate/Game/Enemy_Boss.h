@@ -56,7 +56,7 @@ public:
 	//着地時のダメージ
 	void Landing();
 	//着地時のコリジョン
-	void LandingDamage(float collision_landing);
+	void LandingColision(float collision_landing);
 	//HPが30%以下になった時のBGM関数
 	//void BGM();
 	//空ブレスの時
