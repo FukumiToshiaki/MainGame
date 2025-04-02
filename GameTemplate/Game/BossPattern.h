@@ -35,6 +35,9 @@ public:
 	void SuperAttackMode();
 
 private:
+	/// <summary>
+	/// ƒNƒ‰ƒX
+	/// </summary>
 	Enemy_Boss* m_enemy_Boss = nullptr;
 	Player* m_player = nullptr;
 	
@@ -56,11 +59,5 @@ private:
 	/// ‹ß‹——£‚ÌŽž
 	/// </summary>
 	Vector3 m_screamPos = Vector3::Zero;
-
-	//int m_meleeAttack = 20;
-	//int m_defend = 5;
-	//int m_tailAttack = 15;
-	//int m_fly = 5;
-	//int m_shoot = 3;
 };
 

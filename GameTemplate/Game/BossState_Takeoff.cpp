@@ -11,11 +11,12 @@ void BossState_Takeoff::Animation()
 		// 次のステートに遷移する
 		m_enemy_Boss->ChangeState((Enemy_Boss::EnState)m_enNextState);
 	}
+	if (m_enemy_Boss->GetisScream_Set()) {
+		m_enemy_Boss->ChangeState(Enemy_Boss::enState_Fly);
+	}
+
 }
 
 void BossState_Takeoff::Update()
 {
-	if (m_enemy_Boss->GetisScream_Set()) {
-		m_enemy_Boss->ChangeState(Enemy_Boss::enState_Fly);
-	}
 }

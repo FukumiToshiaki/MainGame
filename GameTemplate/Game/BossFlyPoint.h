@@ -26,5 +26,6 @@ public:
 
 private:
 	FlyPoint m_flyPointList[FLY_POINT_NUM];
+	Enemy_Boss* m_enemy_boss = nullptr;
 };
 

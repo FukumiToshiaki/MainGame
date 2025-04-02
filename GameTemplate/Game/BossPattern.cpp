@@ -11,18 +11,11 @@
 #define FIRST_PHASE 80.0f
 #define SECOND_PHASE 65.0f
 #define FINAL_PHASE 50.0f
-//#define MELEE_ATTACK 0
-//#define TAIL_ATTACK 13
-//#define FLY 20
-//#define MELEE_SHOOT_ATTACK 17.0f
-//#define MELEE_POINT 25.0f
-//#define ATTACK_COOLTIME 5.0f
-//#define LASTATTACK_COOLTIME 4.0f
 #define MELEE_DISTANCE 1500.0f
 #define CHASE_SPEED 700.0f
 #define FLY_SPEED 200.0f
 #define PLAYERLASTHP 20.0f
-#define BOSSLASTHP 25.0f
+#define BOSSLASTHP 20.0f
 #define LASTCOOLTIME 2
 
 BossPattern::~BossPattern()
@@ -49,7 +42,6 @@ void BossPattern::Update()
 	//基底クラスのUpdateを呼ぶ
 	Enemy_Boss::Update();
 
-	//return;
 	//フラグが立っていないなら計算する必要がないので、早期リターン
 	if (!m_isUnderPattern) {
 		return;
@@ -72,7 +64,7 @@ void BossPattern::Update()
 		m_screamCount = 0;
 		//効果音のフラグをtrue
 		m_isSound = true;
-
+		//これ以上したにいかないために
 		return;
 	}
 	//必殺技のための移動
@@ -134,7 +126,6 @@ void BossPattern::Update()
 	//クールタイムをランダムに
 	m_coolTime = rand() % 4;
 }
-
 void BossPattern::CoolTime()
 {
 	//Idle状態なら
@@ -142,7 +133,6 @@ void BossPattern::CoolTime()
 		//trueに
 		m_iscoolTimeStart = true;
 		//ブレスの判定初期化
-		//m_isShoot = false;
 		m_effectCount = 0;
 		m_isFlyKeepDistance = false;
 		m_boss_Shoot->SetisShoot(false);
@@ -240,7 +230,6 @@ void BossPattern::BossPatternMode()
 		m_attack_Rand += rand() % 5;
 	}
 }
-
 void BossPattern::AttackModeLast()
 {
 		//trueなら近距離用のパターン
@@ -290,7 +279,6 @@ void BossPattern::AttackModeLast()
 		}
 	}
 }
-
 void BossPattern::DefenseModeLast()
 {
 		//trueなら近距離用のパターン
@@ -311,11 +299,11 @@ void BossPattern::DefenseModeLast()
 		else if (m_attack_Rand >= 6) {
 			ChangeState(Enemy_Boss::enState_Attack_Shoot);
 		}
-		//2以上ならガード
+		//3以上ならガード
 		else if (m_attack_Rand >= 3) {
 			ChangeState(Enemy_Boss::enState_Defence);
 		}
-		//2未満なら尻尾攻撃
+		//3未満なら尻尾攻撃
 		else {
 			ChangeState(Enemy_Boss::enState_Attack_Tail);
 		}
@@ -340,8 +328,6 @@ void BossPattern::DefenseModeLast()
 		}
 	}
 }
-
-
 void BossPattern::Scream(int screamcount,float screamdistance)
 {	
 	//ボスと原点の距離を求める
@@ -425,7 +411,6 @@ void BossPattern::Scream(int screamcount,float screamdistance)
 		m_isFly_Set = false;
 	}
 }
-
 void BossPattern::SuperDefenseMode()
 {
 	//trueなら近距離用のパターン
@@ -473,7 +458,6 @@ void BossPattern::SuperDefenseMode()
 		}
 	}
 }
-
 void BossPattern::DefenseMode()
 {
 	//trueなら近距離用のパターン
@@ -523,7 +507,6 @@ void BossPattern::DefenseMode()
 		}
 	}
 }
-
 void BossPattern::NormalMode()
 {
 	//trueなら近距離用のパターン
@@ -573,7 +556,6 @@ void BossPattern::NormalMode()
 		}
 	}
 }
-
 void BossPattern::AttackMode()
 {
 	//trueなら近距離用のパターン
@@ -624,7 +606,6 @@ void BossPattern::AttackMode()
 		}
 	}
 }
-
 void BossPattern::SuperAttackMode()
 {
 	//trueなら近距離用のパターン

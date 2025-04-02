@@ -10,7 +10,7 @@ namespace
 
 BossFlyPoint::BossFlyPoint()
 
-{	//アタックポイントのナンバーを初期化する
+{	//フライポイントのナンバーを初期化する
     for (int i = 0; i < FLY_POINT_NUM; i++)
     {
         m_flyPointList[i].m_number = i;
