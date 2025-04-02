@@ -160,6 +160,7 @@
       <Filter>Player</Filter>
     </ClCompile>
     <ClCompile Include="SoundFile.cpp" />
+    <ClCompile Include="BossAI.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -306,5 +307,6 @@
       <Filter>Player</Filter>
     </ClInclude>
     <ClInclude Include="SoundFile.h" />
+    <ClInclude Include="BossAI.h" />
   </ItemGroup>
 </Project>

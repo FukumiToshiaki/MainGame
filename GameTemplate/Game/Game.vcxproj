@@ -223,6 +223,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="BossAI.cpp" />
     <ClCompile Include="BossFlyPoint.cpp" />
     <ClCompile Include="BossPattern.cpp" />
     <ClCompile Include="BossState_Biting.cpp" />
@@ -288,6 +289,7 @@
     <ClCompile Include="Title.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="BossAI.h" />
     <ClInclude Include="BossFlyPoint.h" />
     <ClInclude Include="BossPattern.h" />
     <ClInclude Include="BossState_Biting.h" />
