@@ -14,7 +14,7 @@ Bullet::~Bullet()
 
 void Bullet::OnDeadEffect()
 {
-		//m_boss_shoot->Stop();
+
 }
 bool Bullet::Start()
 {
@@ -42,7 +42,7 @@ bool Bullet::Start()
 	m_shootPos = m_player->Get_PlayerPos() - m_pos;
 	m_shootPos.Normalize();
 
-
+	//エフェクトの作成
 	m_boss_shoot = NewGO<EffectEmitter>(2, "boss_shoot");
 	m_boss_shoot->Init(2);
 	m_boss_shoot->SetScale(Vector3::One * 10.0f);
@@ -71,23 +71,14 @@ bool Bullet::Start()
 
 void Bullet::Update()
 {
-	//Init(m_boss);
 	Move();
 	Delete();
 }
 
-//void Bullet::Init(Enemy_Boss* boss)
-//{
-//	m_boss = boss;
-//	m_pos = m_boss->GetPos();
-//
-//}
-
 void Bullet::Move()
 {
+	//移動速度
 	m_pos += m_shootPos * 100.0f;
-	//if (m_shootCollision != nullptr) {
-	//}
 	if (m_boss_shoot != nullptr) {
 		m_boss_shoot->SetPosition(m_pos);
 		m_shootCollision->SetPosition(m_pos);
@@ -99,9 +90,11 @@ void Bullet::Move()
 void Bullet::Delete()
 {
 	m_deleteTime -= g_gameTime->GetFrameDeltaTime();
-
+	//タイマーが0になったら
 	if (m_deleteTime <= 0) {
+		//削除
 		DeleteGO(this);
-		m_deleteTime = 4.0f;
+		////タイマーのリセット
+		//m_deleteTime = 4.0f;
 	}
 }

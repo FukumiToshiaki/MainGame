@@ -4,6 +4,7 @@
 
 void BossState_Damage::Animation()
 {
+	//アニメーション
 	m_enemy_Boss->GetModelRender().PlayAnimation(
 		Enemy_Boss::enState_Damage_Animation, 0.2f
 	);
@@ -16,13 +17,12 @@ void BossState_Damage::Update()
 	m_enemy_Boss->SetisUnderFlyAttack(false);
 	m_enemy_Boss->SetisUnderTail(false);
 
+	//HPが0になったら
 	if (m_enemy_Boss->GetHP() <= 0) {
 		m_enemy_Boss->ChangeState(Enemy_Boss::enState_Die);
 	}
+	//アニメーションが終わったら次の行動
 	if (!m_enemy_Boss->GetIsPlayingAnimation()) {
 		m_enemy_Boss->ChangeState(Enemy_Boss::enState_Idle);
 	}
-	//if (m_enemy_Boss->GetisDie()) {
-	//	m_enemy_Boss->ChangeState(Enemy_Boss::enState_Die);
-	//}
 }

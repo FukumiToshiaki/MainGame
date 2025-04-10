@@ -38,15 +38,6 @@
 #define HITCOOLTIME 1.5f
 #define FINAL_PHASE 50.0f
 #define DEFAULT_BATTLE_BGM 0.8f
-//#define FLYATTACK_SPEED 5.0f
-//#define DISTANCE_POS 1400.0f
-//#define BITING_DISTANCE 1000.0f
-//#define REST_DISTANCE 1200.0f
-//#define COLLISION_TAIL 400.0f
-//#define COLLISION_FLYATTACK 450.0f
-//#define COLLISION_MELEE 300.0f
-//#define COLLISION_DEFENCE 700.0f
-//#define COLLISION_SCREAM 5500.0f
 namespace
 {
 }
@@ -109,49 +100,9 @@ bool Enemy_Boss::Start()
 			});
 
 	m_modelRender.Init("Assets/modelData/Dragon_Frog/Doragon.tkm", m_animationClipArray, enAnimClip_Num);
-	//スケルトンをロード。
-	//InitSkeleton();
-	//アニメーションを初期化。
-	
-	////ボスのHPが30%以上の時BGMの読み込み
-	//g_soundEngine->ResistWaveFileBank(1, "Assets/sound/Boss_Battle.wav");
-	//m_bossButtle = NewGO<SoundSource>(1);
-	//m_bossButtle->Init(1);
-	//m_bossButtle->Play(true);
-	//////ボス戦BGMの読み込み
-	////g_soundEngine->ResistWaveFileBank(2, "Assets/sound/Boss_LastBattle.wav");
-	//m_bossLastButtle = NewGO<SoundSource>(2);
-	//////ボスの羽ばたきの読み込み
-	////g_soundEngine->ResistWaveFileBank(3, "Assets/sound/Fly.wav");
-	//m_fly = NewGO<SoundSource>(3);
-	//////ボスの滑空突進の読み込み
-	////g_soundEngine->ResistWaveFileBank(4, "Assets/sound/FlyAttack.wav");
-	//m_flyAttack = NewGO<SoundSource>(4);
-	//////ボスの着地の読み込み
-	////g_soundEngine->ResistWaveFileBank(5, "Assets/sound/Landing.wav");
-	//m_landing = NewGO<SoundSource>(5);
-	//////咆哮の読み込み
-	////g_soundEngine->ResistWaveFileBank(6, "Assets/sound/Scream.wav");
-	//m_scream = NewGO<SoundSource>(6);
-	//////ボスの尻尾攻撃の読み込み
-	////g_soundEngine->ResistWaveFileBank(8, "Assets/sound/Tail.wav");
-	//m_tail = NewGO<SoundSource>(8);
-
-	//m_bossLastButtle = NewGO<SoundSource>(2);
-	//m_bossButtle->Init(2);
-	//m_bossButtle->Play(true);
-	////ボスの読み込み
-	//g_soundEngine->ResistWaveFileBank(2, "Assets/sound/Boss_LastBattle.wav");
-	//m_bossButtle = NewGO<SoundSource>(2);
-	//m_bossButtle->Init(2);
-	//m_bossButtle->Play(true);
-	//ボスの咆哮の読み込み
-	////尻尾攻撃のエフェクト
-	//EffectEngine::GetInstance()->ResistEffect(3, u"Assets/Effect/Boss_Tail.efk");
 			//BGMの再生
 	g_soundManager->InitAndPlaySoundSource(enSoundBoss, DEFAULT_BATTLE_BGM, false, true, true);
 
-	//InitAnimation();
 	m_player = FindGO<Player>("player");
 	m_player->AddEnemy_List(this);
 	m_game = FindGO<Game>("game");
@@ -198,67 +149,6 @@ void Enemy_Boss::Rotation(float rotation)
 	m_forward = Vector3::AxisZ;
 	m_rotation.Apply(m_forward);
 }
-//void Enemy_Boss::FlyAttackMove()
-//{
-//	if (m_state!=enState_Attack_Fly)
-//	{
-//		return;
-//	}
-//	//m_pos += m_moveSpeed * FLYATTACK_SPEED;
-//	////プレイヤーの追跡の変数
-//	//m_distance = m_player->Get_PlayerPos() - m_pos;
-//	//m_diff = m_player->Get_PlayerPos() - m_pos;
-//	//m_diff.Normalize();
-//}
-//void Enemy_Boss::Shoot(int movespeed, int hitstartframe, int hitendframe)
-//{
-//	///
-//	Quaternion qRot;
-//	Vector3 diff = m_player->Get_PlayerPos() - m_pos;
-//	diff.Normalize();
-//	Vector3 PosZ = Vector3::AxisZ;
-//	qRot.SetRotation(PosZ, diff);
-//	///
-//
-//	//if (m_shootPos.Length() <= 150.0f) {
-//	//	EffectEmitter* Boss_Shoot = NewGO<EffectEmitter>(3, "boss_shoot");
-//	//	Boss_Shoot->Init(3);
-//	//	Boss_Shoot->SetScale(Vector3::One * 10.0f);
-//	//	Boss_Shoot->SetPosition(diff);
-//	//	Boss_Shoot->Play();
-//	//}
-//	if (m_state != enState_Attack_Shoot) {
-//		return;
-//	}
-//		if (!m_isShoot) {
-//			Boss_Shoot_Start = NewGO<EffectEmitter>(2, "boss_shoot");
-//			Boss_Shoot_Start->Init(2);
-//			Boss_Shoot_Start->SetScale(Vector3::One * 10.0f);
-//			Boss_Shoot_Start->SetPosition(m_pos);
-//			Boss_Shoot_Start->Play();
-//			m_isShoot = true;
-//			//エフェクトカウンターが数値の間にあるなら当たり判定をつける
-//			if (m_effectCount <= 0) {
-//				if (Boss_Shoot_Start != nullptr) {
-//					Boss_Shoot_Start->SetRotation(qRot);
-//				}
-//			}
-//			//ブレスのロックオン
-//			m_moveSpeed_Shoot = m_player->Get_PlayerPos() - m_pos;
-//			m_shootPos = m_moveSpeed_Shoot;
-//			m_moveSpeed_Shoot.Normalize();
-//			m_effectCount++;
-//		}
-//		m_shot += m_moveSpeed_Shoot * movespeed;
-//		//コリジョンオブジェクトを作成する
-//		m_shootCollision = NewGO<CollisionObject>(0);
-//		//球状のコリジョンを作成
-//		m_shootCollision->CreateSphere(m_shot,//座標
-//			qRot,//回転
-//			50.0f//半径
-//		);
-//		m_shootCollision->SetName("boss_shot");
-//}
 void Enemy_Boss::Rest()
 {
 	
@@ -443,21 +333,6 @@ void Enemy_Boss::TailAttack()
 				g_soundManager->GetSEVolume()
 			);
 		}
-		//m_tailEffect = { 90.0f,0.0f,0.0f,0.0f };
-		//m_tailEffect.AddRotationY(1.0f);
-		//m_tailEffect.Apply(m_tailEffectPos);
-		//エフェクト
-		//m_boss_Tail = NewGO<EffectEmitter>(3, "boss_tail");
-		//m_boss_Tail->Init(3);
-		//m_boss_Tail->SetScale(Vector3::One * 10.0f);
-		//m_boss_Tail->SetPosition(m_forward *BOSS_FORWARD);
-		//m_boss_Tail->Play();
-		////m_boss_Tail->SetRotation(m_tailEffect);
-		//// エフェクト死亡時のイベント処理
-		//m_onDeadEventFunction = [&] { m_boss_Tail = nullptr; };
-		//// イベントを登録
-		//m_boss_Tail->AddDeadEventFunction(m_onDeadEventFunction);
-
 	}
 }
 void Enemy_Boss::TailAttackCollision(float collision_tail)
@@ -629,11 +504,11 @@ void Enemy_Boss::OnAnimationEvent(const wchar_t* clipName, const wchar_t* eventN
 		m_isUnderFlyAttack = false;
 	}
 
-	//キーの名前がBoss_Defence_startの場合
-	if (wcscmp(eventName, L"Boss_Defence_start") == 0)
+	//キーの名前がBoss_Defense_startの場合
+	if (wcscmp(eventName, L"Boss_Defense_start") == 0)
 	{
 		//防御中にする
-		m_isUnderDefence = true;
+		m_isUnderDefense = true;
 	}
 
 	//キーの名前がBoss_Attack_Scream_startの場合
@@ -856,14 +731,11 @@ void Enemy_Boss::Update()
 	Matrix matrix = m_modelRender.GetBone(m_flyBoneId)->GetWorldMatrix();
 	float boneYPos = matrix.m[3][1];
 	m_charaCon.SetPosition({ m_charaCon.GetPosition().x, boneYPos-350.0f, m_charaCon.GetPosition().z });
+	//当たり判定を動かすため
 	m_moveSpeed.y = 0.0f;
 	m_pos = m_charaCon.Execute(m_moveSpeed, g_gameTime->GetFrameDeltaTime());
 	m_pos.y = 0.0f;
-	//m_charaCon.SetPosition(m_pos);
-	//コリジョンの当たり判定
-	//m_collision->SetPosition(m_collisionPos);
-	//m_collision->Update();
-	
+	//コリジョンのセット
 	m_collision->SetPosition(m_pos);
 	m_collision->SetRotation(m_rotation);
 	m_collision->SetWorldMatrix(matrix);

@@ -164,7 +164,7 @@ public:
 
 	void SetidUnderDefencePattern(bool UnderDefence)
 	{
-		m_isUnderDefence = UnderDefence;
+		m_isUnderDefense = UnderDefence;
 	}
 
 	void SetEffectCount(int effectcount) {
@@ -228,7 +228,7 @@ protected:
 	bool m_isUnderFlyAttack = false;	//UŒ‚’†‚È‚çtrue
 	bool m_isClear = false;				//ƒNƒŠƒA”»’è
 	bool m_isUnderPattern = false;		//s“®’†‚È‚çtrue
-	bool m_isUnderDefence = false;		//–hŒä’†‚È‚çtrue
+	bool m_isUnderDefense = false;		//–hŒä’†‚È‚çtrue
 	bool m_isUnderScream = false;		//•KE‹Z’†‚È‚çtrue
 	bool m_isUnderLanding = false;		//’…’n’†‚È‚çtrue
 	bool m_isUnderFly = false;			//‹ó‚ğ”ò‚ñ‚Å‚¢‚é‚È‚çtrue

@@ -117,33 +117,6 @@ bool Player::Start()
 	m_collision->CreateSphere(m_pos, Quaternion::Identity, 100.0f);
 	m_collision->SetName("player_collsion");
 	m_collision->SetIsEnableAutoDelete(false);
-	////近接攻撃
-	////g_soundEngine->ResistWaveFileBank(9, "Assets/sound/BitAttack.wav");
-	//m_bitAttack = NewGO<SoundSource>(9);
-	//////ガードのノックバック
-	////g_soundEngine->ResistWaveFileBank(10, "Assets/sound/Defense.wav");
-	//m_defense = NewGO<SoundSource>(10);
-	//////ガードブレイク
-	////g_soundEngine->ResistWaveFileBank(11, "Assets/sound/GuardBreak.wav");
-	//m_guardBreak = NewGO<SoundSource>(11);
-	//////走る
-	////g_soundEngine->ResistWaveFileBank(12, "Assets/sound/Run.wav");
-	//m_run = NewGO<SoundSource>(12);
-	//////歩く
-	////g_soundEngine->ResistWaveFileBank(13, "Assets/sound/Walk.wav");
-	//m_walk = NewGO<SoundSource>(13);
-	//////ダッシュ攻撃
-	////g_soundEngine->ResistWaveFileBank(14, "Assets/sound/WalkAttack.wav");
-	//m_walkAttack = NewGO<SoundSource>(14);
-
-	////手首のボーンを受け取る
-	//m_TestBoneId = m_modelRender.FindBoneID(L"mixamorig:RightHand");
-	////攻撃用コリジョンを用意
-	//m_testAttackCollision = NewGO<CollisionObject>(0);
-	//m_testAttackCollision->CreateBox(m_attack_Pos, Quaternion::Identity, { 120.0f,20.0f,20.0f });
-	//m_testAttackCollision->SetName("player_attack");
-	//m_testAttackCollision->SetIsEnableAutoDelete(false);
-
 	return true;
 }
 
@@ -359,14 +332,6 @@ void Player::Update()
 	Defense();
 	GuardBreak();
 	LongAttack(137,200,30.0f);
-	//// 回転
-	////ボーンの座標を受け取るプログラムテスト
-	//Matrix matrix = m_modelRender.GetBone(m_TestBoneId)->GetWorldMatrix();
-	//m_testAttackCollision->SetPosition(m_attack_Pos);
-	//m_testAttackCollision->SetRotation(m_rotation);
-	//m_testAttackCollision->Update();
-	//m_testAttackCollision->SetWorldMatrix(matrix);
-
 }
 
 void Player::Move(float walk_speed, float run_speed, float walkattack_speed)
