@@ -42,8 +42,6 @@ public:
 	void AdjustmentTransparent();
 	//ƒ‚ƒfƒ‹
 	void Render(RenderContext& renderContext);
-	//ƒLƒƒƒ‰‚Ì•\¦
-	void Model1P();
 	//HPŒ¸­ˆ—
 	void DecreaseHP(float decrease)
 	{

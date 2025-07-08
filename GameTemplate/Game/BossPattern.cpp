@@ -178,6 +178,10 @@ void BossPattern::DistancePattern()
 	//Move状態なら追いかける
 	if (m_distance.Length() <= DISTANCE_POS && m_state == enState_Move) {
 		m_moveSpeed = m_diff * CHASE_SPEED;
+		//プレイヤーが一定範囲に入ったら攻撃
+		if (m_distance.Length() <= MELEE_DISTANCE) {
+			ChangeState(Enemy_Boss::enState_Attack_Biting);
+		}
 	}
 }
 void BossPattern::BossPatternMode()

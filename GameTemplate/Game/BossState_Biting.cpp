@@ -17,5 +17,6 @@ void BossState_Biting::Animation()
 
 void BossState_Biting::Update()
 {
+	//ƒ{ƒX‚ÌˆÚ“®‚ð0‚É‚·‚é
 	m_enemy_Boss->SetMoveSpeed(m_enemy_Boss->GetDiff());
 }

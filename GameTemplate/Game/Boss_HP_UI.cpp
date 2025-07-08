@@ -18,6 +18,7 @@ namespace {
 
 bool Boss_HP_UI::Start()
 {
+	//êŠ‚ğ‹³‚¦‚é
 	m_game = FindGO<Game>("game");
 	m_enemy_boss = FindGO<Enemy_Boss>("enemy_boss");//êŠ‚ğ‹³‚¦‚é
 	//‰æ‘œİ’è

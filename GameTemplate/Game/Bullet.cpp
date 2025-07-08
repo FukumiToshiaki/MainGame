@@ -18,6 +18,7 @@ void Bullet::OnDeadEffect()
 }
 bool Bullet::Start()
 {
+	//場所を教える
 	m_player = FindGO<Player>("player");
 	m_boss = FindGO<Enemy_Boss>("enemy_boss");
 	m_pos = m_boss->GetPos();
@@ -48,12 +49,12 @@ bool Bullet::Start()
 	m_boss_shoot->SetScale(Vector3::One * 10.0f);
 	m_boss_shoot->SetPosition(m_boss->GetPos());
 	m_boss_shoot->Play();
-	// エフェクト死亡時のイベント処理
+	//エフェクト死亡時のイベント処理
 	m_onDeadEventFunction = [&] { m_boss_shoot = nullptr;};
-	// イベントを登録
+	//イベントを登録
 	m_boss_shoot->AddDeadEventFunction(m_onDeadEventFunction);
 
-		// エフェクトが死亡した;
+		//エフェクトが死亡した;
 	//コリジョンオブジェクトを作成する
 	m_shootCollision = NewGO<CollisionObject>(0);
 	//球状のコリジョンを作成
@@ -79,6 +80,8 @@ void Bullet::Move()
 {
 	//移動速度
 	m_pos += m_shootPos * 100.0f;
+	//m_boss_shootがnullptrではないのなら
+	//ポジションなどを教える
 	if (m_boss_shoot != nullptr) {
 		m_boss_shoot->SetPosition(m_pos);
 		m_shootCollision->SetPosition(m_pos);

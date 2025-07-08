@@ -17,7 +17,8 @@ bool Boss_Shoot::Start()
 	return true;
 }
 void Boss_Shoot::Init(Enemy_Boss* boss)
-{
+{	
+	//場所を教える
 	m_player = FindGO<Player>("player");
 	m_boss = boss;
 	m_pos = m_boss->GetPos();
@@ -53,6 +54,7 @@ void Boss_Shoot::Shoot()
 }
 void Boss_Shoot::FlyShoot()
 {
+	//ボスステートがフライショット以外ならreturn
 	if (m_boss->m_state != Enemy_Boss::enState_Attack_FlyShoot) {
 		return;
 	}
@@ -63,6 +65,7 @@ void Boss_Shoot::FlyShoot()
 			enSoundShoot,
 			g_soundManager->GetSEVolume()
 		);
+		//ブレスを発生させる
 		m_bullet = NewGO<Bullet>(0, "bullet");
 	}
 

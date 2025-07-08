@@ -60,9 +60,11 @@ bool Game::Start()
 
 void Game::Update()
 {
+	//ボスのHPが0になったらクリアのステートに
 	if (m_enemy_Boss->GetHP() <= 0) {
 		m_gameState = enGameClear;
 	}
+	//プレイヤーのHPが0になったらゲームオーバーのステートに
 	if (m_player->GetHP() <= 0.0f) {
 		m_gameState = enGameOver;
 	}
